@@ -291,7 +291,8 @@ export const COURSE: Unit[] = BOOK_CHAPTERS.map((ch) => ({
       section: sec.id,
       title: sec.title,
       summary: sec.headline,
-      steps: [read, ...rest],
+      // Hand-written chapters open with their own story cards instead of the summary card.
+      steps: WRITTEN[sec.id]?.[0]?.type === "story" ? rest : [read, ...rest],
       fact: { front: `${sec.title}?`, back: `${sec.headline}. ${sec.text}` },
     };
   }),

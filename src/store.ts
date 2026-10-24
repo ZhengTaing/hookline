@@ -20,6 +20,7 @@ export interface Progress {
 }
 
 const GUEST_KEY = "hookline.progress";
+const RESET_KEY = "hookline.resetTag";
 
 export function emptyProgress(): Progress {
   return { visits: [], completedLessons: [], xp: 0, best: {}, review: [] };
@@ -44,6 +45,12 @@ export async function loadProgress(userId: string | null): Promise<Progress> {
     return normalize(data?.data);
   }
   try {
+    // Test builds carry a reset tag; a new tag starts guest progress over.
+    const tag = import.meta.env.VITE_RESET_TAG as string | undefined;
+    if (tag && localStorage.getItem(RESET_KEY) !== tag) {
+      localStorage.removeItem(GUEST_KEY);
+      localStorage.setItem(RESET_KEY, tag);
+    }
     return normalize(JSON.parse(localStorage.getItem(GUEST_KEY) ?? "null"));
   } catch {
     return emptyProgress();

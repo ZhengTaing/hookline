@@ -69,18 +69,21 @@ describe("chord spelling", () => {
 });
 
 describe("course path", () => {
-  it("has one step per book section, each opening with its read-and-hear card", () => {
+  it("has one step per book section, each opening with its read-and-hear card or story cards", () => {
     const sections = BOOK_CHAPTERS.flatMap((c) => c.sections.map((s) => s.id));
     expect(sections.length).toBe(189);
     expect(allLessons().map((l) => l.id)).toEqual(sections);
-    for (const l of allLessons()) expect(l.steps[0].type, l.id).toBe("read");
+    for (const l of allLessons()) expect(["read", "story"], l.id).toContain(l.steps[0].type);
   });
 
-  it("follows the mockup's steps, with no story cards, duels or timed rounds", () => {
-    const gameTypes = new Set(["story", "duel", "rush", "songMatch"]);
+  it("follows the mockup's steps, with no duels or timed rounds", () => {
+    const gameTypes = new Set(["duel", "rush", "songMatch"]);
     const moved = allLessons().filter((l) => NEW_LAYOUT.has(Number(l.id.split(".")[0])));
     expect(moved.length).toBeGreaterThan(0);
-    for (const l of moved) for (const s of l.steps) expect(gameTypes.has(s.type), `${l.id} has a ${s.type} step`).toBe(false);
+    for (const l of moved) {
+      for (const s of l.steps) expect(gameTypes.has(s.type), `${l.id} has a ${s.type} step`).toBe(false);
+      expect(l.steps.some((s) => s.type === "practice" && s.title === "Use it in real songs"), `${l.id} has no real-song step`).toBe(true);
+    }
   });
 
   it("builds each short check from the section's own card", () => {

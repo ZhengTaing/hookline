@@ -1,9 +1,10 @@
 import { parseNote } from "../music";
-import type { RushQuestion, Sound, Step } from "./types";
+import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
-// Chapter 1 in the Lesson Types layout: after each section's card, name it on the staff,
-// build it on the guitar, and name it by ear. Every question practises only what that
-// section's card just explained, and every answer says why.
+// Chapter 1 in the Lesson Types layout: story cards with the book's explanation (every card
+// shows its notes on the staff), then name it on the staff, build it on the guitar, name it
+// by ear, and use it in a real song. Every question practises only what that section's cards
+// explained, and every answer says why.
 
 const notes = (...names: string[]): Sound => ({ kind: "melodic", notes: names.map((n) => parseNote(n).midi), gap: 0.6 });
 
@@ -27,8 +28,20 @@ const firstOrSecond = (a: string, b: string, why: string): RushQuestion => ({
   miss: why,
 });
 
+const card = (text: string, staff: string[], sound: Sound = notes(...staff)): StoryCard => ({ text, staff, sound });
+const story = (...cards: StoryCard[]): Step => ({ type: "story", cards });
+
+/** A "Use it in real songs" step. */
+const songs = (...questions: RushQuestion[]): Step => ({ type: "practice", title: "Use it in real songs", questions });
+
 export const CHAPTER_1: Record<string, Step[]> = {
   "1.1": [
+    story(
+      card("Pitch is how high or low a note sounds. A piano has 88 notes: they sound higher as you move right and lower as you move left.", ["C4", "E4", "G4", "C5"]),
+      card("On the staff, higher notes are drawn higher up. These four notes climb, so they climb on the page too.", ["E4", "G4", "B4", "D5"]),
+      card("On guitar, each fret toward the body raises the pitch a half step. On the A string, fret 5 (D) sounds higher than fret 2 (B).", ["B3", "D4"], notes("B2", "D3")),
+      card("Listen from low to high. The further up the staff, the higher it sounds.", ["C4", "G4", "C5", "G5"]),
+    ),
     {
       type: "practice",
       title: "Name it on the guitar",
@@ -70,9 +83,24 @@ export const CHAPTER_1: Record<string, Step[]> = {
         firstOrSecond("D4", "D5", "The second note was higher: the same letter, one octave up"),
       ],
     },
+    songs({
+      kind: "choice",
+      prompt: "The riff from “Seven Nation Army” by The White Stripes. Which note is the highest?",
+      options: ["E", "G", "B"],
+      answer: "G",
+      sound: notes("E3", "E3", "G3", "E3", "D3", "C3", "B2"),
+      miss: "The riff jumps up from E to G, then walks down D, C, B",
+    }),
   ],
 
   "1.2": [
+    story(
+      card("Music is written on a staff: five lines and the four spaces between them. A clef at the start says which note each line is.", ["G4"]),
+      card("This is the treble clef, also called the G clef: its curl wraps around the G line. Guitar music is written in treble clef.", ["G4"]),
+      card("The lines, bottom to top, are E G B D F. Remember them as “Every Good Boy Does Fine”.", ["E4", "G4", "B4", "D5", "F5"]),
+      card("The spaces, bottom to top, spell F A C E.", ["F4", "A4", "C5", "E5"]),
+      card("Music uses just seven letters, A to G, then starts again. Short ledger lines extend the staff for notes above or below it.", ["C4", "A5"]),
+    ),
     {
       type: "practice",
       title: "Name it on the staff",
@@ -97,9 +125,35 @@ export const CHAPTER_1: Record<string, Step[]> = {
         },
       ],
     },
+    songs(
+      {
+        kind: "choice",
+        prompt: "The start of “Ode to Joy” by Beethoven. Which note does it start on?",
+        options: ["E", "F", "G", "D"],
+        answer: "E",
+        visual: { type: "staff", notes: ["E4", "E4", "F4", "G4", "G4", "F4", "E4", "D4"] },
+        sound: notes("E4", "E4", "F4", "G4", "G4", "F4", "E4", "D4"),
+        miss: "It starts on the bottom line, E. Every Good Boy Does Fine",
+      },
+      {
+        kind: "choice",
+        prompt: "Same tune. Which note is the highest?",
+        options: ["E", "F", "G", "D"],
+        answer: "G",
+        visual: { type: "staff", notes: ["E4", "E4", "F4", "G4", "G4", "F4", "E4", "D4"] },
+        sound: notes("E4", "E4", "F4", "G4", "G4", "F4", "E4", "D4"),
+        miss: "The highest notes sit on the second line, G",
+      },
+    ),
   ],
 
   "1.3": [
+    story(
+      card("88 piano keys but only seven letters, so the letters repeat. From one note to the next note with the same name is an octave (8ve).", ["C4", "C5"]),
+      card("Each octave gets a number, counting up from C. Middle C is C4. In treble clef it sits on the ledger line just below the staff.", ["C4"]),
+      card("The number changes at every C. So the B right below middle C is B3, and the D right above it is D4.", ["B3", "C4", "D4"]),
+      card("C5 is in the third space, one octave above middle C. C6 sits two ledger lines above the staff.", ["C4", "C5", "C6"]),
+    ),
     {
       type: "practice",
       title: "Name it on the staff",
@@ -131,9 +185,23 @@ export const CHAPTER_1: Record<string, Step[]> = {
         },
       ],
     },
+    songs({
+      kind: "choice",
+      prompt: "The first two notes of “Somewhere Over the Rainbow” (“Some-where”) are the same letter. How far apart are they?",
+      options: ["One octave", "The same note", "Two octaves"],
+      answer: "One octave",
+      sound: notes("C4", "C5"),
+      miss: "The melody leaps up an octave, from C4 to C5",
+    }),
   ],
 
   "1.4": [
+    story(
+      card("Accidentals are signs placed in front of a note to raise or lower it.", ["F4", "F#4"]),
+      card("A sharp ♯ raises a note a half step. On guitar that's one fret up: F on the low E string is fret 1, F♯ is fret 2.", ["F4", "F#4"]),
+      card("A flat ♭ lowers a note a half step: one fret down.", ["B4", "Bb4"]),
+      card("A natural ♮ cancels a sharp or flat. A double sharp or double flat moves a note two half steps, a whole step.", ["C#5", "C5"]),
+    ),
     {
       type: "practice",
       title: "Name it on the staff",
@@ -173,9 +241,24 @@ export const CHAPTER_1: Record<string, Step[]> = {
         },
       ],
     },
+    songs({
+      kind: "choice",
+      prompt: "The riff from “Smoke on the Water” by Deep Purple. Which two notes have flats?",
+      options: ["B♭ and D♭", "B and D", "G and C"],
+      answer: "B♭ and D♭",
+      visual: { type: "staff", notes: ["G4", "Bb4", "C5", "G4", "Bb4", "Db5", "C5"] },
+      sound: notes("G3", "Bb3", "C4", "G3", "Bb3", "Db4", "C4"),
+      miss: "The ♭ signs sit in front of B and D: the riff is G, B♭, C, then G, B♭, D♭, C",
+    }),
   ],
 
   "1.5": [
+    story(
+      card("C♯ and D♭ are the same piano key and the same guitar fret, but they're written in different places on the staff.", ["C#4", "Db4"]),
+      card("Every black key has two names: C♯/D♭, D♯/E♭, F♯/G♭, G♯/A♭ and A♯/B♭.", ["F#4", "Gb4"]),
+      card("Notes that sound the same but are written differently are enharmonic. White keys can be too: E♯ sounds the same as F.", ["E#4", "F4"]),
+      card("Which name to use depends on the key you're in. You'll see why in chapter 2.", ["A#4", "Bb4"]),
+    ),
     {
       type: "practice",
       title: "Name it",
@@ -207,5 +290,14 @@ export const CHAPTER_1: Record<string, Step[]> = {
         },
       ],
     },
+    songs({
+      kind: "choice",
+      prompt: "“Für Elise” by Beethoven starts E, D♯, E, D♯. On guitar, D♯ is the same fret as which note?",
+      options: ["E♭", "D", "E"],
+      answer: "E♭",
+      visual: { type: "staff", notes: ["E5", "D#5", "E5", "D#5", "E5"] },
+      sound: notes("E5", "D#5", "E5", "D#5", "E5", "B4", "D5", "C5", "A4"),
+      miss: "D♯ and E♭ are enharmonic: one fret, two names",
+    }),
   ],
 };

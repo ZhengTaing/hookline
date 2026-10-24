@@ -13,6 +13,8 @@ export interface StoryCard {
   left?: string;
   right?: string;
   label?: string;
+  /** Notes drawn on the treble staff instead of the bubbles, e.g. ["C4", "C5"]. */
+  staff?: string[];
   sound: Sound;
 }
 

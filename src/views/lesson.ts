@@ -112,25 +112,32 @@ export function runLesson(
     const draw = (withSound: boolean) => {
       const c = cards[i];
       const dots = cards.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("");
-      const viz =
-        c.left || c.right
+      const viz = c.staff
+        ? staffSvg(c.staff)
+        : c.left || c.right
           ? `<div class="viz"><span class="bubble fill">${c.left ?? ""}</span><span class="gap"><span>${c.label ?? ""}</span></span><span class="bubble">${c.right ?? ""}</span></div>`
           : `<div class="viz"><span class="bubble fill">♪</span></div>`;
       const last = i === cards.length - 1;
       frame(`
         <div class="minibars">${dots}</div>
-        <p class="eyebrow">Intro · book section ${lesson.section}</p>
-        <button class="story" type="button" data-tap aria-label="${last ? "Hear it again" : "Next card"}">
-          ${viz}<span class="story-text">${c.text}</span>
+        <p class="eyebrow">Book section ${lesson.section} · ${i + 1} of ${cards.length}</p>
+        <button class="story" type="button" data-tap aria-label="Hear it again">
+          ${viz}<span class="story-text${c.text.length > 90 ? " long" : ""}">${c.text}</span>
         </button>
-        <p class="hint">${last ? "Tap the card to hear it again" : "Tap the card for the next one"}</p>
-        ${last ? `<button class="btn" type="button" data-next>Got it</button>` : ""}`);
+        <p class="hint">Tap the card to hear it again</p>
+        <div class="row push">
+          <button class="btn ghost" type="button" data-prev ${i === 0 ? "disabled" : ""}>Back</button>
+          <button class="btn" type="button" ${last ? "data-next" : "data-fwd"}>${last ? "Got it" : "Next"}</button>
+        </div>`);
       if (withSound) play(c.sound);
-      root.querySelector("[data-tap]")!.addEventListener("click", () => {
-        if (i < cards.length - 1) {
-          i++;
-          draw(true);
-        } else play(c.sound);
+      root.querySelector("[data-tap]")!.addEventListener("click", () => play(c.sound));
+      root.querySelector("[data-prev]")!.addEventListener("click", () => {
+        i--;
+        draw(true);
+      });
+      root.querySelector("[data-fwd]")?.addEventListener("click", () => {
+        i++;
+        draw(true);
       });
       root.querySelector("[data-next]")?.addEventListener("click", next);
     };
