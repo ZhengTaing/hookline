@@ -15,6 +15,8 @@ export interface StoryCard {
   label?: string;
   /** Notes drawn on the treble staff instead of the bubbles, e.g. ["C4", "C5"]. */
   staff?: string[];
+  /** Sharps (positive) or flats (negative) in the staff's key signature. */
+  keySig?: number;
   sound: Sound;
 }
 
@@ -40,7 +42,12 @@ export type RushQuestion =
   | { kind: "choice"; prompt: string; options: string[]; answer: string; visual?: Visual; sound?: Sound; miss: string }
   /** `hint` shows under the fretboard before answering, saying how to find it. */
   | { kind: "fretInterval"; string: number; fret: number; semitones: number; label: string; hint?: string }
-  | { kind: "findNote"; pitchClass: number; prompt?: string; hint?: string };
+  | { kind: "findNote"; pitchClass: number; prompt?: string; hint?: string }
+  /**
+   * Tap tiles into the empty slots, in order. `given` holds the filled slots (null = empty),
+   * `answer` the whole row, `tiles` the choices (decoys allowed), `labels` small text under each slot.
+   */
+  | { kind: "order"; prompt: string; given: (string | null)[]; answer: string[]; tiles: string[]; labels?: string[]; visual?: Visual; sound?: Sound; miss: string };
 
 export interface SongRound {
   notes: [number, number];

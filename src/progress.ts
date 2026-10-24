@@ -4,7 +4,8 @@ import type { LessonResult } from "./views/lesson";
 
 /** Folds a finished lesson into progress. Missed items come back the next day. */
 export function applyResult(progress: Progress, result: LessonResult, tomorrow: string): Progress {
-  const completed = progress.completedLessons.includes(result.lessonId)
+  // Chapter practice runs ("practice-2") count XP and misses but don't complete a section.
+  const completed = progress.completedLessons.includes(result.lessonId) || result.lessonId.startsWith("practice-")
     ? progress.completedLessons
     : [...progress.completedLessons, result.lessonId];
   const known = new Set(progress.review.map((r) => r.text));

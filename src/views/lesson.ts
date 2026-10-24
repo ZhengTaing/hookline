@@ -113,7 +113,7 @@ export function runLesson(
       const c = cards[i];
       const dots = cards.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("");
       const viz = c.staff
-        ? staffSvg(c.staff)
+        ? staffSvg(c.staff, { keySig: c.keySig })
         : c.left || c.right
           ? `<div class="viz"><span class="bubble fill">${c.left ?? ""}</span><span class="gap"><span>${c.label ?? ""}</span></span><span class="bubble">${c.right ?? ""}</span></div>`
           : `<div class="viz"><span class="bubble fill">♪</span></div>`;
@@ -293,6 +293,60 @@ export function runLesson(
             answer(ok, `${displayName(question.lower)} up to ${displayName(question.upper)} is a ${right}`);
           }),
         );
+        return;
+      }
+
+      if (question.kind === "order") {
+        const picks: (string | null)[] = [...question.given];
+        let checked = false;
+        const drawOrder = () => {
+          const slots = picks
+            .map((p, i) => {
+              const given = question.given[i] !== null;
+              const mark = checked && !given ? (p === question.answer[i] ? " right" : " wrong") : "";
+              return `<button class="slot${given ? " given" : ""}${mark}" type="button" data-slot="${i}" ${given ? "disabled" : ""}>${p ?? ""}</button>`;
+            })
+            .join("");
+          const labels = question.labels ? `<div class="slot-labels" style="--n:${picks.length}">${question.labels.map((l) => `<span>${l}</span>`).join("")}</div>` : "";
+          frame(`${head()}
+            <h2>${question.prompt}</h2>
+            <div class="song-grid order" style="--n:${picks.length}">${slots}</div>${labels}
+            ${question.visual ? visualHtml(question.visual) : ""}
+            <div class="opts">${question.tiles.map((t) => `<button class="opt" type="button" data-tile="${t}" ${checked ? "disabled" : ""}>${t}</button>`).join("")}</div>
+            <p class="fb${checked ? (picks.every((p, i) => p === question.answer[i]) ? " ok" : " no") : ""}" aria-live="polite"></p>
+            <div class="row push">
+              ${question.sound ? `<button class="btn ghost" type="button" data-sound>▶ Hear it</button>` : ""}
+              ${checked ? foot().replace(" push", "") : `<button class="btn" type="button" data-check ${picks.some((p) => p === null) ? "disabled" : ""}>Check</button>`}
+            </div>`);
+          const fb = root.querySelector(".fb")!;
+          if (checked) {
+            const ok = picks.every((p, i) => p === question.answer[i]);
+            fb.textContent = `${ok ? "Yes." : `Not quite: ${question.answer.join(" ")}.`} ${sentence(question.miss)}`;
+          } else fb.textContent = "Tap a choice to fill the next empty slot. Tap a slot to clear it.";
+          if (question.sound) root.querySelector("[data-sound]")!.addEventListener("click", () => play(question.sound!));
+          root.querySelectorAll<HTMLButtonElement>("[data-tile]").forEach((b) =>
+            b.addEventListener("click", () => {
+              const i = picks.indexOf(null);
+              if (i >= 0) picks[i] = b.dataset.tile!;
+              drawOrder();
+            }),
+          );
+          root.querySelectorAll<HTMLButtonElement>(".slot:not(.given)").forEach((b) =>
+            b.addEventListener("click", () => {
+              if (checked) return;
+              picks[Number(b.dataset.slot)] = null;
+              drawOrder();
+            }),
+          );
+          root.querySelector("[data-check]")?.addEventListener("click", () => {
+            checked = true;
+            const ok = picks.every((p, i) => p === question.answer[i]);
+            drawOrder();
+            if (question.sound) play(question.sound);
+            answer(ok, question.miss);
+          });
+        };
+        drawOrder();
         return;
       }
 

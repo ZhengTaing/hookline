@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { intervalName, parseNote } from "../music";
 import { KEY_TABLES } from "./chapters-2-4";
 import { CHORD_HELPERS } from "./chapters-6-9";
-import { NEW_LAYOUT, allLessons } from "./content";
+import { NEW_LAYOUT, allLessons, chapterPractice } from "./content";
 import { BOOK_CHAPTERS } from "./sections";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -51,6 +51,21 @@ describe("choice questions", () => {
   });
 });
 
+describe("put it in order", () => {
+  it("keeps given slots in the answer and offers every missing note as a tile", () => {
+    for (const l of allLessons())
+      for (const s of l.steps)
+        if (s.type === "practice")
+          for (const q of s.questions)
+            if (q.kind === "order") {
+              expect(q.given.length, l.id).toBe(q.answer.length);
+              q.given.forEach((g, i) => g !== null && expect(g, l.id).toBe(q.answer[i]));
+              const missing = q.answer.filter((_, i) => q.given[i] === null);
+              for (const m of missing) expect(q.tiles, `${l.id} ${q.prompt}`).toContain(m);
+            }
+  });
+});
+
 describe("key tables", () => {
   it("match the key signatures the scale speller works out", () => {
     for (const [sig, key] of Object.entries(KEY_TABLES.MAJOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "major"), key).toBe(Number(sig));
@@ -96,5 +111,15 @@ describe("course path", () => {
           if (s.type === "practice" && s.title === "Check")
             for (const q of s.questions) if (q.kind === "choice") expect(own, `${sec.id} check`).toContain(q.answer);
       }
+  });
+});
+
+describe("chapter practice", () => {
+  it("gathers every question from a chapter's sections without story cards", () => {
+    const drill = chapterPractice(2)!;
+    expect(drill.steps.some((s) => s.type === "story")).toBe(false);
+    const count = (steps: typeof drill.steps) => steps.reduce((n, s) => n + (s.type === "practice" ? s.questions.length : 0), 0);
+    const lessons = allLessons().filter((l) => l.id.startsWith("2."));
+    expect(count(drill.steps)).toBe(lessons.reduce((n, l) => n + count(l.steps), 0));
   });
 });

@@ -1,4 +1,5 @@
 import { CHAPTER_1 } from "./chapter-1";
+import { CHAPTER_2 } from "./chapter-2";
 import { CHAPTERS_2_4 } from "./chapters-2-4";
 import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
@@ -193,9 +194,9 @@ const GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLesson));
  * Chapters moved to the new lesson layout so far. The rest keep the earlier layout until
  * each one is checked, one chapter at a time.
  */
-export const NEW_LAYOUT = new Set([1]);
+export const NEW_LAYOUT = new Set([1, 2]);
 /** Hand-written steps for chapters in the new layout. */
-const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1 };
+const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2 };
 const OLD_GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLessonV2));
 const order = (id: string) => id.split(".").map(Number);
 const atOrBefore = (a: string, b: string) => order(a)[0] < order(b)[0] || (order(a)[0] === order(b)[0] && order(a)[1] <= order(b)[1]);
@@ -304,4 +305,22 @@ export function allLessons() {
 
 export function findLesson(id: string) {
   return allLessons().find((l) => l.id === id);
+}
+
+/**
+ * Extra practice for a whole chapter: every question from its sections' lessons, section by
+ * section, with no story cards. Finishing it adds XP and review cards but no completed lesson.
+ */
+export function chapterPractice(n: number): Lesson | undefined {
+  const unit = COURSE[n - 1];
+  if (!unit) return undefined;
+  const steps = unit.lessons.flatMap((l) =>
+    l.steps.flatMap((s): Step[] => {
+      if (s.type === "practice") return [{ ...s, title: `${l.id} · ${s.title}` }];
+      if (s.type === "rush") return [{ type: "practice", title: `${l.id} · ${s.source}`, questions: s.questions }];
+      if (s.type === "realSong" || s.type === "tapBeat") return [s];
+      return [];
+    }),
+  );
+  return steps.length ? { id: `practice-${n}`, section: String(n), title: `Chapter ${n} practice`, summary: unit.title, steps } : undefined;
 }

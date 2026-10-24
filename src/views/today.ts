@@ -1,4 +1,4 @@
-import { COURSE } from "../lessons/content";
+import { COURSE, chapterPractice } from "../lessons/content";
 import type { Lesson, Unit } from "../lessons/types";
 import { dueCards, isUnlocked, nextLessonId } from "../progress";
 import type { Progress } from "../store";
@@ -6,7 +6,7 @@ import { bestStreak, currentStreak, recentDays } from "../streak";
 
 /** Rough minutes for a section: the summary and a check, or a full game lesson. */
 function minutes(lesson: Lesson): number {
-  return lesson.steps.some((s) => s.type === "rush") ? 6 : 2;
+  return lesson.steps.some((s) => s.type === "rush") || lesson.steps.length > 4 ? 6 : 2;
 }
 
 function chapterOf(lessonId: string): Unit | undefined {
@@ -79,7 +79,7 @@ export function renderChapter(progress: Progress, n: number): string {
       const open = isUnlocked(progress, l.id);
       const state = done ? "done" : l.id === nextId ? "next" : open ? "open" : "locked";
       const label = done ? "Done" : l.id === nextId ? "Now" : "";
-      const game = minutes(l) > 2 ? `<span class="tag">Game</span>` : "";
+      const game = l.steps.some((s) => s.type === "rush") ? `<span class="tag">Game</span>` : "";
       const inner = `<span class="unit-n">${l.id}</span>
         <span class="unit-text"><strong>${l.title}</strong><small>${l.summary}</small>${game}</span>
         <em>${label}</em>`;
@@ -103,6 +103,7 @@ export function renderChapter(progress: Progress, n: number): string {
             ? `<p class="muted">Chapter done. Replay any section above.</p>`
             : `<p class="muted">Finish the earlier chapters to open this one.</p>`
       }
+      ${chapterPractice(n) ? `<a class="btn ghost" href="#drill/${n}">Practice this chapter's questions</a>` : ""}
       ${n < COURSE.length ? `<a class="btn ghost" href="#chapter/${n + 1}">Next chapter: ${COURSE[n].title}</a>` : ""}
     </section>`;
 }

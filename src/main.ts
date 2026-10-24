@@ -1,7 +1,7 @@
 import "./style.css";
 import type { Session } from "@supabase/supabase-js";
 import { ICONS } from "./icons";
-import { COURSE, findLesson } from "./lessons/content";
+import { COURSE, chapterPractice, findLesson } from "./lessons/content";
 import { answerCard, applyResult, nextLessonId } from "./progress";
 import { emptyProgress, loadProgress, saveProgress, type Progress } from "./store";
 import { currentStreak, dayKey, recordVisit } from "./streak";
@@ -65,7 +65,9 @@ function shell(tab: Tab, body: string): void {
 async function finishLesson(result: LessonResult, title: string): Promise<void> {
   stopLesson = null;
   progress = applyResult(progress, result, tomorrow());
-  const chapter = COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
+  const chapter = result.lessonId.startsWith("practice-")
+    ? Number(result.lessonId.slice("practice-".length))
+    : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
   shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress)));
   window.scrollTo(0, 0);
   try {
@@ -93,6 +95,22 @@ function route(): void {
         lesson,
         (result) => void finishLesson(result, lesson.title),
         () => (location.hash = `#chapter/${COURSE.findIndex((u) => u.lessons.includes(lesson)) + 1}`),
+      );
+      return;
+    }
+  }
+
+  if (hash.startsWith("drill/")) {
+    const n = Number(hash.slice("drill/".length));
+    const drill = chapterPractice(n);
+    if (drill) {
+      app.innerHTML = `<main class="lesson-root"></main>`;
+      window.scrollTo(0, 0);
+      stopLesson = runLesson(
+        app.querySelector<HTMLElement>(".lesson-root")!,
+        drill,
+        (result) => void finishLesson(result, drill.title),
+        () => (location.hash = `#chapter/${n}`),
       );
       return;
     }
