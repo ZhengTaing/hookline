@@ -1,11 +1,15 @@
 import "./style.css";
 import type { Session } from "@supabase/supabase-js";
 import { ICONS } from "./icons";
-import { loadProgress, saveProgress, type Progress } from "./store";
-import { dayKey, recordVisit } from "./streak";
+import { findLesson } from "./lessons/content";
+import { applyResult } from "./progress";
+import { emptyProgress, loadProgress, saveProgress, type Progress } from "./store";
+import { currentStreak, dayKey, recordVisit } from "./streak";
 import { supabase } from "./supabase";
+import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
+import { renderResults } from "./views/results";
 import { renderToday } from "./views/today";
 
 type Tab = "learn" | "practice" | "songs" | "chords" | "quiz";
@@ -18,27 +22,27 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
-let progress: Progress = { visits: [], completedLessons: [] };
+let progress: Progress = emptyProgress();
 let isNewToday = false;
 let userId: string | null = null;
 let email = "";
-
-function currentTab(): Tab {
-  const t = location.hash.slice(1) as Tab;
-  return TABS.some((x) => x.id === t) ? t : "learn";
-}
+let signedIn = false;
+let stopLesson: (() => void) | null = null;
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
-function renderShell(): void {
-  const tab = currentTab();
-  const body = tab === "learn" ? renderToday(progress, dayKey(new Date()), isNewToday) : renderPlaceholder(tab);
+function tomorrow(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return dayKey(d);
+}
+
+function shell(tab: Tab, body: string): void {
   const account = supabase
     ? `<button class="link" type="button" id="sign-out">Log out</button>`
     : `<span class="muted">Guest mode</span>`;
-
   app.innerHTML = `
     <header class="top">
       <span class="wordmark">Hookline</span>
@@ -52,10 +56,48 @@ function renderShell(): void {
       ).join("")}
     </nav>
   `;
-
   document.querySelector("#sign-out")?.addEventListener("click", async () => {
     await supabase?.auth.signOut();
   });
+}
+
+async function finishLesson(result: LessonResult, title: string): Promise<void> {
+  stopLesson = null;
+  progress = applyResult(progress, result, tomorrow());
+  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title));
+  window.scrollTo(0, 0);
+  try {
+    await saveProgress(userId, progress);
+  } catch {
+    const note = document.createElement("p");
+    note.className = "fb no";
+    note.textContent = "Your result couldn't be saved. Check your connection, then play the lesson again.";
+    app.querySelector(".results")?.prepend(note);
+  }
+}
+
+function route(): void {
+  stopLesson?.();
+  stopLesson = null;
+  const hash = location.hash.slice(1);
+
+  if (hash.startsWith("lesson/")) {
+    const lesson = findLesson(hash.slice("lesson/".length));
+    if (lesson) {
+      app.innerHTML = `<main class="lesson-root"></main>`;
+      window.scrollTo(0, 0);
+      stopLesson = runLesson(
+        app.querySelector<HTMLElement>(".lesson-root")!,
+        lesson,
+        (result) => void finishLesson(result, lesson.title),
+        () => (location.hash = "#learn"),
+      );
+      return;
+    }
+  }
+
+  const tab = (TABS.some((t) => t.id === hash) ? hash : "learn") as Tab;
+  shell(tab, tab === "learn" ? renderToday(progress, dayKey(new Date()), isNewToday) : renderPlaceholder(tab));
 }
 
 function renderError(message: string): void {
@@ -74,13 +116,15 @@ async function enter(id: string | null, userEmail = ""): Promise<void> {
       progress = { ...progress, visits: recordVisit(progress.visits, today) };
       await saveProgress(userId, progress);
     }
-    renderShell();
+    signedIn = true;
+    route();
   } catch (e) {
     renderError(e instanceof Error ? e.message : "Your progress couldn't be loaded.");
   }
 }
 
 function showLogin(message = "", mode: "signin" | "signup" = "signin"): void {
+  signedIn = false;
   app.innerHTML = renderLogin(message, mode);
   const form = document.querySelector<HTMLFormElement>("#login-form")!;
   const msg = form.querySelector<HTMLParagraphElement>(".form-msg")!;
@@ -128,7 +172,7 @@ async function start(): Promise<void> {
 }
 
 window.addEventListener("hashchange", () => {
-  if (userId !== null || !supabase) renderShell();
+  if (signedIn) route();
 });
 
 void start();

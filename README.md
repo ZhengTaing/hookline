@@ -36,3 +36,9 @@ The anon key is meant to be public. Your data is protected by the row level secu
 | `npm run dev` | Local dev server |
 | `npm test` | Unit tests (streak logic) |
 | `npm run build` | Type-check and build to `dist/` |
+
+## Lessons
+
+Lesson content lives in [`src/lessons/content.ts`](src/lessons/content.ts). Each lesson is a list of steps: story cards, sound duels, a timed rush (staff and fretboard questions), and song matching. `npm test` checks that every answer is among its choices.
+
+Lessons are adapted from Robert Hutchinson, *Music Theory for the 21st-Century Classroom* ([musictheory.pugetsound.edu](https://musictheory.pugetsound.edu)), under the GNU Free Documentation License 1.2. Adapted lesson text stays under that license.
