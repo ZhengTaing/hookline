@@ -53,6 +53,8 @@ export type Step =
   | { type: "songMatch"; rounds: SongRound[] }
   /** A book section's summary, with its examples as sound chips to tap. */
   | { type: "read"; section: string; title: string; headline: string; text: string; chips: { label: string; sound: Sound }[] }
+  /** A worked example of a question format, shown before that format is first quizzed. */
+  | { type: "demo"; question: RushQuestion; note: string }
   /** An untimed question set: identify, build on the fretboard, or name it by ear. */
   | { type: "practice"; title: string; questions: RushQuestion[] }
   /** Label each chord of a real song with a Roman numeral (or other label). */

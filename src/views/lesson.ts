@@ -1,6 +1,7 @@
 import { chord, feedback, melodic, tone } from "../audio";
 import { INTERVAL_WORDS, NOTE_NAMES, displayName, fretMidi, intervalName, parseNote } from "../music";
 import type { DuelRound, Lesson, RushQuestion, Sound, Step, Visual } from "../lessons/types";
+import { spotsFor } from "../lessons/demos";
 import { fretboardSvg, staffSvg } from "../ui/notation";
 
 export interface LessonResult {
@@ -98,6 +99,7 @@ export function runLesson(
     else if (step.type === "rush") rush(step.seconds, step.source, step.questions);
     else if (step.type === "practice") rush(0, step.title, step.questions);
     else if (step.type === "read") read(step);
+    else if (step.type === "demo") demo(step);
     else if (step.type === "realSong") realSong(step);
     else if (step.type === "songMatch") songMatch(step.rounds);
     else tapBeat(step);
@@ -376,6 +378,49 @@ export function runLesson(
         play(step.chips[Number(b.dataset.chip)].sound);
       }),
     );
+    root.querySelector("[data-next]")!.addEventListener("click", next);
+  }
+
+  // ---- worked example ----
+  function demo(step: Extract<Step, { type: "demo" }>): void {
+    const q = step.question;
+    let prompt = "";
+    let body = "";
+    let sound: Sound | null = null;
+    if (q.kind === "findNote") {
+      prompt = q.prompt ?? `Find ${NOTE_NAMES[q.pitchClass]}`;
+      body = `<p class="big-note">${NOTE_NAMES[q.pitchClass]}</p>${fretboardSvg(spotsFor(q.pitchClass).map((p) => ({ ...p, tone: "right" as const })))}`;
+    } else if (q.kind === "fretInterval") {
+      const base = fretMidi(q.string, q.fret);
+      prompt = `Tap a ${q.label} above ${NOTE_NAMES[base % 12]}`;
+      const answers = spotsFor((base + q.semitones) % 12).filter((p) => fretMidi(p.string, p.fret) > base);
+      body = fretboardSvg([{ string: q.string, fret: q.fret, tone: "given" }, ...answers.map((p) => ({ ...p, tone: "right" as const }))]);
+      sound = { kind: "melodic", notes: [base, base + q.semitones], gap: 0.45 };
+    } else if (q.kind === "staff") {
+      const named = q.options.some((o) => /^[PMm+°]/.test(o));
+      const size = parseNote(q.upper).step - parseNote(q.lower).step + 1;
+      const answer = named ? intervalName(q.lower, q.upper) : SIZE_WORDS[size];
+      prompt = named ? "Name this interval" : "How big is this interval?";
+      body = `${staffSvg([q.lower, q.upper])}<div class="opts">${q.options.map((o) => `<span class="opt${o === answer ? " right" : ""}">${o}</span>`).join("")}</div>`;
+      sound = { kind: "melodic", notes: [parseNote(q.lower).midi, parseNote(q.upper).midi], gap: 0.45 };
+    } else {
+      prompt = q.prompt;
+      const visual = q.visual ? visualHtml(q.visual) : "";
+      body = `${visual}<div class="opts${q.options.some((o) => o.length > 14) ? " stack" : ""}">${q.options.map((o) => `<span class="opt${o === q.answer ? " right" : ""}">${o}</span>`).join("")}</div>`;
+      sound = q.sound && q.sound.kind !== "none" ? q.sound : null;
+    }
+    frame(`
+      <p class="eyebrow">Watch one first</p>
+      <h2>${prompt}</h2>
+      ${body}
+      ${sound ? `<button class="btn ghost" type="button" data-sound>▶ Hear it</button>` : ""}
+      <p class="demo-note">${step.note}</p>
+      <button class="btn push" type="button" data-next>Your turn</button>`);
+    if (sound) {
+      const s = sound;
+      root.querySelector("[data-sound]")!.addEventListener("click", () => play(s));
+      play(s);
+    }
     root.querySelector("[data-next]")!.addEventListener("click", next);
   }
 
