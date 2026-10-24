@@ -3,7 +3,6 @@ import { intervalName, parseNote } from "../music";
 import { KEY_TABLES } from "./chapters-2-4";
 import { CHORD_HELPERS } from "./chapters-6-9";
 import { allLessons } from "./content";
-import { formatOf } from "./demos";
 import { BOOK_CHAPTERS } from "./sections";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -80,21 +79,5 @@ describe("course path", () => {
   it("places every game lesson on the section where it starts", () => {
     const withRush = allLessons().filter((l) => l.steps.some((s) => s.type === "rush")).map((l) => l.id);
     expect(withRush).toHaveLength(59);
-  });
-});
-
-describe("teach before test", () => {
-  it("shows a worked example of each question format before it is first asked", () => {
-    for (const l of allLessons()) {
-      const shown = new Set<string>();
-      for (const s of l.steps) {
-        if (s.type === "demo") shown.add(formatOf(s.question)!);
-        if (s.type === "rush" || s.type === "practice")
-          for (const q of s.questions) {
-            const f = formatOf(q);
-            if (f) expect(shown.has(f), `${l.id} asks ${f} before showing it`).toBe(true);
-          }
-      }
-    }
   });
 });

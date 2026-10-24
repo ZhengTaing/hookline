@@ -52,7 +52,6 @@ export function fretboardSvg(marks: FretMark[]): string {
   for (let st = 0; st < 6; st++)
     s += `<line class="string" x1="${X(0)}" x2="274" y1="${Y(st)}" y2="${Y(st)}" stroke-width="${0.8 + st * 0.25}" />`;
   for (let f = 0; f <= 5; f++) s += `<text class="fret-n" x="${X(f)}" y="134">${f}</text>`;
-  ["e", "B", "G", "D", "A", "E"].forEach((n, st) => (s += `<text class="fret-n" x="5" y="${Y(st) + 3.5}">${n}</text>`));
   for (let st = 0; st < 6; st++)
     for (let f = 0; f <= 5; f++) {
       const mark = marks.find((m) => m.string === st && m.fret === f);

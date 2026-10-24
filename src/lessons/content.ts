@@ -3,7 +3,6 @@ import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
 import { CHAPTERS_23_35 } from "./chapters-23-35";
 import { CHAPTERS_6_9 } from "./chapters-6-9";
-import { withDemos } from "./demos";
 import { mixLesson } from "./mix";
 import { BOOK_CHAPTERS, parseExample } from "./sections";
 import type { Lesson, RushQuestion, Step, Unit } from "./types";
@@ -220,7 +219,7 @@ export const COURSE: Unit[] = BOOK_CHAPTERS.map((ch) => ({
       section: sec.id,
       title: sec.title,
       summary: sec.headline,
-      steps: withDemos([read, ...rest]),
+      steps: [read, ...rest],
       fact: { front: `${sec.title}?`, back: `${sec.headline}. ${sec.text}` },
     };
   }),
