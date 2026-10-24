@@ -36,8 +36,9 @@ export type Visual =
 export type RushQuestion =
   | { kind: "staff"; lower: string; upper: string; options: string[] }
   | { kind: "choice"; prompt: string; options: string[]; answer: string; visual?: Visual; sound?: Sound; miss: string }
-  | { kind: "fretInterval"; string: number; fret: number; semitones: number; label: string }
-  | { kind: "findNote"; pitchClass: number; prompt?: string };
+  /** `hint` shows under the fretboard before answering, saying how to find it. */
+  | { kind: "fretInterval"; string: number; fret: number; semitones: number; label: string; hint?: string }
+  | { kind: "findNote"; pitchClass: number; prompt?: string; hint?: string };
 
 export interface SongRound {
   notes: [number, number];

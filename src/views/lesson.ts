@@ -34,6 +34,9 @@ function visualHtml(v: Visual): string {
   return fretboardSvg(v.marks.map((m) => ({ ...m, tone: "given" as const })));
 }
 
+/** A full sentence from a short explanation. */
+const sentence = (why: string) => (/[.!?]$/.test(why) ? why : `${why}.`);
+
 function shuffle<T>(items: T[]): T[] {
   const a = [...items];
   for (let i = a.length - 1; i > 0; i--) {
@@ -278,6 +281,7 @@ export function runLesson(
             const fb = root.querySelector(".fb")!;
             fb.className = `fb ${ok ? "ok" : "no"}`;
             fb.textContent = ok ? plus() : `It's a ${right}.`;
+            if (untimed) fb.textContent = `${ok ? "Yes." : `Not quite, it's a ${right}.`} ${displayName(question.lower)} up to ${displayName(question.upper)}: count the letters, including both ends, to get the size.`;
             melodic([parseNote(question.lower).midi, parseNote(question.upper).midi], 0.45);
             answer(ok, `${displayName(question.lower)} up to ${displayName(question.upper)} is a ${right}`);
           }),
@@ -291,10 +295,11 @@ export function runLesson(
           ${untimed ? "" : `<p class="eyebrow">Book ${source}</p>`}
           <h2>${question.prompt}</h2>
           ${question.visual ? visualHtml(question.visual) : ""}
-          ${question.sound ? `<button class="${question.visual ? "btn ghost" : "play-big"}" type="button" data-sound>▶ Play</button>` : ""}
+          ${question.sound && !(untimed && question.visual) ? `<button class="${question.visual ? "btn ghost" : "play-big"}" type="button" data-sound>▶ Play</button>` : ""}
           <div class="opts${options.some((o) => o.length > 14) ? " stack" : ""}">${options.map((o) => `<button class="opt" type="button" data-o="${o}">${o}</button>`).join("")}</div>
           <p class="fb" aria-live="polite"></p>${foot()}`);
-        if (question.sound) {
+        // In untimed sets a picture question plays its sound after the answer, like the mockup.
+        if (question.sound && !(untimed && question.visual)) {
           const s = question.sound;
           root.querySelector("[data-sound]")!.addEventListener("click", () => play(s));
           play(s);
@@ -307,7 +312,8 @@ export function runLesson(
             if (!ok) root.querySelector(`[data-o="${CSS.escape(question.answer)}"]`)!.classList.add("right");
             const fb = root.querySelector(".fb")!;
             fb.className = `fb ${ok ? "ok" : "no"}`;
-            fb.textContent = ok ? plus() : `It's ${question.answer}.`;
+            fb.textContent = untimed ? `${ok ? "Yes." : `Not quite, it's ${question.answer}.`} ${sentence(question.miss)}` : ok ? plus() : `It's ${question.answer}.`;
+            if (untimed && question.sound && question.visual) play(question.sound);
             answer(ok, question.miss);
           }),
         );
@@ -330,7 +336,7 @@ export function runLesson(
           <h2>${prompt}</h2>
           ${question.kind === "findNote" ? `<p class="big-note">${NOTE_NAMES[question.pitchClass]}</p>` : ""}
           ${fretboardSvg(marks)}
-          <p class="fb" aria-live="polite">${hit ? "" : "Anywhere on frets 0 to 5."}</p>${foot()}`);
+          <p class="fb" aria-live="polite">${hit ? "" : (question.hint ?? "Anywhere on frets 0 to 5.")}</p>${foot()}`);
         root.querySelector(".fretboard")!.addEventListener("click", (e) => {
           const spot = (e.target as Element).closest<SVGGElement>(".spot");
           if (!spot || locked) return;
@@ -352,7 +358,8 @@ export function runLesson(
           drawBoard({ string: st, fret: f, ok });
           const fb = root.querySelector(".fb")!;
           fb.className = `fb ${ok ? "ok" : "no"}`;
-          fb.textContent = ok ? "Yes." : `That's ${NOTE_NAMES[m % 12]}${question.kind === "fretInterval" ? `, ${INTERVAL_WORDS[(((m - fretMidi(question.string, question.fret)) % 12) + 12) % 12] ?? "a unison"} up` : ""}.`;
+          fb.textContent = ok ? "Yes." : `That's ${NOTE_NAMES[m % 12]}${question.kind === "fretInterval" && !question.hint ? `, ${INTERVAL_WORDS[(((m - fretMidi(question.string, question.fret)) % 12) + 12) % 12] ?? "a unison"} up` : ""}.`;
+          if (!ok && question.hint) fb.textContent += ` ${question.hint}`;
           answer(ok, miss);
         });
       };

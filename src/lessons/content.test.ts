@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { intervalName, parseNote } from "../music";
 import { KEY_TABLES } from "./chapters-2-4";
 import { CHORD_HELPERS } from "./chapters-6-9";
-import { allLessons } from "./content";
+import { NEW_LAYOUT, allLessons } from "./content";
 import { BOOK_CHAPTERS } from "./sections";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -76,8 +76,22 @@ describe("course path", () => {
     for (const l of allLessons()) expect(l.steps[0].type, l.id).toBe("read");
   });
 
-  it("places every game lesson on the section where it starts", () => {
-    const withRush = allLessons().filter((l) => l.steps.some((s) => s.type === "rush")).map((l) => l.id);
-    expect(withRush).toHaveLength(59);
+  it("follows the mockup's steps, with no story cards, duels or timed rounds", () => {
+    const gameTypes = new Set(["story", "duel", "rush", "songMatch"]);
+    const moved = allLessons().filter((l) => NEW_LAYOUT.has(Number(l.id.split(".")[0])));
+    expect(moved.length).toBeGreaterThan(0);
+    for (const l of moved) for (const s of l.steps) expect(gameTypes.has(s.type), `${l.id} has a ${s.type} step`).toBe(false);
+  });
+
+  it("builds each short check from the section's own card", () => {
+    for (const ch of BOOK_CHAPTERS)
+      for (const sec of ch.sections) {
+        if (!NEW_LAYOUT.has(ch.n)) continue;
+        const lesson = allLessons().find((l) => l.id === sec.id)!;
+        const own = [sec.headline, ...(sec.ex ?? []).map((e) => e.slice(0, e.lastIndexOf("=")))];
+        for (const s of lesson.steps)
+          if (s.type === "practice" && s.title === "Check")
+            for (const q of s.questions) if (q.kind === "choice") expect(own, `${sec.id} check`).toContain(q.answer);
+      }
   });
 });

@@ -1,11 +1,14 @@
+import { CHAPTER_1 } from "./chapter-1";
 import { CHAPTERS_2_4 } from "./chapters-2-4";
 import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
 import { CHAPTERS_23_35 } from "./chapters-23-35";
 import { CHAPTERS_6_9 } from "./chapters-6-9";
 import { mixLesson } from "./mix";
-import { BOOK_CHAPTERS, parseExample } from "./sections";
-import type { Lesson, RushQuestion, Step, Unit } from "./types";
+import { mixLesson as mixLessonV2 } from "./mix-v2";
+import { BOOK_CHAPTERS, type BookChapter, parseExample } from "./sections";
+import { parseNote } from "../music";
+import type { Lesson, RushQuestion, Step, Unit, Visual } from "./types";
 
 // Lessons adapted from Robert Hutchinson, "Music Theory for the 21st-Century Classroom"
 // (GNU Free Documentation License 1.2). Section numbers refer to that book.
@@ -183,21 +186,97 @@ const BOOK: Unit[] = [
   ...CHAPTERS_23_35,
 ];
 
-/** The game lessons, each with its learn-it steps mixed in before the timed round. */
+/** The book's exercise sets, laid out as the mockup's steps. */
 const GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLesson));
 
+/**
+ * Chapters moved to the new lesson layout so far. The rest keep the earlier layout until
+ * each one is checked, one chapter at a time.
+ */
+export const NEW_LAYOUT = new Set([1]);
+/** Hand-written steps for chapters in the new layout. */
+const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1 };
+const OLD_GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLessonV2));
 const order = (id: string) => id.split(".").map(Number);
 const atOrBefore = (a: string, b: string) => order(a)[0] < order(b)[0] || (order(a)[0] === order(b)[0] && order(a)[1] <= order(b)[1]);
 
-/** The game lesson that teaches a section: the latest one starting at or before it. */
+/** The earlier layout: a game lesson's steps, or two questions borrowed from the one that covers the section. */
+function oldSteps(sectionId: string, i: number): Step[] {
+  const game = [...OLD_GAMES].reverse().find((g) => atOrBefore(g.id, sectionId));
+  if (game?.id === sectionId) return game.steps;
+  const pool = game?.steps.flatMap((s): RushQuestion[] => (s.type === "rush" ? s.questions : [])) ?? [];
+  const check = pool.length ? [0, 1].map((k) => pool[(i * 2 + k) % pool.length]).filter((q, k, a) => a.indexOf(q) === k) : [];
+  return check.length ? [{ type: "practice", title: "Quick check", questions: check }] : [];
+}
+
+
+/** The exercise set that starts at a section, if any. */
 function gameFor(sectionId: string): Lesson | undefined {
-  return [...GAMES].reverse().find((g) => atOrBefore(g.id, sectionId));
+  return GAMES.find((g) => g.id === sectionId);
+}
+
+/** Spreads picks around without randomness, so a section always asks the same thing. */
+const rotate = <T,>(items: T[], by: number): T[] => items.map((_, k) => items[(k + by) % items.length]);
+
+/**
+ * An example's notes drawn on the treble staff, moved up by octaves so nothing sits far below
+ * it. Null for progressions or anything too spread out to read.
+ */
+function onStaff(example: string): Visual | null {
+  const notes = example.slice(example.lastIndexOf("=") + 1).replace(/^~/, "").trim();
+  if (notes.includes("|")) return null;
+  const names = notes.split(/\s+/);
+  const parsed = names.map(parseNote);
+  const low = Math.min(...parsed.map((n) => n.step));
+  const high = Math.max(...parsed.map((n) => n.step));
+  if (high - low > 12 || names.length > 8) return null;
+  const up = Math.max(0, Math.ceil((4 * 7 - low) / 7));
+  const moved = parsed.map((n) => `${n.letter}${n.accidental}${n.octave + up}`);
+  return { type: "staff", notes: moved, chord: !example.slice(example.lastIndexOf("=") + 1).startsWith("~") && names.length > 1 };
+}
+
+/**
+ * For a section without book exercises of its own: a check on exactly what its card just said
+ * (which sentence sums it up) and, when the card has two or more examples, which one is playing.
+ */
+function sectionCheck(ch: BookChapter, i: number): Step[] {
+  const sec = ch.sections[i];
+  const steps: Step[] = [];
+  const others = ch.sections.filter((s) => s.id !== sec.id && s.headline !== sec.headline);
+  if (others.length >= 2) {
+    const wrong = rotate(others, i).slice(0, 2).map((s) => s.headline);
+    steps.push({
+      type: "practice",
+      title: "Check",
+      questions: [{ kind: "choice", prompt: `Which one sums up “${sec.title}”?`, options: rotate([sec.headline, ...wrong], i % 3), answer: sec.headline, miss: `${sec.title}: ${sec.headline}` }],
+    });
+  }
+  const chips = (sec.ex ?? []).map(parseExample).slice(0, 4);
+  const distinct = chips.length >= 2 && new Set(chips.map((c) => c.label)).size === chips.length;
+  const drawn = (sec.ex ?? []).slice(0, 4).map(onStaff);
+  if (distinct && drawn.every((d) => d)) {
+    const pick = (i + 1) % chips.length;
+    steps.push({
+      type: "practice",
+      title: "Name it on the staff",
+      questions: [{ kind: "choice", prompt: "Which example from the card is this?", options: chips.map((c) => c.label), answer: chips[pick].label, visual: drawn[pick]!, sound: chips[pick].sound, miss: `That's ${chips[pick].label}` }],
+    });
+  }
+  if (distinct) {
+    const pick = chips[i % chips.length];
+    steps.push({
+      type: "practice",
+      title: "Name it by ear",
+      questions: [{ kind: "choice", prompt: "Listen. Which example from the card is this?", options: chips.map((c) => c.label), answer: pick.label, sound: pick.sound, miss: `That was ${pick.label}` }],
+    });
+  }
+  return steps;
 }
 
 /**
  * The course path: one unit per book chapter, one step per section. Each step opens with the
- * section's read-and-hear card. Where a game lesson starts, its full set of steps follows;
- * other sections get a short untimed check drawn from the game lesson that covers them.
+ * section's read-and-hear card. Where the book has exercises for the section, they follow;
+ * other sections get a short check on what their own card said.
  */
 export const COURSE: Unit[] = BOOK_CHAPTERS.map((ch) => ({
   id: `ch${ch.n}`,
@@ -206,14 +285,7 @@ export const COURSE: Unit[] = BOOK_CHAPTERS.map((ch) => ({
   summary: `${ch.sections.length} sections`,
   lessons: ch.sections.map((sec, i): Lesson => {
     const read: Step = { type: "read", section: sec.id, title: sec.title, headline: sec.headline, text: sec.text, chips: (sec.ex ?? []).map(parseExample) };
-    const game = gameFor(sec.id);
-    let rest: Step[] = [];
-    if (game?.id === sec.id) rest = game.steps;
-    else if (game) {
-      const pool = game.steps.flatMap((s): RushQuestion[] => (s.type === "rush" ? s.questions : []));
-      const check = pool.length ? [0, 1].map((k) => pool[(i * 2 + k) % pool.length]).filter((q, k, a) => a.indexOf(q) === k) : [];
-      if (check.length) rest = [{ type: "practice", title: "Quick check", questions: check }];
-    }
+    const rest = !NEW_LAYOUT.has(ch.n) ? oldSteps(sec.id, i) : (WRITTEN[sec.id] ?? gameFor(sec.id)?.steps ?? sectionCheck(ch, i));
     return {
       id: sec.id,
       section: sec.id,

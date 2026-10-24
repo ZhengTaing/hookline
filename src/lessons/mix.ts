@@ -1,9 +1,8 @@
 import { intervalName, parseNote } from "../music";
 import type { Lesson, RushQuestion, Sound, Step } from "./types";
 
-// Adds the "learn it" steps to every lesson, between the intro cards and the timed round:
-// an untimed identify set, a fretboard step, an ear check,
-// and, where there's a good fit, labeling the chords of a real song.
+// Turns a book lesson's exercises into the mockup's steps: name it, build it on the guitar,
+// name it by ear, and, where there's a good fit, labeling the chords of a real song.
 
 const ROOTS: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
@@ -74,61 +73,45 @@ function staffToEar(q: Extract<RushQuestion, { kind: "staff" }>): RushQuestion {
   };
 }
 
-/** Builds "find the root on the fretboard" questions from chord or note answers. */
-function fretQuestions(questions: RushQuestion[]): RushQuestion[] {
-  const found = questions.filter((q) => q.kind === "findNote" || q.kind === "fretInterval");
-  if (found.length) return found.slice(0, 2);
-  const out: RushQuestion[] = [];
-  const seen = new Set<number>();
-  for (const q of questions) {
-    if (q.kind !== "choice") continue;
-    const c = chordParts(q.answer);
-    if (!c || seen.has(c.pc)) continue;
-    seen.add(c.pc);
-    const isNote = q.answer === c.root;
-    out.push({
-      kind: "findNote",
-      pitchClass: c.pc,
-      prompt: isNote ? `Find ${q.answer} on the neck` : `Find the root of ${q.answer} on the neck`,
-    });
-    if (out.length === 2) break;
-  }
-  return out;
+const isFret = (q: RushQuestion) => q.kind === "findNote" || q.kind === "fretInterval";
+
+/** A question answered by listening rather than looking. */
+function isEar(q: RushQuestion): boolean {
+  return q.kind === "choice" && !!q.sound && q.sound.kind !== "none" && (!q.visual || /^Listen/.test(q.prompt));
 }
 
-/** Inserts the learn-it steps after the intro cards and duels, before the timed round. */
+/**
+ * Rebuilds a lesson as the Lesson Types mockup lays it out: name it (staff and picture
+ * questions), build it on the fretboard, name it by ear, then a real song. Every question
+ * comes from the lesson's own book exercises. Story cards, duels and timed rounds are dropped;
+ * tap-the-rhythm steps stay, since rhythm can only be practised by feel.
+ */
 export function mixLesson(lesson: Lesson): Lesson {
-  const rush = lesson.steps.find((s): s is Extract<Step, { type: "rush" }> => s.type === "rush");
-  const questions = rush?.questions ?? [];
-  const extra: Step[] = [];
+  const questions = lesson.steps.flatMap((s) => (s.type === "rush" ? s.questions : []));
+  const steps: Step[] = [];
 
-  const visual = questions.filter((q) => q.kind === "staff" || (q.kind === "choice" && q.visual));
-  const identify = (visual.length ? visual : questions.filter((q) => q.kind === "choice")).slice(0, 3);
-  if (identify.length) extra.push({ type: "practice", title: visual.length ? "Identify" : "Check", questions: identify });
+  const name = questions.filter((q) => !isFret(q) && !isEar(q)).slice(0, 5);
+  if (name.length) steps.push({ type: "practice", title: name.some((q) => q.kind === "staff") ? "Name it on the staff" : "Name it", questions: name });
 
-  const build = fretQuestions(questions);
-  if (build.length) extra.push({ type: "practice", title: "On the guitar", questions: build });
+  const build = questions.filter(isFret).slice(0, 3);
+  if (build.length) steps.push({ type: "practice", title: "Build it on the guitar", questions: build });
 
-  const ear = questions
-    .filter((q) => !identify.includes(q))
-    .flatMap((q): RushQuestion[] => {
-      if (q.kind === "staff") return [staffToEar(q)];
-      const listenable = q.kind === "choice" && q.sound && q.sound.kind !== "none" && (q.visual || /^Listen|quality/.test(q.prompt));
-      if (q.kind === "choice" && listenable) {
-        const { visual: _visual, ...rest } = q;
-        return [{ ...rest, prompt: q.prompt.startsWith("Listen") ? q.prompt : `Listen. ${q.prompt}` }];
-      }
-      return [];
-    })
-    .slice(0, 2);
-  if (ear.length) extra.push({ type: "practice", title: "Ear check", questions: ear });
+  const ear = [
+    ...questions.filter(isEar).map((q): RushQuestion => {
+      if (q.kind !== "choice") return q;
+      const { visual: _visual, ...rest } = q;
+      return { ...rest, prompt: q.prompt.startsWith("Listen") ? q.prompt : `Listen. ${q.prompt}` };
+    }),
+    ...questions.flatMap((q) => (q.kind === "staff" ? [staffToEar(q)] : [])),
+  ].slice(0, 3);
+  if (ear.length) steps.push({ type: "practice", title: "Name it by ear", questions: ear });
+
+  steps.push(...lesson.steps.filter((s) => s.type === "tapBeat"));
 
   const song = SONGS[lesson.id];
-  if (song) extra.push({ type: "realSong", ...song, sound: chordsSound(song.chords) });
+  if (song) steps.push({ type: "realSong", ...song, sound: chordsSound(song.chords) });
 
-  const introEnd = lesson.steps.findIndex((s) => s.type !== "story" && s.type !== "duel");
-  const at = introEnd < 0 ? lesson.steps.length : introEnd;
-  return { ...lesson, steps: [...lesson.steps.slice(0, at), ...extra, ...lesson.steps.slice(at)] };
+  return { ...lesson, steps };
 }
 
 export const MIX_DATA = { SONGS, chordParts };
