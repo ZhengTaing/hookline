@@ -55,3 +55,55 @@ export const INTERVAL_WORDS: Record<number, string> = {
 export function fretMidi(string: number, fret: number): number {
   return OPEN_STRINGS[string] + fret;
 }
+
+const MAJOR_STEPS = [2, 2, 1, 2, 2, 2, 1];
+const NATURAL_MINOR_STEPS = [2, 1, 2, 2, 1, 2, 2];
+
+/**
+ * Spells a seven-note scale from a tonic like "D" or "Bb", using each letter once.
+ * `raise` lists scale degrees (1-7) to raise a half step, e.g. [7] for harmonic minor.
+ */
+export function spellScale(tonic: string, kind: "major" | "minor", raise: number[] = []): string[] {
+  const start = parseNote(`${tonic}4`);
+  const steps = kind === "major" ? MAJOR_STEPS : NATURAL_MINOR_STEPS;
+  const out: string[] = [];
+  let midi = start.midi;
+  const letterIndex = LETTERS.indexOf(start.letter);
+  for (let degree = 1; degree <= 7; degree++) {
+    const letter = LETTERS[(letterIndex + degree - 1) % 7];
+    const target = (midi + (raise.includes(degree) ? 1 : 0)) % 12;
+    const natural = LETTER_PC[LETTERS.indexOf(letter)];
+    const diff = (((target - natural) % 12) + 12) % 12;
+    const acc = diff === 0 ? "" : diff === 1 ? "#" : diff === 11 ? "b" : diff === 2 ? "##" : diff === 10 ? "bb" : "?";
+    out.push(letter + acc);
+    midi += steps[degree - 1];
+  }
+  return out;
+}
+
+/** Number of sharps (positive) or flats (negative) in a major or minor key signature. */
+export function keySignature(tonic: string, kind: "major" | "minor"): number {
+  const scale = spellScale(tonic, kind);
+  const sharps = scale.filter((n) => n.endsWith("#")).length;
+  const flats = scale.filter((n) => n.endsWith("b")).length;
+  return sharps - flats;
+}
+
+export function pretty(name: string): string {
+  return name.replace(/##/g, "𝄪").replace(/bb/g, "𝄫").replace(/#/g, "♯").replace(/b/g, "♭").replace(/-?\d$/, "");
+}
+
+/** MIDI numbers for a spelled scale starting at octave 4, rising, ending on the octave. */
+export function scaleMidi(scale: string[]): number[] {
+  const out: number[] = [];
+  let prev = -1;
+  for (const n of [...scale, scale[0]]) {
+    const letter = n[0];
+    const shift = (n.match(/#/g)?.length ?? 0) - (n.slice(1).match(/b/g)?.length ?? 0);
+    let m = 60 + LETTER_PC[LETTERS.indexOf(letter)] + shift;
+    while (m <= prev) m += 12;
+    out.push(m);
+    prev = m;
+  }
+  return out;
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { intervalName, parseNote } from "../music";
+import { KEY_TABLES } from "./chapters-2-4";
 import { allLessons } from "./content";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -31,5 +32,26 @@ describe("lesson content", () => {
             expect(r.choices).toContain(r.song);
             expect(r.notes[1] - r.notes[0]).toBe({ P5: 7, m3: 3, M6: 9 }[r.interval]);
           }
+  });
+});
+
+describe("choice questions", () => {
+  it("always offer the right answer exactly once", () => {
+    for (const lesson of allLessons())
+      for (const step of lesson.steps) {
+        if (step.type !== "rush") continue;
+        for (const q of step.questions) {
+          if (q.kind !== "choice") continue;
+          expect(q.options.filter((o) => o === q.answer).length, `${lesson.id} ${q.prompt}`).toBe(1);
+          expect(new Set(q.options).size, `${lesson.id} ${q.prompt}`).toBe(q.options.length);
+        }
+      }
+  });
+});
+
+describe("key tables", () => {
+  it("match the key signatures the scale speller works out", () => {
+    for (const [sig, key] of Object.entries(KEY_TABLES.MAJOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "major"), key).toBe(Number(sig));
+    for (const [sig, key] of Object.entries(KEY_TABLES.MINOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "minor"), key + "m").toBe(Number(sig));
   });
 });

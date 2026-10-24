@@ -1,3 +1,4 @@
+import { CHAPTERS_2_4 } from "./chapters-2-4";
 import type { Unit } from "./types";
 
 // Lessons adapted from Robert Hutchinson, "Music Theory for the 21st-Century Classroom"
@@ -83,6 +84,7 @@ export const COURSE: Unit[] = [
       },
     ],
   },
+  ...CHAPTERS_2_4,
   {
     id: "intervals",
     title: "Intervals",
@@ -173,7 +175,6 @@ export const COURSE: Unit[] = [
 
 /** Units after these arrive with later lessons. Shown locked on the course path. */
 export const UPCOMING = [
-  { title: "Major and minor scales", chapter: "Chapters 2–3" },
   { title: "Chords and chord symbols", chapter: "Chapters 6, 8" },
   { title: "Roman numerals and progressions", chapter: "Chapters 7, 9" },
   { title: "Melody and song form", chapter: "Chapters 10–12" },

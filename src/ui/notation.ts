@@ -1,24 +1,39 @@
 import { NOTE_NAMES, OPEN_STRINGS, parseNote } from "../music";
 
-/** Two notes on a treble staff. E4 sits on the bottom line. */
-export function staffSvg(lower: string, upper: string): string {
-  const y = (step: number) => 80 - (step - 30) * 5;
+// Treble staff: E4 (diatonic step 30) sits on the bottom line at y=80, lines are 10 apart.
+const yFor = (step: number) => 80 - (step - 30) * 5;
+
+// Where key-signature accidentals sit, as note names, in the standard order.
+const SHARP_SPOTS = ["F5", "C5", "G5", "D5", "A4", "E5", "B4"];
+const FLAT_SPOTS = ["B4", "E5", "A4", "D5", "G4", "C5", "F4"];
+
+/**
+ * Notes on a treble staff, left to right, or stacked when `chord` is set.
+ * `keySig` is sharps (positive) or flats (negative).
+ */
+export function staffSvg(notes: string[], opts: { keySig?: number; chord?: boolean } = {}): string {
+  const keySig = opts.keySig ?? 0;
+  const sigWidth = Math.abs(keySig) * 10;
+  const width = Math.max(276, 70 + sigWidth + (opts.chord ? 60 : notes.length * 34));
   let s = "";
-  for (let i = 0; i < 5; i++) s += `<line x1="8" x2="268" y1="${40 + i * 10}" y2="${40 + i * 10}" />`;
+  for (let i = 0; i < 5; i++) s += `<line x1="8" x2="${width - 8}" y1="${40 + i * 10}" y2="${40 + i * 10}" />`;
   s += `<text class="clef" x="12" y="86">𝄞</text>`;
-  [
-    [lower, 140],
-    [upper, 190],
-  ].forEach(([name, xs]) => {
-    const n = parseNote(name as string);
-    const x = xs as number;
-    const yy = y(n.step);
-    for (let ly = 90; ly <= yy; ly += 10) s += `<line x1="${x - 14}" x2="${x + 14}" y1="${ly}" y2="${ly}" />`;
-    for (let ly = 30; ly >= yy; ly -= 10) s += `<line x1="${x - 14}" x2="${x + 14}" y1="${ly}" y2="${ly}" />`;
-    if (n.accidental) s += `<text class="acc" x="${x - 26}" y="${yy + 6}">${n.accidental === "b" ? "♭" : "♯"}</text>`;
-    s += `<ellipse cx="${x}" cy="${yy}" rx="8" ry="5.5" transform="rotate(-20 ${x} ${yy})" />`;
+  const spots = keySig > 0 ? SHARP_SPOTS : FLAT_SPOTS;
+  for (let i = 0; i < Math.abs(keySig); i++) {
+    const yy = yFor(parseNote(spots[i]).step);
+    s += `<text class="acc" x="${58 + i * 10}" y="${yy + 6}">${keySig > 0 ? "♯" : "♭"}</text>`;
+  }
+  const startX = 84 + sigWidth;
+  notes.forEach((name, i) => {
+    const n = parseNote(name);
+    const x = opts.chord ? startX + 20 : startX + i * 34 + (notes.length === 2 ? 22 : 0);
+    const yy = yFor(n.step);
+    for (let ly = 90; ly <= yy; ly += 10) s += `<line x1="${x - 13}" x2="${x + 13}" y1="${ly}" y2="${ly}" />`;
+    for (let ly = 30; ly >= yy; ly -= 10) s += `<line x1="${x - 13}" x2="${x + 13}" y1="${ly}" y2="${ly}" />`;
+    if (n.accidental) s += `<text class="acc" x="${x - 24}" y="${yy + 6}">${n.accidental === "b" ? "♭" : "♯"}</text>`;
+    s += `<ellipse cx="${x}" cy="${yy}" rx="7.5" ry="5.2" transform="rotate(-20 ${x} ${yy})" />`;
   });
-  return `<svg class="staff" viewBox="0 0 276 110" role="img" aria-label="Two notes on a treble staff">${s}</svg>`;
+  return `<svg class="staff" viewBox="0 0 ${width} 110" role="img" aria-label="Notes on a treble staff">${s}</svg>`;
 }
 
 export interface FretMark {

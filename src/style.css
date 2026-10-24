@@ -225,7 +225,14 @@ button, input { font: inherit; color: inherit; }
 .duel button.wrong { border-color: var(--danger); color: var(--danger); }
 
 .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opts.stack { grid-template-columns: 1fr; }
 .list { display: grid; gap: 8px; }
+.beats { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 8px 0; }
+.beats i { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); }
+.beats i.hit { background: var(--ink); border-color: var(--ink); }
+.beats i.miss { border-color: var(--danger); }
+.tap { width: 100%; min-height: 160px; border: 1px solid var(--line); border-radius: 20px; background: transparent; color: var(--ink); font: inherit; font-size: 22px; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.tap:active { background: var(--ink); color: var(--on-ink); }
 .opt { border: 1px solid var(--line); background: transparent; border-radius: 12px; padding: 13px 8px; font-weight: 700; font-size: 16px; cursor: pointer; }
 .opt.left { text-align: left; padding-inline: 14px; font-size: 15px; }
 .opt.right { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }

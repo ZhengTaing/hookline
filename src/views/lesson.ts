@@ -1,6 +1,6 @@
 import { chord, feedback, melodic, tone } from "../audio";
 import { INTERVAL_WORDS, NOTE_NAMES, displayName, fretMidi, intervalName, parseNote } from "../music";
-import type { DuelRound, Lesson, RushQuestion, Sound, Step } from "../lessons/types";
+import type { DuelRound, Lesson, RushQuestion, Sound, Step, Visual } from "../lessons/types";
 import { fretboardSvg, staffSvg } from "../ui/notation";
 
 export interface LessonResult {
@@ -18,6 +18,12 @@ const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4:
 function play(sound: Sound): void {
   if (sound.kind === "melodic") melodic(sound.notes, sound.gap);
   if (sound.kind === "chord") chord(sound.notes);
+}
+
+function visualHtml(v: Visual): string {
+  if (v.type === "staff") return staffSvg(v.notes, { keySig: v.keySig, chord: v.chord });
+  if (v.type === "big") return `<p class="big-note">${v.text}</p>${v.caption ? `<p class="hint">${v.caption}</p>` : ""}`;
+  return fretboardSvg(v.marks.map((m) => ({ ...m, tone: "given" as const })));
 }
 
 function shuffle<T>(items: T[]): T[] {
@@ -82,7 +88,8 @@ export function runLesson(
     if (step.type === "story") story(step.cards);
     else if (step.type === "duel") duel(step.rounds);
     else if (step.type === "rush") rush(step.seconds, step.source, step.questions);
-    else songMatch(step.rounds);
+    else if (step.type === "songMatch") songMatch(step.rounds);
+    else tapBeat(step);
   }
 
   // ---- story cards ----
@@ -126,8 +133,9 @@ export function runLesson(
       const notesFor = (side: string) => (side === targetSide ? round.target : round.other).map((n) => root0 + n);
       const sound = (side: string) => {
         const n = notesFor(side);
-        if (n.length > 2) chord(n);
-        else melodic(n, 0.45);
+        const mode = round.play ?? (n.length > 2 ? "chord" : "melodic");
+        if (mode === "chord") chord(n);
+        else melodic(n, n.length > 2 ? 0.22 : 0.45);
       };
       let answered = false;
       frame(`
@@ -229,7 +237,7 @@ export function runLesson(
         frame(`${head()}
           <p class="eyebrow">Book ${source}</p>
           <h2>${named ? "Name this interval" : "How big is this interval?"}</h2>
-          ${staffSvg(question.lower, question.upper)}
+          ${staffSvg([question.lower, question.upper])}
           <div class="opts">${question.options.map((o) => `<button class="opt" type="button" data-o="${o}">${o}</button>`).join("")}</div>
           <p class="fb" aria-live="polite"></p>`);
         root.querySelectorAll<HTMLButtonElement>("[data-o]").forEach((b) =>
@@ -243,6 +251,35 @@ export function runLesson(
             fb.textContent = ok ? `+${10 * Math.min(1 + Math.floor((combo + 1) / 2), 4)}` : `It's a ${right}.`;
             melodic([parseNote(question.lower).midi, parseNote(question.upper).midi], 0.45);
             answer(ok, `${displayName(question.lower)} up to ${displayName(question.upper)} is a ${right}`);
+          }),
+        );
+        return;
+      }
+
+      if (question.kind === "choice") {
+        const options = shuffle(question.options);
+        frame(`${head()}
+          <p class="eyebrow">Book ${source}</p>
+          <h2>${question.prompt}</h2>
+          ${question.visual ? visualHtml(question.visual) : ""}
+          ${question.sound ? `<button class="btn ghost" type="button" data-sound>▶ Play</button>` : ""}
+          <div class="opts${options.some((o) => o.length > 14) ? " stack" : ""}">${options.map((o) => `<button class="opt" type="button" data-o="${o}">${o}</button>`).join("")}</div>
+          <p class="fb" aria-live="polite"></p>`);
+        if (question.sound) {
+          const s = question.sound;
+          root.querySelector("[data-sound]")!.addEventListener("click", () => play(s));
+          play(s);
+        }
+        root.querySelectorAll<HTMLButtonElement>("[data-o]").forEach((b) =>
+          b.addEventListener("click", () => {
+            if (locked) return;
+            const ok = b.dataset.o === question.answer;
+            b.classList.add(ok ? "right" : "wrong");
+            if (!ok) root.querySelector(`[data-o="${CSS.escape(question.answer)}"]`)!.classList.add("right");
+            const fb = root.querySelector(".fb")!;
+            fb.className = `fb ${ok ? "ok" : "no"}`;
+            fb.textContent = ok ? `+${10 * Math.min(1 + Math.floor((combo + 1) / 2), 4)}` : `It's ${question.answer}.`;
+            answer(ok, question.miss);
           }),
         );
         return;
@@ -333,6 +370,74 @@ export function runLesson(
       window.setTimeout(playIt, 200);
     };
     draw();
+  }
+
+  // ---- tap the beat ----
+  function tapBeat(step: Extract<Step, { type: "tapBeat" }>): void {
+    const beatMs = 60000 / step.bpm;
+    const countIn = step.beatsPerBar;
+    const total = step.beatsPerBar * step.bars;
+    frame(`
+      <p class="eyebrow">Feel it · tap the beat</p>
+      <h2>${step.title}</h2>
+      <p class="hint">After ${countIn} count-in clicks, tap the big button on every beat. Beat 1 of each bar clicks louder.</p>
+      <div class="beats">${Array.from({ length: total }, () => "<i></i>").join("")}</div>
+      <button class="tap" type="button" data-start>Start</button>
+      <p class="fb" aria-live="polite"></p>
+      <button class="btn push" type="button" data-next disabled>Continue</button>`);
+    const tapBtn = root.querySelector<HTMLButtonElement>("[data-start]")!;
+    const fb = root.querySelector(".fb")!;
+    const dots = root.querySelectorAll<HTMLElement>(".beats i");
+    let start = 0;
+    let running = false;
+    let scored = false;
+    const hits = new Set<number>();
+    let timers: number[] = [];
+    cleanup = () => timers.forEach((t) => window.clearTimeout(t));
+
+    const begin = () => {
+      running = true;
+      hits.clear();
+      dots.forEach((d) => (d.className = ""));
+      fb.textContent = "";
+      tapBtn.textContent = "Tap";
+      start = performance.now() + countIn * beatMs;
+      for (let i = 0; i < countIn + total; i++) {
+        const accent = i % step.beatsPerBar === 0;
+        timers.push(window.setTimeout(() => tone(accent ? 96 : 89, 0, 0.05, i < countIn ? 0.12 : 0.06), i * beatMs));
+      }
+      timers.push(
+        window.setTimeout(() => {
+          running = false;
+          const ok = hits.size >= Math.ceil(total * 0.75);
+          dots.forEach((d, i) => !hits.has(i) && d.classList.add("miss"));
+          fb.className = `fb ${ok ? "ok" : "no"}`;
+          fb.textContent = `${hits.size} of ${total} beats on time. ${ok ? "Nice and steady." : "Try again and listen for the loud click on 1."}`;
+          if (!scored) score(ok, ok ? 20 : 0, `Keeping a steady beat in ${step.title}`);
+          scored = true;
+          tapBtn.textContent = "Try again";
+          root.querySelector<HTMLButtonElement>("[data-next]")!.disabled = false;
+        }, (countIn + total) * beatMs + 300),
+      );
+    };
+
+    tapBtn.addEventListener("pointerdown", () => {
+      if (!running) {
+        timers.forEach((t) => window.clearTimeout(t));
+        timers = [];
+        begin();
+        return;
+      }
+      const t = performance.now() - start;
+      const beat = Math.round(t / beatMs);
+      if (beat < 0 || beat >= total) return;
+      const off = Math.abs(t - beat * beatMs);
+      if (off <= Math.min(140, beatMs * 0.25)) {
+        hits.add(beat);
+        dots[beat].className = "hit";
+      }
+    });
+    root.querySelector("[data-next]")!.addEventListener("click", next);
   }
 
   runStep(lesson.steps[0]);
