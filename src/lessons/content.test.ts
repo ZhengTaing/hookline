@@ -3,6 +3,7 @@ import { intervalName, parseNote } from "../music";
 import { KEY_TABLES } from "./chapters-2-4";
 import { CHORD_HELPERS } from "./chapters-6-9";
 import { allLessons } from "./content";
+import { BOOK_CHAPTERS } from "./sections";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
 
@@ -64,5 +65,19 @@ describe("chord spelling", () => {
     expect(CHORD_HELPERS.spellChord("C", "°7")).toEqual(["C", "Eb", "Gb", "Bbb"]);
     expect(CHORD_HELPERS.spellChord("E", "7")).toEqual(["E", "G#", "B", "D"]);
     expect(CHORD_HELPERS.staffNames(["G", "B", "D"])).toEqual(["G4", "B4", "D5"]);
+  });
+});
+
+describe("course path", () => {
+  it("has one step per book section, each opening with its read-and-hear card", () => {
+    const sections = BOOK_CHAPTERS.flatMap((c) => c.sections.map((s) => s.id));
+    expect(sections.length).toBe(189);
+    expect(allLessons().map((l) => l.id)).toEqual(sections);
+    for (const l of allLessons()) expect(l.steps[0].type, l.id).toBe("read");
+  });
+
+  it("places every game lesson on the section where it starts", () => {
+    const withRush = allLessons().filter((l) => l.steps.some((s) => s.type === "rush")).map((l) => l.id);
+    expect(withRush).toHaveLength(59);
   });
 });

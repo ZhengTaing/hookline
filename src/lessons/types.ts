@@ -51,8 +51,8 @@ export type Step =
   | { type: "duel"; rounds: DuelRound[] }
   | { type: "rush"; seconds: number; source: string; questions: RushQuestion[] }
   | { type: "songMatch"; rounds: SongRound[] }
-  /** The takeaway in one or two sentences, with sound chips to tap. */
-  | { type: "rule"; title: string; rule: string; chips: { label: string; sound: Sound }[] }
+  /** A book section's summary, with its examples as sound chips to tap. */
+  | { type: "read"; section: string; title: string; headline: string; text: string; chips: { label: string; sound: Sound }[] }
   /** An untimed question set: identify, build on the fretboard, or name it by ear. */
   | { type: "practice"; title: string; questions: RushQuestion[] }
   /** Label each chord of a real song with a Roman numeral (or other label). */
@@ -75,6 +75,8 @@ export interface Lesson {
   title: string;
   summary: string;
   steps: Step[];
+  /** A review card added when the lesson is finished. */
+  fact?: { front: string; back: string };
 }
 
 export interface Unit {

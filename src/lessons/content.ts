@@ -4,7 +4,8 @@ import { CHAPTERS_13_22 } from "./chapters-13-22";
 import { CHAPTERS_23_35 } from "./chapters-23-35";
 import { CHAPTERS_6_9 } from "./chapters-6-9";
 import { mixLesson } from "./mix";
-import type { Unit } from "./types";
+import { BOOK_CHAPTERS, parseExample } from "./sections";
+import type { Lesson, RushQuestion, Step, Unit } from "./types";
 
 // Lessons adapted from Robert Hutchinson, "Music Theory for the 21st-Century Classroom"
 // (GNU Free Documentation License 1.2). Section numbers refer to that book.
@@ -182,12 +183,47 @@ const BOOK: Unit[] = [
   ...CHAPTERS_23_35,
 ];
 
-/** The book's units, each lesson with its learn-it steps mixed in before the timed round. */
-export const COURSE: Unit[] = BOOK.map((u) => ({ ...u, lessons: u.lessons.map(mixLesson) }));
+/** The game lessons, each with its learn-it steps mixed in before the timed round. */
+const GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLesson));
 
-/** Units after these arrive with later lessons. Shown locked on the course path. */
-export const UPCOMING: { title: string; chapter: string }[] = [
-];
+const order = (id: string) => id.split(".").map(Number);
+const atOrBefore = (a: string, b: string) => order(a)[0] < order(b)[0] || (order(a)[0] === order(b)[0] && order(a)[1] <= order(b)[1]);
+
+/** The game lesson that teaches a section: the latest one starting at or before it. */
+function gameFor(sectionId: string): Lesson | undefined {
+  return [...GAMES].reverse().find((g) => atOrBefore(g.id, sectionId));
+}
+
+/**
+ * The course path: one unit per book chapter, one step per section. Each step opens with the
+ * section's read-and-hear card. Where a game lesson starts, its full set of steps follows;
+ * other sections get a short untimed check drawn from the game lesson that covers them.
+ */
+export const COURSE: Unit[] = BOOK_CHAPTERS.map((ch) => ({
+  id: `ch${ch.n}`,
+  title: ch.title,
+  chapter: `Chapter ${ch.n}`,
+  summary: `${ch.sections.length} sections`,
+  lessons: ch.sections.map((sec, i): Lesson => {
+    const read: Step = { type: "read", section: sec.id, title: sec.title, headline: sec.headline, text: sec.text, chips: (sec.ex ?? []).map(parseExample) };
+    const game = gameFor(sec.id);
+    let rest: Step[] = [];
+    if (game?.id === sec.id) rest = game.steps;
+    else if (game) {
+      const pool = game.steps.flatMap((s): RushQuestion[] => (s.type === "rush" ? s.questions : []));
+      const check = pool.length ? [0, 1].map((k) => pool[(i * 2 + k) % pool.length]).filter((q, k, a) => a.indexOf(q) === k) : [];
+      if (check.length) rest = [{ type: "practice", title: "Quick check", questions: check }];
+    }
+    return {
+      id: sec.id,
+      section: sec.id,
+      title: sec.title,
+      summary: sec.headline,
+      steps: [read, ...rest],
+      fact: { front: `${sec.title}?`, back: `${sec.headline}. ${sec.text}` },
+    };
+  }),
+}));
 
 export function allLessons() {
   return COURSE.flatMap((u) => u.lessons);

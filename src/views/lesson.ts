@@ -11,6 +11,8 @@ export interface LessonResult {
   bestCombo: number;
   /** Short descriptions of what was missed, for review cards. */
   missed: string[];
+  /** The section's key fact, added as a review card. */
+  fact?: { front: string; back: string };
 }
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -51,7 +53,7 @@ export function runLesson(
   onFinish: (result: LessonResult) => void,
   onExit: () => void,
 ): () => void {
-  const result: LessonResult = { lessonId: lesson.id, xp: 0, correct: 0, total: 0, bestCombo: 0, missed: [] };
+  const result: LessonResult = { lessonId: lesson.id, xp: 0, correct: 0, total: 0, bestCombo: 0, missed: [], fact: lesson.fact };
   let stepIndex = 0;
   let cleanup: (() => void) | null = null;
 
@@ -95,7 +97,7 @@ export function runLesson(
     else if (step.type === "duel") duel(step.rounds);
     else if (step.type === "rush") rush(step.seconds, step.source, step.questions);
     else if (step.type === "practice") rush(0, step.title, step.questions);
-    else if (step.type === "rule") rule(step);
+    else if (step.type === "read") read(step);
     else if (step.type === "realSong") realSong(step);
     else if (step.type === "songMatch") songMatch(step.rounds);
     else tapBeat(step);
@@ -359,13 +361,13 @@ export function runLesson(
     draw();
   }
 
-  // ---- rule card ----
-  function rule(step: Extract<Step, { type: "rule" }>): void {
+  // ---- read and hear ----
+  function read(step: Extract<Step, { type: "read" }>): void {
     frame(`
-      <p class="eyebrow">${lesson.section} · ${step.title}</p>
-      <h2>${lesson.title}</h2>
-      <blockquote class="rule">${step.rule}</blockquote>
-      ${step.chips.length ? `<p class="hint left">Tap to hear it:</p><div class="chips">${step.chips.map((c, i) => `<button class="chip" type="button" data-chip="${i}">${c.label}</button>`).join("")}</div>` : ""}
+      <p class="eyebrow">${step.section} · ${step.title}</p>
+      <h2>${step.headline}</h2>
+      <p class="read-text">${step.text}</p>
+      ${step.chips.length ? `<p class="hint left">Hear it:</p><div class="chips">${step.chips.map((c, i) => `<button class="chip" type="button" data-chip="${i}">${c.label}</button>`).join("")}</div>` : ""}
       <button class="btn push" type="button" data-next>Next</button>`);
     root.querySelectorAll<HTMLButtonElement>("[data-chip]").forEach((b) =>
       b.addEventListener("click", () => {

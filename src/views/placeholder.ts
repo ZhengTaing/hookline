@@ -1,5 +1,4 @@
 const COPY: Record<string, { title: string; body: string; milestone: string }> = {
-  practice: { title: "Practice", body: "Ear checks on what you just learned.", milestone: "M3" },
   songs: { title: "My songs", body: "Your drafts, with each lesson turned into a change you can hear.", milestone: "M5" },
   chords: { title: "Chords", body: "Chord sheets that auto-scroll and transpose, with Roman numerals.", milestone: "M6" },
   quiz: { title: "Quiz", body: "Questions about songs you actually listen to.", milestone: "M7" },

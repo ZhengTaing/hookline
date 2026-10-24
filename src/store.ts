@@ -1,9 +1,13 @@
 import { supabase } from "./supabase";
 
 export interface ReviewItem {
+  /** The front of the card: a question, or a fact to remember when there's no back. */
   text: string;
+  back?: string;
   /** Local day key when it should come back. */
   due: string;
+  /** How many times in a row it was remembered; sets the next gap. */
+  box?: number;
 }
 
 export interface Progress {

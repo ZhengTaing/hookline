@@ -1,8 +1,8 @@
 import "./style.css";
 import type { Session } from "@supabase/supabase-js";
 import { ICONS } from "./icons";
-import { findLesson } from "./lessons/content";
-import { applyResult } from "./progress";
+import { COURSE, findLesson } from "./lessons/content";
+import { answerCard, applyResult, nextLessonId } from "./progress";
 import { emptyProgress, loadProgress, saveProgress, type Progress } from "./store";
 import { currentStreak, dayKey, recordVisit } from "./streak";
 import { supabase } from "./supabase";
@@ -10,12 +10,13 @@ import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
 import { renderResults } from "./views/results";
-import { renderToday } from "./views/today";
+import { mountReview } from "./views/review";
+import { renderChapter, renderToday } from "./views/today";
 
 type Tab = "learn" | "practice" | "songs" | "chords" | "quiz";
 const TABS: { id: Tab; label: string }[] = [
   { id: "learn", label: "Learn" },
-  { id: "practice", label: "Practice" },
+  { id: "practice", label: "Review" },
   { id: "songs", label: "My songs" },
   { id: "chords", label: "Chords" },
   { id: "quiz", label: "Quiz" },
@@ -64,7 +65,8 @@ function shell(tab: Tab, body: string): void {
 async function finishLesson(result: LessonResult, title: string): Promise<void> {
   stopLesson = null;
   progress = applyResult(progress, result, tomorrow());
-  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title));
+  const chapter = COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
+  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress)));
   window.scrollTo(0, 0);
   try {
     await saveProgress(userId, progress);
@@ -90,10 +92,32 @@ function route(): void {
         app.querySelector<HTMLElement>(".lesson-root")!,
         lesson,
         (result) => void finishLesson(result, lesson.title),
-        () => (location.hash = "#learn"),
+        () => (location.hash = `#chapter/${COURSE.findIndex((u) => u.lessons.includes(lesson)) + 1}`),
       );
       return;
     }
+  }
+
+  if (hash.startsWith("chapter/")) {
+    shell("learn", renderChapter(progress, Number(hash.slice("chapter/".length))));
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  if (hash === "practice") {
+    shell("practice", `<div class="review-root"></div>`);
+    const today = dayKey(new Date());
+    mountReview(app.querySelector<HTMLElement>(".review-root")!, progress, today, (text, remembered) => {
+      progress = answerCard(progress, text, remembered, today);
+      route();
+      saveProgress(userId, progress).catch(() => {
+        const note = document.createElement("p");
+        note.className = "fb no";
+        note.textContent = "Couldn't save your review. Check your connection.";
+        app.querySelector(".review")?.prepend(note);
+      });
+    });
+    return;
   }
 
   const tab = (TABS.some((t) => t.id === hash) ? hash : "learn") as Tab;
