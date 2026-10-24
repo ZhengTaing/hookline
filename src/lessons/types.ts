@@ -5,6 +5,8 @@ export type Sound =
   | { kind: "progression"; chords: number[][]; gap?: number }
   /** A melody over one held chord. */
   | { kind: "withChord"; chord: number[]; notes: number[]; gap?: number }
+  /** Clicks in rhythm: durations in beats (negative = rest), with an optional pitch for each note. */
+  | { kind: "rhythm"; beats: number[]; bpm: number; pitches?: number[] }
   | { kind: "none" };
 
 export interface StoryCard {
@@ -17,6 +19,9 @@ export interface StoryCard {
   staff?: string[];
   /** Sharps (positive) or flats (negative) in the staff's key signature. */
   keySig?: number;
+  /** Note values drawn on a rhythm line instead of a staff, with an optional time signature. */
+  rhythm?: string[];
+  time?: string;
   sound: Sound;
 }
 
@@ -35,7 +40,9 @@ export interface DuelRound {
 export type Visual =
   | { type: "staff"; notes: string[]; keySig?: number; chord?: boolean }
   | { type: "big"; text: string; caption?: string }
-  | { type: "fretboard"; marks: { string: number; fret: number }[] };
+  | { type: "fretboard"; marks: { string: number; fret: number }[] }
+  /** Note values on one line (see rhythmSvg), with an optional time signature. */
+  | { type: "rhythm"; notes: string[]; time?: string };
 
 export type RushQuestion =
   | { kind: "staff"; lower: string; upper: string; options: string[] }
@@ -76,6 +83,9 @@ export type Step =
       /** Tap a rhythm instead of every beat: positions in eighth notes from the downbeat. It plays along as a woodblock. */
       pattern?: number[];
       hint?: string;
+      /** The rhythm to read, drawn above the tap button. */
+      rhythm?: string[];
+      time?: string;
     };
 
 export interface Lesson {

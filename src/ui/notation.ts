@@ -63,3 +63,88 @@ export function fretboardSvg(marks: FretMark[]): string {
     }
   return `<svg class="fretboard" viewBox="0 0 280 140" role="img" aria-label="Guitar fretboard, frets 0 to 5">${s}</svg>`;
 }
+
+/** Beats per rhythm token, in quarter notes. A token ending in "r" is a rest; "t" is a triplet eighth; "~" ties. */
+const TOKEN_BEATS: Record<string, number> = { w: 4, "h.": 3, h: 2, "q.": 1.5, q: 1, "e.": 0.75, e: 0.5, s: 0.25, t: 1 / 3 };
+
+/** Durations in beats for a rhythm, rests negative, with tied notes merged. */
+export function rhythmBeats(tokens: string[]): number[] {
+  const out: number[] = [];
+  let tie = false;
+  for (const t of tokens) {
+    if (t === "~") {
+      tie = true;
+      continue;
+    }
+    if (t === "|") continue;
+    const rest = t.endsWith("r");
+    const beats = TOKEN_BEATS[rest ? t.slice(0, -1) : t] ?? 1;
+    if (tie && out.length) out[out.length - 1] += beats;
+    else out.push(rest ? -beats : beats);
+    tie = false;
+  }
+  return out;
+}
+
+/**
+ * Rhythm on one line: note values (w h h. q q. e e. s t), rests (wr hr qr er), and "~" to tie
+ * two notes. `time` like "4/4" draws a time signature first; "|" draws a bar line.
+ */
+export function rhythmSvg(tokens: string[], time?: string): string {
+  const line = 70;
+  let s = `<line x1="8" x2="292" y1="${line}" y2="${line}" />`;
+  let x = 26;
+  if (time) {
+    const [top, bottom] = time.split("/");
+    s += `<text class="time" x="${x}" y="${line - 6}" text-anchor="middle">${top}</text><text class="time" x="${x}" y="${line + 22}" text-anchor="middle">${bottom}</text>`;
+    x += 30;
+  }
+  const notes = tokens.filter((t) => t !== "~" && t !== "|");
+  const total = notes.reduce((n, t) => n + (TOKEN_BEATS[t.replace(/r$/, "")] ?? 1), 0);
+  const unit = Math.min(52, (284 - x - 20) / Math.max(total, 1));
+  const heads: number[] = [];
+  const ties: number[] = [];
+  let tripletRun: number[] = [];
+  const flushTriplet = () => {
+    if (tripletRun.length >= 3) s += `<text class="tuplet" x="${(tripletRun[0] + tripletRun[tripletRun.length - 1]) / 2 + 6}" y="22" text-anchor="middle">3</text>`;
+    tripletRun = [];
+  };
+  for (const t of tokens) {
+    if (t === "~") {
+      ties.push(heads.length - 1);
+      continue;
+    }
+    if (t === "|") {
+      s += `<line x1="${x - 8}" x2="${x - 8}" y1="${line - 18}" y2="${line + 18}" />`;
+      continue;
+    }
+    const rest = t.endsWith("r");
+    const v = rest ? t.slice(0, -1) : t;
+    const beats = TOKEN_BEATS[v] ?? 1;
+    const cx = x + 8;
+    if (rest) {
+      if (v === "w") s += `<rect x="${cx - 8}" y="${line}" width="16" height="6" />`;
+      else if (v === "h") s += `<rect x="${cx - 8}" y="${line - 6}" width="16" height="6" />`;
+      else if (v === "q") s += `<path class="rest" d="M${cx - 3} ${line - 18} l6 7 l-6 6 l6 7 q-7 -2 -3 6" />`;
+      else s += `<circle cx="${cx - 2}" cy="${line - 6}" r="3" /><path class="rest" d="M${cx - 2} ${line - 4} q5 1 6 -3 l-6 18" />`;
+      heads.push(cx);
+      flushTriplet();
+    } else {
+      const open = v === "w" || v.startsWith("h");
+      s += `<ellipse class="${open ? "open" : ""}" cx="${cx}" cy="${line}" rx="7" ry="5" transform="rotate(-20 ${cx} ${line})" />`;
+      if (v !== "w") s += `<line x1="${cx + 6.5}" x2="${cx + 6.5}" y1="${line - 2}" y2="${line - 36}" />`;
+      const flags = v.startsWith("e") || v === "t" ? 1 : v === "s" ? 2 : 0;
+      for (let f = 0; f < flags; f++) s += `<path class="flag" d="M${cx + 6.5} ${line - 36 + f * 8} q4 6 10 9 q-2 4 -3 8" />`;
+      if (v.endsWith(".")) s += `<circle cx="${cx + 14}" cy="${line - 2}" r="2.2" />`;
+      heads.push(cx);
+      if (v === "t") {
+        tripletRun.push(cx);
+        if (tripletRun.length === 3) flushTriplet();
+      } else flushTriplet();
+    }
+    x += Math.max(22, beats * unit);
+  }
+  flushTriplet();
+  for (const i of ties) if (heads[i + 1] !== undefined) s += `<path class="tie" d="M${heads[i] + 2} ${line + 9} q${(heads[i + 1] - heads[i]) / 2} 12 ${heads[i + 1] - heads[i] - 4} 0" />`;
+  return `<svg class="staff rhythm" viewBox="0 0 300 110" role="img" aria-label="A rhythm${time ? ` in ${time}` : ""}">${s}</svg>`;
+}

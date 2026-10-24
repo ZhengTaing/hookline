@@ -316,3 +316,8 @@ button, input { font: inherit; color: inherit; }
 .song-grid.order-list { grid-template-columns: 64px 1fr; gap: 6px 10px; align-items: center; text-align: left; }
 .order-list .row-label { font-size: 13px; font-weight: 700; color: var(--dim); }
 .order-list .slot { height: 40px; text-align: left; padding: 0 12px; }
+.rhythm .open { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+.rhythm .flag, .rhythm .tie, .rhythm .rest { fill: none; stroke: var(--ink); stroke-width: 1.8; }
+.rhythm rect, .rhythm circle { fill: var(--ink); }
+.rhythm .time { font: 700 24px Manrope, sans-serif; fill: var(--ink); }
+.rhythm .tuplet { font: 700 13px Manrope, sans-serif; fill: var(--ink); }

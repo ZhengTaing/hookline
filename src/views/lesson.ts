@@ -1,7 +1,7 @@
 import { chord, feedback, melodic, tone } from "../audio";
 import { INTERVAL_WORDS, NOTE_NAMES, displayName, fretMidi, intervalName, parseNote } from "../music";
 import type { DuelRound, Lesson, RushQuestion, Sound, Step, Visual } from "../lessons/types";
-import { fretboardSvg, staffSvg } from "../ui/notation";
+import { fretboardSvg, rhythmSvg, staffSvg } from "../ui/notation";
 
 export interface LessonResult {
   lessonId: string;
@@ -21,6 +21,15 @@ function play(sound: Sound): void {
   if (sound.kind === "melodic") melodic(sound.notes, sound.gap);
   if (sound.kind === "chord") chord(sound.notes);
   if (sound.kind === "progression") sound.chords.forEach((c, i) => chord(c, i * (sound.gap ?? 0.9)));
+  if (sound.kind === "rhythm") {
+    const beat = 60 / sound.bpm;
+    let t = 0;
+    let n = 0;
+    for (const b of sound.beats) {
+      if (b > 0) tone(sound.pitches?.[n++] ?? 84, t, Math.min(0.5, b * beat * 0.9), 0.2);
+      t += Math.abs(b) * beat;
+    }
+  }
   if (sound.kind === "withChord") {
     const gap = sound.gap ?? 0.5;
     sound.chord.forEach((n) => tone(n, 0, gap * sound.notes.length + 0.6, 0.07));
@@ -30,6 +39,7 @@ function play(sound: Sound): void {
 
 function visualHtml(v: Visual): string {
   if (v.type === "staff") return staffSvg(v.notes, { keySig: v.keySig, chord: v.chord });
+  if (v.type === "rhythm") return rhythmSvg(v.notes, v.time);
   if (v.type === "big") return `<p class="big-note${v.text.length > 8 ? " long" : ""}">${v.text}</p>${v.caption ? `<p class="hint">${v.caption}</p>` : ""}`;
   return fretboardSvg(v.marks.map((m) => ({ ...m, tone: "given" as const })));
 }
@@ -112,7 +122,9 @@ export function runLesson(
     const draw = (withSound: boolean) => {
       const c = cards[i];
       const dots = cards.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("");
-      const viz = c.staff
+      const viz = c.rhythm
+        ? rhythmSvg(c.rhythm, c.time)
+        : c.staff
         ? staffSvg(c.staff, { keySig: c.keySig })
         : c.left || c.right
           ? `<div class="viz"><span class="bubble fill">${c.left ?? ""}</span><span class="gap"><span>${c.label ?? ""}</span></span><span class="bubble">${c.right ?? ""}</span></div>`
@@ -557,6 +569,7 @@ export function runLesson(
     frame(`
       <p class="eyebrow">Feel it · ${step.pattern ? "tap the rhythm" : "tap the beat"}</p>
       <h2>${step.title}</h2>
+      ${step.rhythm ? rhythmSvg(step.rhythm, step.time) : ""}
       <p class="hint">${step.hint ?? `After ${countIn} count-in clicks, tap the big button on every beat. Beat 1 of each bar clicks louder.`}</p>
       <div class="beats">${Array.from({ length: total }, () => "<i></i>").join("")}</div>
       <button class="tap" type="button" data-start>Start</button>
