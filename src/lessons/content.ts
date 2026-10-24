@@ -1,5 +1,6 @@
 import { CHAPTERS_2_4 } from "./chapters-2-4";
 import { CHAPTERS_10_12 } from "./chapters-10-12";
+import { CHAPTERS_13_22 } from "./chapters-13-22";
 import { CHAPTERS_6_9 } from "./chapters-6-9";
 import type { Unit } from "./types";
 
@@ -175,15 +176,17 @@ export const COURSE: Unit[] = [
   },
   ...CHAPTERS_6_9,
   ...CHAPTERS_10_12,
+  ...CHAPTERS_13_22,
 ];
 
 /** Units after these arrive with later lessons. Shown locked on the course path. */
 export const UPCOMING = [
-  { title: "Phrases, texture and contrast", chapter: "Chapters 13–15" },
-  { title: "Figured bass and secondary chords", chapter: "Chapters 16–18" },
-  { title: "Borrowed chords, Neapolitan and augmented 6ths", chapter: "Chapters 19–21" },
-  { title: "Changing key", chapter: "Chapters 22–23" },
-  { title: "Classical form, voice leading, jazz and beyond", chapter: "Chapters 24–35" },
+  { title: "Enharmonic modulation", chapter: "Chapter 23" },
+  { title: "Classical forms", chapter: "Chapters 24–25" },
+  { title: "Voice leading", chapter: "Chapters 26–29" },
+  { title: "Counterpoint", chapter: "Chapter 30" },
+  { title: "Jazz theory", chapter: "Chapter 31" },
+  { title: "Impressionism, set theory, serialism, minimalism", chapter: "Chapters 32–35" },
 ];
 
 export function allLessons() {

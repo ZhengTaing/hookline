@@ -382,11 +382,14 @@ export function runLesson(
   function tapBeat(step: Extract<Step, { type: "tapBeat" }>): void {
     const beatMs = 60000 / step.bpm;
     const countIn = step.beatsPerBar;
-    const total = step.beatsPerBar * step.bars;
+    const beats = step.beatsPerBar * step.bars;
+    const targets = step.pattern ? step.pattern.map((p) => (p * beatMs) / 2) : Array.from({ length: beats }, (_, i) => i * beatMs);
+    const total = targets.length;
+    const tolerance = Math.min(140, (step.pattern ? beatMs / 2 : beatMs) * 0.3);
     frame(`
-      <p class="eyebrow">Feel it · tap the beat</p>
+      <p class="eyebrow">Feel it · ${step.pattern ? "tap the rhythm" : "tap the beat"}</p>
       <h2>${step.title}</h2>
-      <p class="hint">After ${countIn} count-in clicks, tap the big button on every beat. Beat 1 of each bar clicks louder.</p>
+      <p class="hint">${step.hint ?? `After ${countIn} count-in clicks, tap the big button on every beat. Beat 1 of each bar clicks louder.`}</p>
       <div class="beats">${Array.from({ length: total }, () => "<i></i>").join("")}</div>
       <button class="tap" type="button" data-start>Start</button>
       <p class="fb" aria-live="polite"></p>
@@ -408,22 +411,26 @@ export function runLesson(
       fb.textContent = "";
       tapBtn.textContent = "Tap";
       start = performance.now() + countIn * beatMs;
-      for (let i = 0; i < countIn + total; i++) {
+      for (let i = 0; i < countIn + beats; i++) {
         const accent = i % step.beatsPerBar === 0;
         timers.push(window.setTimeout(() => tone(accent ? 96 : 89, 0, 0.05, i < countIn ? 0.12 : 0.06), i * beatMs));
       }
+      if (step.pattern)
+        for (const t of targets) timers.push(window.setTimeout(() => tone(81, 0, 0.08, 0.1), countIn * beatMs + t));
       timers.push(
         window.setTimeout(() => {
           running = false;
           const ok = hits.size >= Math.ceil(total * 0.75);
           dots.forEach((d, i) => !hits.has(i) && d.classList.add("miss"));
           fb.className = `fb ${ok ? "ok" : "no"}`;
-          fb.textContent = `${hits.size} of ${total} beats on time. ${ok ? "Nice and steady." : "Try again and listen for the loud click on 1."}`;
+          fb.textContent = step.pattern
+            ? `${hits.size} of ${total} hits on time. ${ok ? "You've got the groove." : "Try again and copy the woodblock."}`
+            : `${hits.size} of ${total} beats on time. ${ok ? "Nice and steady." : "Try again and listen for the loud click on 1."}`;
           if (!scored) score(ok, ok ? 20 : 0, `Keeping a steady beat in ${step.title}`);
           scored = true;
           tapBtn.textContent = "Try again";
           root.querySelector<HTMLButtonElement>("[data-next]")!.disabled = false;
-        }, (countIn + total) * beatMs + 300),
+        }, (countIn + beats) * beatMs + 300),
       );
     };
 
@@ -435,10 +442,9 @@ export function runLesson(
         return;
       }
       const t = performance.now() - start;
-      const beat = Math.round(t / beatMs);
-      if (beat < 0 || beat >= total) return;
-      const off = Math.abs(t - beat * beatMs);
-      if (off <= Math.min(140, beatMs * 0.25)) {
+      let beat = 0;
+      targets.forEach((x, i) => Math.abs(t - x) < Math.abs(t - targets[beat]) && (beat = i));
+      if (Math.abs(t - targets[beat]) <= tolerance) {
         hits.add(beat);
         dots[beat].className = "hit";
       }

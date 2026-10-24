@@ -51,7 +51,16 @@ export type Step =
   | { type: "duel"; rounds: DuelRound[] }
   | { type: "rush"; seconds: number; source: string; questions: RushQuestion[] }
   | { type: "songMatch"; rounds: SongRound[] }
-  | { type: "tapBeat"; bpm: number; beatsPerBar: number; bars: number; title: string };
+  | {
+      type: "tapBeat";
+      bpm: number;
+      beatsPerBar: number;
+      bars: number;
+      title: string;
+      /** Tap a rhythm instead of every beat: positions in eighth notes from the downbeat. It plays along as a woodblock. */
+      pattern?: number[];
+      hint?: string;
+    };
 
 export interface Lesson {
   id: string;
