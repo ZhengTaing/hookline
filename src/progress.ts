@@ -26,6 +26,8 @@ export function nextLessonId(progress: Progress): string | null {
 
 /** A lesson is open once every lesson before it is finished. */
 export function isUnlocked(progress: Progress, lessonId: string): boolean {
+  // Preview builds (VITE_UNLOCK_ALL=1) open every lesson for trying things out.
+  if (import.meta.env.VITE_UNLOCK_ALL === "1") return true;
   const lessons = allLessons();
   const i = lessons.findIndex((l) => l.id === lessonId);
   return lessons.slice(0, i).every((l) => progress.completedLessons.includes(l.id));
