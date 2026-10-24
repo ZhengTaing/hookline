@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { intervalName, parseNote } from "../music";
 import { KEY_TABLES } from "./chapters-2-4";
+import { CHORD_HELPERS } from "./chapters-6-9";
 import { allLessons } from "./content";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -53,5 +54,15 @@ describe("key tables", () => {
   it("match the key signatures the scale speller works out", () => {
     for (const [sig, key] of Object.entries(KEY_TABLES.MAJOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "major"), key).toBe(Number(sig));
     for (const [sig, key] of Object.entries(KEY_TABLES.MINOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "minor"), key + "m").toBe(Number(sig));
+  });
+});
+
+describe("chord spelling", () => {
+  it("stacks letters in thirds with the right accidentals", () => {
+    expect(CHORD_HELPERS.spellChord("Bb", "minor")).toEqual(["Bb", "Db", "F"]);
+    expect(CHORD_HELPERS.spellChord("F#", "minor")).toEqual(["F#", "A", "C#"]);
+    expect(CHORD_HELPERS.spellChord("C", "°7")).toEqual(["C", "Eb", "Gb", "Bbb"]);
+    expect(CHORD_HELPERS.spellChord("E", "7")).toEqual(["E", "G#", "B", "D"]);
+    expect(CHORD_HELPERS.staffNames(["G", "B", "D"])).toEqual(["G4", "B4", "D5"]);
   });
 });

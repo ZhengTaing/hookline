@@ -1,4 +1,5 @@
 import { CHAPTERS_2_4 } from "./chapters-2-4";
+import { CHAPTERS_6_9 } from "./chapters-6-9";
 import type { Unit } from "./types";
 
 // Lessons adapted from Robert Hutchinson, "Music Theory for the 21st-Century Classroom"
@@ -171,13 +172,16 @@ export const COURSE: Unit[] = [
       },
     ],
   },
+  ...CHAPTERS_6_9,
 ];
 
 /** Units after these arrive with later lessons. Shown locked on the course path. */
 export const UPCOMING = [
-  { title: "Chords and chord symbols", chapter: "Chapters 6, 8" },
-  { title: "Roman numerals and progressions", chapter: "Chapters 7, 9" },
-  { title: "Melody and song form", chapter: "Chapters 10–12" },
+  { title: "Non-chord tones", chapter: "Chapter 10" },
+  { title: "Melody", chapter: "Chapter 11" },
+  { title: "Song form", chapter: "Chapter 12" },
+  { title: "Secondary chords, borrowed chords and key changes", chapter: "Chapters 13–22" },
+  { title: "Classical form, voice leading, jazz and beyond", chapter: "Chapters 23–35" },
 ];
 
 export function allLessons() {

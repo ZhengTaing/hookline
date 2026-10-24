@@ -107,3 +107,59 @@ export function scaleMidi(scale: string[]): number[] {
   }
   return out;
 }
+
+export type ChordQuality = "major" | "minor" | "dim" | "aug" | "maj7" | "7" | "m7" | "ø7" | "°7";
+
+const QUALITY_SHAPES: Record<string, ChordQuality> = {
+  "4,7": "major", "3,7": "minor", "3,6": "dim", "4,8": "aug",
+  "4,7,11": "maj7", "4,7,10": "7", "3,7,10": "m7", "3,6,10": "ø7", "3,6,9": "°7",
+};
+
+const SYMBOL_SUFFIX: Record<ChordQuality, string> = {
+  major: "", minor: "m", dim: "°", aug: "+", maj7: "maj7", "7": "7", m7: "m7", "ø7": "ø7", "°7": "°7",
+};
+
+export interface DiatonicChord {
+  /** Spelled chord tones from the root up, e.g. ["D", "F", "A"]. */
+  notes: string[];
+  /** MIDI numbers in close position, root between C3 and B3. */
+  midi: number[];
+  quality: ChordQuality;
+  roman: string;
+  symbol: string;
+}
+
+const ROMANS = ["I", "II", "III", "IV", "V", "VI", "VII"];
+
+/** Names a chord quality from its semitones above the root. */
+export function chordQuality(semitones: number[]): ChordQuality {
+  const q = QUALITY_SHAPES[semitones.join(",")];
+  if (!q) throw new Error(`unknown chord shape ${semitones}`);
+  return q;
+}
+
+export function chordSymbol(root: string, quality: ChordQuality): string {
+  return pretty(root) + SYMBOL_SUFFIX[quality];
+}
+
+/**
+ * The triad (or seventh chord) built on a scale degree, stacking every other scale note.
+ * Minor keys use the natural minor scale, except V and vii° which raise the leading tone, as the book does in 7.3.
+ */
+export function diatonicChord(tonic: string, kind: "major" | "minor", degree: number, seventh = false): DiatonicChord {
+  const raise = kind === "minor" && (degree === 5 || degree === 7) ? [7] : [];
+  const scale = spellScale(tonic, kind, raise);
+  const midi1 = scaleMidi(scale).slice(0, 7).map((m) => m - 12);
+  const midi = [...midi1, ...midi1.map((m) => m + 12)];
+  const idx = seventh ? [0, 2, 4, 6] : [0, 2, 4];
+  const picks = idx.map((i) => degree - 1 + i);
+  const notes = picks.map((i) => scale[i % 7]);
+  const m = picks.map((i) => midi[i]);
+  const quality = chordQuality(m.slice(1).map((x) => x - m[0]));
+  const base = ROMANS[degree - 1];
+  const lower = ["minor", "dim", "m7", "ø7", "°7"].includes(quality);
+  const roman =
+    (lower ? base.toLowerCase() : base) +
+    ({ major: "", minor: "", dim: "°", aug: "+", maj7: "maj7", "7": "7", m7: "7", "ø7": "ø7", "°7": "°7" } as const)[quality];
+  return { notes, midi: m, quality, roman, symbol: chordSymbol(notes[0], quality) };
+}

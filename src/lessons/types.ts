@@ -2,6 +2,7 @@
 export type Sound =
   | { kind: "melodic"; notes: number[]; gap?: number }
   | { kind: "chord"; notes: number[] }
+  | { kind: "progression"; chords: number[][]; gap?: number }
   | { kind: "none" };
 
 export interface StoryCard {

@@ -18,6 +18,7 @@ const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4:
 function play(sound: Sound): void {
   if (sound.kind === "melodic") melodic(sound.notes, sound.gap);
   if (sound.kind === "chord") chord(sound.notes);
+  if (sound.kind === "progression") sound.chords.forEach((c, i) => chord(c, i * (sound.gap ?? 0.9)));
 }
 
 function visualHtml(v: Visual): string {
