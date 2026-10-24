@@ -37,7 +37,7 @@ export type RushQuestion =
   | { kind: "staff"; lower: string; upper: string; options: string[] }
   | { kind: "choice"; prompt: string; options: string[]; answer: string; visual?: Visual; sound?: Sound; miss: string }
   | { kind: "fretInterval"; string: number; fret: number; semitones: number; label: string }
-  | { kind: "findNote"; pitchClass: number };
+  | { kind: "findNote"; pitchClass: number; prompt?: string };
 
 export interface SongRound {
   notes: [number, number];
@@ -51,6 +51,12 @@ export type Step =
   | { type: "duel"; rounds: DuelRound[] }
   | { type: "rush"; seconds: number; source: string; questions: RushQuestion[] }
   | { type: "songMatch"; rounds: SongRound[] }
+  /** The takeaway in one or two sentences, with sound chips to tap. */
+  | { type: "rule"; title: string; rule: string; chips: { label: string; sound: Sound }[] }
+  /** An untimed question set: identify, build on the fretboard, or name it by ear. */
+  | { type: "practice"; title: string; questions: RushQuestion[] }
+  /** Label each chord of a real song with a Roman numeral (or other label). */
+  | { type: "realSong"; song: string; artist: string; key: string; chords: string[]; answer: string[]; options: string[]; sound: Sound }
   | {
       type: "tapBeat";
       bpm: number;

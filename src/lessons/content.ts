@@ -3,6 +3,7 @@ import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
 import { CHAPTERS_23_35 } from "./chapters-23-35";
 import { CHAPTERS_6_9 } from "./chapters-6-9";
+import { mixLesson } from "./mix";
 import type { Unit } from "./types";
 
 // Lessons adapted from Robert Hutchinson, "Music Theory for the 21st-Century Classroom"
@@ -10,7 +11,7 @@ import type { Unit } from "./types";
 
 const C4 = 60;
 
-export const COURSE: Unit[] = [
+const BOOK: Unit[] = [
   {
     id: "notes",
     title: "Notes and the fretboard",
@@ -180,6 +181,9 @@ export const COURSE: Unit[] = [
   ...CHAPTERS_13_22,
   ...CHAPTERS_23_35,
 ];
+
+/** The book's units, each lesson with its learn-it steps mixed in before the timed round. */
+export const COURSE: Unit[] = BOOK.map((u) => ({ ...u, lessons: u.lessons.map(mixLesson) }));
 
 /** Units after these arrive with later lessons. Shown locked on the course path. */
 export const UPCOMING: { title: string; chapter: string }[] = [

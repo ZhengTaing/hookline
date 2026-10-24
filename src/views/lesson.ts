@@ -94,6 +94,9 @@ export function runLesson(
     if (step.type === "story") story(step.cards);
     else if (step.type === "duel") duel(step.rounds);
     else if (step.type === "rush") rush(step.seconds, step.source, step.questions);
+    else if (step.type === "practice") rush(0, step.title, step.questions);
+    else if (step.type === "rule") rule(step);
+    else if (step.type === "realSong") realSong(step);
     else if (step.type === "songMatch") songMatch(step.rounds);
     else tapBeat(step);
   }
@@ -185,8 +188,10 @@ export function runLesson(
   }
 
   // ---- timed rush ----
+  /** The timed speed round. With `seconds` 0 it's an untimed practice set, and `source` is its title. */
   function rush(seconds: number, source: string, questions: RushQuestion[]): void {
-    const order = shuffle(questions);
+    const untimed = seconds === 0;
+    const order = untimed ? questions : shuffle(questions);
     const end = Date.now() + seconds * 1000;
     let q = 0;
     let combo = 0;
@@ -195,7 +200,7 @@ export function runLesson(
     let finished = false;
     const multiplier = () => Math.min(1 + Math.floor(combo / 2), 4);
 
-    const timer = window.setInterval(() => {
+    const timer = untimed ? 0 : window.setInterval(() => {
       const left = Math.max(0, end - Date.now());
       const bar = root.querySelector<HTMLElement>(".timer i");
       if (bar) bar.style.width = `${(left / (seconds * 1000)) * 100}%`;
@@ -214,8 +219,20 @@ export function runLesson(
         result.bestCombo = Math.max(result.bestCombo, combo);
         points += 10 * multiplier();
       } else combo = 0;
-      score(ok, ok ? 10 * multiplier() : 0, miss);
+      score(ok, ok ? (untimed ? 5 : 10 * multiplier()) : 0, miss);
       locked = true;
+      if (untimed) {
+        const btn = root.querySelector<HTMLButtonElement>("[data-next]")!;
+        btn.disabled = false;
+        btn.addEventListener("click", () => {
+          if (q < order.length - 1) {
+            q++;
+            locked = false;
+            draw();
+          } else next();
+        });
+        return;
+      }
       window.setTimeout(() => {
         if (finished) return;
         locked = false;
@@ -227,12 +244,16 @@ export function runLesson(
     };
 
     const head = () => {
+      if (untimed) return `<p class="eyebrow">${source} · ${q + 1} of ${order.length}</p>`;
       const left = Math.max(0, end - Date.now());
       return `
         <div class="hud"><span>Score <b>${points}</b></span><span>${q + 1}/${order.length} · <b class="time">${Math.ceil(left / 1000)}</b>s</span></div>
         <div class="timer"><i style="width:${(left / (seconds * 1000)) * 100}%"></i></div>
         <div class="combo">${combo >= 2 ? `Combo ×${multiplier()} · ${combo} in a row` : ""}</div>`;
     };
+
+    const foot = () => (untimed ? `<button class="btn push" type="button" data-next disabled>${q < order.length - 1 ? "Next" : "Continue"}</button>` : "");
+    const plus = () => (untimed ? "Yes!" : `+${10 * Math.min(1 + Math.floor((combo + 1) / 2), 4)}`);
 
     const draw = () => {
       const question = order[q];
@@ -241,11 +262,11 @@ export function runLesson(
         const size = parseNote(question.upper).step - parseNote(question.lower).step + 1;
         const right = named ? intervalName(question.lower, question.upper) : SIZE_WORDS[size];
         frame(`${head()}
-          <p class="eyebrow">Book ${source}</p>
+          ${untimed ? "" : `<p class="eyebrow">Book ${source}</p>`}
           <h2>${named ? "Name this interval" : "How big is this interval?"}</h2>
           ${staffSvg([question.lower, question.upper])}
           <div class="opts">${question.options.map((o) => `<button class="opt" type="button" data-o="${o}">${o}</button>`).join("")}</div>
-          <p class="fb" aria-live="polite"></p>`);
+          <p class="fb" aria-live="polite"></p>${foot()}`);
         root.querySelectorAll<HTMLButtonElement>("[data-o]").forEach((b) =>
           b.addEventListener("click", () => {
             if (locked) return;
@@ -254,7 +275,7 @@ export function runLesson(
             if (!ok) root.querySelector(`[data-o="${right}"]`)!.classList.add("right");
             const fb = root.querySelector(".fb")!;
             fb.className = `fb ${ok ? "ok" : "no"}`;
-            fb.textContent = ok ? `+${10 * Math.min(1 + Math.floor((combo + 1) / 2), 4)}` : `It's a ${right}.`;
+            fb.textContent = ok ? plus() : `It's a ${right}.`;
             melodic([parseNote(question.lower).midi, parseNote(question.upper).midi], 0.45);
             answer(ok, `${displayName(question.lower)} up to ${displayName(question.upper)} is a ${right}`);
           }),
@@ -265,12 +286,12 @@ export function runLesson(
       if (question.kind === "choice") {
         const options = shuffle(question.options);
         frame(`${head()}
-          <p class="eyebrow">Book ${source}</p>
+          ${untimed ? "" : `<p class="eyebrow">Book ${source}</p>`}
           <h2>${question.prompt}</h2>
           ${question.visual ? visualHtml(question.visual) : ""}
-          ${question.sound ? `<button class="btn ghost" type="button" data-sound>▶ Play</button>` : ""}
+          ${question.sound ? `<button class="${question.visual ? "btn ghost" : "play-big"}" type="button" data-sound>▶ Play</button>` : ""}
           <div class="opts${options.some((o) => o.length > 14) ? " stack" : ""}">${options.map((o) => `<button class="opt" type="button" data-o="${o}">${o}</button>`).join("")}</div>
-          <p class="fb" aria-live="polite"></p>`);
+          <p class="fb" aria-live="polite"></p>${foot()}`);
         if (question.sound) {
           const s = question.sound;
           root.querySelector("[data-sound]")!.addEventListener("click", () => play(s));
@@ -284,7 +305,7 @@ export function runLesson(
             if (!ok) root.querySelector(`[data-o="${CSS.escape(question.answer)}"]`)!.classList.add("right");
             const fb = root.querySelector(".fb")!;
             fb.className = `fb ${ok ? "ok" : "no"}`;
-            fb.textContent = ok ? `+${10 * Math.min(1 + Math.floor((combo + 1) / 2), 4)}` : `It's ${question.answer}.`;
+            fb.textContent = ok ? plus() : `It's ${question.answer}.`;
             answer(ok, question.miss);
           }),
         );
@@ -296,18 +317,18 @@ export function runLesson(
       const prompt =
         question.kind === "fretInterval"
           ? `Tap a ${question.label} above ${NOTE_NAMES[fretMidi(question.string, question.fret) % 12]}`
-          : `Find ${NOTE_NAMES[question.pitchClass]}`;
+          : question.prompt ?? `Find ${NOTE_NAMES[question.pitchClass]}`;
       const drawBoard = (hit?: { string: number; fret: number; ok: boolean }) => {
         const marks = [
           ...(given ? [{ ...given, tone: "given" as const }] : []),
           ...(hit ? [{ string: hit.string, fret: hit.fret, tone: hit.ok ? ("right" as const) : ("wrong" as const) }] : []),
         ];
         frame(`${head()}
-          <p class="eyebrow">Book ${source}</p>
+          ${untimed ? "" : `<p class="eyebrow">Book ${source}</p>`}
           <h2>${prompt}</h2>
           ${question.kind === "findNote" ? `<p class="big-note">${NOTE_NAMES[question.pitchClass]}</p>` : ""}
           ${fretboardSvg(marks)}
-          <p class="fb" aria-live="polite">${hit ? "" : "Anywhere on frets 0 to 5."}</p>`);
+          <p class="fb" aria-live="polite">${hit ? "" : "Anywhere on frets 0 to 5."}</p>${foot()}`);
         root.querySelector(".fretboard")!.addEventListener("click", (e) => {
           const spot = (e.target as Element).closest<SVGGElement>(".spot");
           if (!spot || locked) return;
@@ -336,6 +357,79 @@ export function runLesson(
       drawBoard();
     };
     draw();
+  }
+
+  // ---- rule card ----
+  function rule(step: Extract<Step, { type: "rule" }>): void {
+    frame(`
+      <p class="eyebrow">${lesson.section} · ${step.title}</p>
+      <h2>${lesson.title}</h2>
+      <blockquote class="rule">${step.rule}</blockquote>
+      ${step.chips.length ? `<p class="hint left">Tap to hear it:</p><div class="chips">${step.chips.map((c, i) => `<button class="chip" type="button" data-chip="${i}">${c.label}</button>`).join("")}</div>` : ""}
+      <button class="btn push" type="button" data-next>Next</button>`);
+    root.querySelectorAll<HTMLButtonElement>("[data-chip]").forEach((b) =>
+      b.addEventListener("click", () => {
+        root.querySelectorAll(".chip.on").forEach((c) => c.classList.remove("on"));
+        b.classList.add("on");
+        play(step.chips[Number(b.dataset.chip)].sound);
+      }),
+    );
+    root.querySelector("[data-next]")!.addEventListener("click", next);
+  }
+
+  // ---- real song ----
+  function realSong(step: Extract<Step, { type: "realSong" }>): void {
+    const picks: (string | null)[] = step.chords.map(() => null);
+    let checked = false;
+    const search = encodeURIComponent(`${step.song} ${step.artist}`);
+    const draw = () => {
+      frame(`
+        <p class="eyebrow">Real song · chapter ${lesson.section.split(".")[0]}</p>
+        <h2>“${step.song}” (${step.artist}) is in ${step.key}. Label each chord.</h2>
+        <div class="song-grid" style="--n:${step.chords.length}">
+          ${step.chords.map((c) => `<b>${c}</b>`).join("")}
+          ${picks.map((p, i) => `<button class="slot${checked ? (p === step.answer[i] ? " right" : " wrong") : ""}" type="button" data-slot="${i}">${p ?? ""}</button>`).join("")}
+          ${checked ? step.answer.map((a, i) => `<small>${picks[i] === a ? "" : a}</small>`).join("") : ""}
+        </div>
+        <div class="numerals">${step.options.map((o) => `<button class="opt" type="button" data-num="${o}">${o}</button>`).join("")}</div>
+        <p class="hint left">Tap a label to fill the next slot. Tap a slot to clear it.</p>
+        <p class="fb" aria-live="polite"></p>
+        <p class="hint left">Hear the original: <a href="https://www.youtube.com/results?search_query=${search}" target="_blank" rel="noopener">find it on YouTube</a></p>
+        <div class="row push">
+          <button class="btn ghost" type="button" data-hear>▶ Hear it</button>
+          <button class="btn" type="button" data-check ${checked || picks.some((p) => !p) ? "disabled" : ""}>Check</button>
+        </div>
+        ${checked ? `<button class="btn" type="button" data-next>Continue</button>` : ""}`);
+      root.querySelector("[data-hear]")!.addEventListener("click", () => play(step.sound));
+      root.querySelectorAll<HTMLButtonElement>("[data-num]").forEach((b) =>
+        b.addEventListener("click", () => {
+          if (checked) return;
+          const i = picks.indexOf(null);
+          if (i >= 0) picks[i] = b.dataset.num!;
+          draw();
+        }),
+      );
+      root.querySelectorAll<HTMLButtonElement>("[data-slot]").forEach((b) =>
+        b.addEventListener("click", () => {
+          if (checked) return;
+          picks[Number(b.dataset.slot)] = null;
+          draw();
+        }),
+      );
+      root.querySelector("[data-check]")!.addEventListener("click", () => {
+        checked = true;
+        const right = picks.filter((p, i) => p === step.answer[i]).length;
+        const ok = right === step.answer.length;
+        score(ok, ok ? 20 : 0, `${step.song}: ${step.chords.join(" ")} is ${step.answer.join(" ")} in ${step.key}`);
+        draw();
+        const fb = root.querySelector(".fb")!;
+        fb.className = `fb ${ok ? "ok" : "no"}`;
+        fb.textContent = ok ? `All ${right} right. That's ${step.answer.join(" – ")}.` : `${right} of ${step.answer.length} right. The answers are under each slot.`;
+      });
+      root.querySelector("[data-next]")?.addEventListener("click", next);
+    };
+    draw();
+    play(step.sound);
   }
 
   // ---- song match ----
