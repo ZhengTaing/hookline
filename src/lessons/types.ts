@@ -3,6 +3,8 @@ export type Sound =
   | { kind: "melodic"; notes: number[]; gap?: number }
   | { kind: "chord"; notes: number[] }
   | { kind: "progression"; chords: number[][]; gap?: number }
+  /** A melody over one held chord. */
+  | { kind: "withChord"; chord: number[]; notes: number[]; gap?: number }
   | { kind: "none" };
 
 export interface StoryCard {

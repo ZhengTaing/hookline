@@ -1,4 +1,5 @@
 import { CHAPTERS_2_4 } from "./chapters-2-4";
+import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_6_9 } from "./chapters-6-9";
 import type { Unit } from "./types";
 
@@ -173,15 +174,16 @@ export const COURSE: Unit[] = [
     ],
   },
   ...CHAPTERS_6_9,
+  ...CHAPTERS_10_12,
 ];
 
 /** Units after these arrive with later lessons. Shown locked on the course path. */
 export const UPCOMING = [
-  { title: "Non-chord tones", chapter: "Chapter 10" },
-  { title: "Melody", chapter: "Chapter 11" },
-  { title: "Song form", chapter: "Chapter 12" },
-  { title: "Secondary chords, borrowed chords and key changes", chapter: "Chapters 13–22" },
-  { title: "Classical form, voice leading, jazz and beyond", chapter: "Chapters 23–35" },
+  { title: "Phrases, texture and contrast", chapter: "Chapters 13–15" },
+  { title: "Figured bass and secondary chords", chapter: "Chapters 16–18" },
+  { title: "Borrowed chords, Neapolitan and augmented 6ths", chapter: "Chapters 19–21" },
+  { title: "Changing key", chapter: "Chapters 22–23" },
+  { title: "Classical form, voice leading, jazz and beyond", chapter: "Chapters 24–35" },
 ];
 
 export function allLessons() {

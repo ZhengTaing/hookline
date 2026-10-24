@@ -247,6 +247,7 @@ button, input { font: inherit; color: inherit; }
 .timer i { display: block; height: 100%; background: var(--ink); }
 .combo { min-height: 16px; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
 .big-note { margin: 0; text-align: center; font-size: 64px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
+.big-note.long { font-size: 30px; letter-spacing: 0; line-height: 1.2; word-spacing: 0.1em; }
 
 .staff, .fretboard { width: 100%; height: auto; display: block; }
 .staff line { stroke: var(--ink); stroke-width: 1; }

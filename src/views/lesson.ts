@@ -19,11 +19,16 @@ function play(sound: Sound): void {
   if (sound.kind === "melodic") melodic(sound.notes, sound.gap);
   if (sound.kind === "chord") chord(sound.notes);
   if (sound.kind === "progression") sound.chords.forEach((c, i) => chord(c, i * (sound.gap ?? 0.9)));
+  if (sound.kind === "withChord") {
+    const gap = sound.gap ?? 0.5;
+    sound.chord.forEach((n) => tone(n, 0, gap * sound.notes.length + 0.6, 0.07));
+    melodic(sound.notes, gap);
+  }
 }
 
 function visualHtml(v: Visual): string {
   if (v.type === "staff") return staffSvg(v.notes, { keySig: v.keySig, chord: v.chord });
-  if (v.type === "big") return `<p class="big-note">${v.text}</p>${v.caption ? `<p class="hint">${v.caption}</p>` : ""}`;
+  if (v.type === "big") return `<p class="big-note${v.text.length > 8 ? " long" : ""}">${v.text}</p>${v.caption ? `<p class="hint">${v.caption}</p>` : ""}`;
   return fretboardSvg(v.marks.map((m) => ({ ...m, tone: "given" as const })));
 }
 
