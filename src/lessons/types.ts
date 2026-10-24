@@ -86,6 +86,9 @@ export type Step =
       /** The rhythm to read, drawn above the tap button. */
       rhythm?: string[];
       time?: string;
+      /** Play it on the guitar: the shape to hold, drawn on the fretboard. Each tap strums it, or with
+       * `pick`, plays the next mark in that order (indexes into `marks`, cycling). */
+      guitar?: { name: string; marks: { string: number; fret: number }[]; pick?: number[] };
     };
 
 export interface Lesson {

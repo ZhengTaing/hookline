@@ -56,7 +56,7 @@ const howLong = (notes: string[], answer: string, options: string[], why: string
 });
 
 /** Read a rhythm and tap it. In x/8 time the clicks are eighth notes, so `bpm` counts eighths. */
-const tapIt = (title: string, notes: string[], hint: string, bpm = 80, time = "4/4"): Step => {
+const tapIt = (title: string, notes: string[], hint: string, bpm = 80, time = "4/4"): Extract<Step, { type: "tapBeat" }> => {
   const [top, bottom] = time.split("/").map(Number);
   const perEighth = bottom === 8 ? 2 : 1;
   const length = rhythmBeats(notes).reduce((a, b) => a + Math.abs(b), 0);
@@ -72,6 +72,30 @@ const tapIt = (title: string, notes: string[], hint: string, bpm = 80, time = "4
     time,
   };
 };
+
+type Shape = { name: string; marks: { string: number; fret: number }[]; pick?: number[] };
+// Strings count from high e (0) to low E (5), as on the fretboard picture.
+const shape = (name: string, frets: (number | null)[], pick?: number[]): Shape => ({
+  name,
+  marks: frets.flatMap((fret, i) => (fret === null ? [] : [{ string: 5 - i, fret }])),
+  pick,
+});
+// Frets listed low E to high e, null = don't play.
+const EM = shape("E minor", [0, 2, 2, 0, 0, 0]);
+const G = shape("G major", [3, 2, 0, 0, 0, 3]);
+const D = shape("D major", [null, null, 0, 2, 3, 2]);
+const E5 = shape("E5 power chord", [0, 2, 2, null, null, null]);
+// Picked one string at a time: A, D, G, B, high e, B (the marks run high e to A).
+const AM_PICK = shape("A minor", [null, 0, 2, 2, 1, 0], [4, 3, 2, 1, 0, 1]);
+
+const tell = (shape: string, what: string) =>
+  `Hold ${shape} on your guitar. ${what} Hands busy? Tap the button instead and it plays the guitar for you.`;
+
+/** The same tap-along, played on the guitar with a chord shape on the fretboard. */
+const onGuitar = (title: string, notes: string[], gtr: Shape, what: string, bpm = 80, time = "4/4"): Step => ({
+  ...tapIt(title, notes, tell(gtr.name, what), bpm, time),
+  guitar: gtr,
+});
 
 const melody = (...names: string[]) => names.map((n) => parseNote(n).midi);
 
@@ -91,6 +115,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       { kind: "choice", prompt: "How many beats are in each bar?", options: ["2", "3", "4"], answer: "2", visual: { type: "rhythm", notes: ["q", "q"], time: "2/4" }, miss: "2/4 has two quarter-note beats per bar, like a march: 1 2, 1 2" },
     ),
     { type: "tapBeat", bpm: 84, beatsPerBar: 4, bars: 2, title: "Tap the beat in 4/4", hint: "After four count-in clicks, tap on every beat. Beat 1 of each bar clicks louder." },
+    { type: "tapBeat", bpm: 84, beatsPerBar: 3, bars: 2, title: "Strum a waltz in 3/4", hint: tell("E minor", "Strum once on every click, a little harder on beat 1."), guitar: EM },
     practice(
       "Name it by ear",
       { kind: "choice", prompt: "Listen. How many beats in each bar? Count from each loud click.", options: ["3", "4"], answer: "3", sound: pulse(3, 3), miss: "Loud, soft, soft: 1 2 3. That's three beats per bar" },
@@ -129,6 +154,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       miss: "Each one is half the one before: whole, half, quarter, eighth, sixteenth",
     }),
     tapIt("Read it and tap it", ["q", "q", "h"], "Tap once for each note: quarter, quarter, then a half note held for two beats."),
+    onGuitar("Strum it on the guitar", ["q", "q", "h", "h", "h"], G, "Strum once per note, and let the half notes ring for two beats."),
     practice(
       "Name it by ear",
       { kind: "choice", prompt: "Listen. Which rhythm is this?", options: ["Four quarters", "Two halves", "Eight eighths"], answer: "Eight eighths", sound: rhythm(Array(8).fill("e")), miss: "Two clicks per beat: eighth notes" },
@@ -144,6 +170,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       miss: "Two stomps in one beat are two eighth notes. The clap that follows is a quarter note, one beat",
     }),
     tapIt("Tap “We Will Rock You”", ["e", "e", "q", "e", "e", "q"], "Stomp-stomp (two quick eighths), then clap (a quarter). Tap all three, twice.", 81),
+    onGuitar("Strum “We Will Rock You”", ["e", "e", "q", "e", "e", "q"], E5, "Two quick strums for the stomps, then one for the clap.", 81),
   ],
 
   "4.3": [
@@ -161,6 +188,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       howLong(["h", "~", "q"], "3", ["2", "3", "4"], "Tied notes add up: a half (2) plus a quarter (1) is 3 beats"),
     ),
     tapIt("Read it and tap it", ["q.", "e", "q", "q"], "Long, short, then two quarters. Hold the dotted quarter a little past beat 2 before the quick eighth."),
+    onGuitar("Strum it on the guitar", ["q.", "e", "q.", "e", "|", "h.", "q"], D, "Strum long-short, long-short, then let the dotted half ring for three beats."),
     practice(
       "Name it by ear",
       { kind: "choice", prompt: "Listen. Even or long-short?", options: ["Even: two quarters", "Long-short: dotted quarter and eighth"], answer: "Long-short: dotted quarter and eighth", sound: rhythm(["q.", "e", "q.", "e", "q.", "e", "h"]), miss: "The first note of each pair was longer: dotted quarter, then eighth" },
@@ -191,6 +219,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       { kind: "choice", prompt: "How many big beats are in a bar of 12/8?", options: ["4", "6", "12"], answer: "4", visual: { type: "rhythm", notes: ["q.", "q.", "q.", "q."], time: "12/8" }, miss: "Divide 12 by 3: four dotted-quarter beats" },
     ),
     tapIt("Tap the big beats in 6/8", ["q.", "q.", "|", "q.", "q."], "The clicks are eighth notes, in two groups of three. Tap only on the first of each group: two taps per bar.", 150, "6/8"),
+    onGuitar("Pick a 6/8 pattern", ["e", "e", "e", "e", "e", "e", "|", "e", "e", "e", "e", "e", "e"], AM_PICK, "Pick one string per click: A, D, G, B, high e, B. Feel it as two groups of three.", 150, "6/8"),
     practice(
       "Name it by ear",
       { kind: "choice", prompt: "Listen. Is each beat split into two or three?", options: ["Two: simple", "Three: compound"], answer: "Three: compound", sound: rhythm(Array(12).fill("e"), 180, 3), miss: "The clicks came in threes: 1 la li 2 la li. That's compound" },
@@ -218,6 +247,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       { kind: "choice", prompt: "How many triplet eighths fit in one beat?", options: ["2", "3", "4"], answer: "3", visual: { type: "rhythm", notes: ["t", "t", "t", "q", "h"], time: "4/4" }, miss: "A triplet puts three notes in the space of two eighths: one beat" },
       { kind: "choice", prompt: "Which beat has the triplet?", options: ["Beat 1", "Beat 2", "Beat 3"], answer: "Beat 2", visual: { type: "rhythm", notes: ["q", "t", "t", "t", "h"], time: "4/4" }, miss: "Beat 1 is a quarter, beat 2 has the three notes marked 3, and beats 3–4 are a half note" },
     ),
+    onGuitar("Shuffle on the guitar", ["t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t", "t"], E5, "Strum three even times per click: a triplet on every beat.", 60),
     practice(
       "Name it by ear",
       { kind: "choice", prompt: "Listen. Straight or triplets?", options: ["Straight eighths", "Triplets"], answer: "Triplets", sound: rhythm(Array(12).fill("t")), miss: "Three even clicks per beat: triplets" },
@@ -246,6 +276,7 @@ export const CHAPTER_4: Record<string, Step[]> = {
       { kind: "choice", prompt: "Which is easier to read in 4/4?", options: ["Quarter, half, quarter", "Quarter, quarter tied to quarter, quarter"], answer: "Quarter, quarter tied to quarter, quarter", visual: { type: "rhythm", notes: ["q", "q", "~", "q", "q"], time: "4/4" }, miss: "Splitting the half note with a tie shows where beat 3 starts" },
     ),
     tapIt("Tap a syncopated rhythm", ["e", "q", "e", "q", "q"], "Count “1 and 2 and 3 4”. Tap on 1, the “and” after 1, the “and” after 2, then on 3 and 4: short, long, short, long, long.", 72),
+    onGuitar("Strum it syncopated", ["e", "q", "e", "q", "q"], EM, "Strum short, long, short, long, long. The second and third strums land between the beats.", 72),
     practice("Name it by ear", {
       kind: "choice",
       prompt: "Listen. On the beat, or syncopated?",

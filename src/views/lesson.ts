@@ -566,9 +566,19 @@ export function runLesson(
     const targets = step.pattern ? step.pattern.map((p) => (p * beatMs) / 2) : Array.from({ length: beats }, (_, i) => i * beatMs);
     const total = targets.length;
     const tolerance = Math.min(140, (step.pattern ? beatMs / 2 : beatMs) * 0.3);
+    const gtr = step.guitar;
+    const OPEN = [64, 59, 55, 50, 45, 40];
+    const gtrNotes = gtr ? gtr.marks.map((m) => OPEN[m.string] + m.fret) : [];
+    let picked = 0;
+    const strum = () => {
+      if (!gtr) return;
+      if (gtr.pick) tone(gtrNotes[gtr.pick[picked++ % gtr.pick.length]], 0, 1, 0.16);
+      else chord([...gtrNotes].sort((a, b) => a - b));
+    };
     frame(`
-      <p class="eyebrow">Feel it · ${step.pattern ? "tap the rhythm" : "tap the beat"}</p>
+      <p class="eyebrow">${gtr ? `Play it on the guitar · ${gtr.name}` : `Feel it · ${step.pattern ? "tap the rhythm" : "tap the beat"}`}</p>
       <h2>${step.title}</h2>
+      ${gtr ? fretboardSvg(gtr.marks.map((m) => ({ ...m, tone: "given" as const }))) : ""}
       ${step.rhythm ? rhythmSvg(step.rhythm, step.time) : ""}
       <p class="hint">${step.hint ?? `After ${countIn} count-in clicks, tap the big button on every beat. Beat 1 of each bar clicks louder.`}</p>
       <div class="beats">${Array.from({ length: total }, () => "<i></i>").join("")}</div>
@@ -588,6 +598,7 @@ export function runLesson(
     const begin = () => {
       running = true;
       hits.clear();
+      picked = 0;
       dots.forEach((d) => (d.className = ""));
       fb.textContent = "";
       tapBtn.textContent = "Tap";
@@ -622,6 +633,7 @@ export function runLesson(
         begin();
         return;
       }
+      strum();
       const t = performance.now() - start;
       let beat = 0;
       targets.forEach((x, i) => Math.abs(t - x) < Math.abs(t - targets[beat]) && (beat = i));

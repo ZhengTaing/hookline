@@ -92,7 +92,7 @@ export function rhythmBeats(tokens: string[]): number[] {
  */
 export function rhythmSvg(tokens: string[], time?: string): string {
   const line = 70;
-  let s = `<line x1="8" x2="292" y1="${line}" y2="${line}" />`;
+  let s = "";
   let x = 26;
   if (time) {
     const [top, bottom] = time.split("/");
@@ -115,7 +115,8 @@ export function rhythmSvg(tokens: string[], time?: string): string {
       continue;
     }
     if (t === "|") {
-      s += `<line x1="${x - 8}" x2="${x - 8}" y1="${line - 18}" y2="${line + 18}" />`;
+      s += `<line x1="${x + 4}" x2="${x + 4}" y1="${line - 18}" y2="${line + 18}" />`;
+      x += 16;
       continue;
     }
     const rest = t.endsWith("r");
@@ -146,5 +147,8 @@ export function rhythmSvg(tokens: string[], time?: string): string {
   }
   flushTriplet();
   for (const i of ties) if (heads[i + 1] !== undefined) s += `<path class="tie" d="M${heads[i] + 2} ${line + 9} q${(heads[i + 1] - heads[i]) / 2} 12 ${heads[i + 1] - heads[i] - 4} 0" />`;
-  return `<svg class="staff rhythm" viewBox="0 0 300 110" role="img" aria-label="A rhythm${time ? ` in ${time}` : ""}">${s}</svg>`;
+  // Busy rhythms (lots of short notes) get a wider picture that scales down, instead of running off the edge.
+  const width = Math.max(300, x + 16);
+  s = `<line x1="8" x2="${width - 8}" y1="${line}" y2="${line}" />` + s;
+  return `<svg class="staff rhythm" viewBox="0 0 ${width} 110" role="img" aria-label="A rhythm${time ? ` in ${time}` : ""}">${s}</svg>`;
 }
