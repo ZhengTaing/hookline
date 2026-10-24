@@ -307,10 +307,14 @@ export function runLesson(
               return `<button class="slot${given ? " given" : ""}${mark}" type="button" data-slot="${i}" ${given ? "disabled" : ""}>${p ?? ""}</button>`;
             })
             .join("");
-          const labels = question.labels ? `<div class="slot-labels" style="--n:${picks.length}">${question.labels.map((l) => `<span>${l}</span>`).join("")}</div>` : "";
+          const list = question.layout === "list";
+          const labels = question.labels && !list ? `<div class="slot-labels" style="--n:${picks.length}">${question.labels.map((l) => `<span>${l}</span>`).join("")}</div>` : "";
+          const grid = list
+            ? `<div class="song-grid order order-list">${slots.split("</button>").filter(Boolean).map((b, i) => `<span class="row-label">${question.labels?.[i] ?? i + 1}</span>${b}</button>`).join("")}</div>`
+            : `<div class="song-grid order" style="--n:${picks.length}">${slots}</div>${labels}`;
           frame(`${head()}
             <h2>${question.prompt}</h2>
-            <div class="song-grid order" style="--n:${picks.length}">${slots}</div>${labels}
+            ${grid}
             ${question.visual ? visualHtml(question.visual) : ""}
             <div class="opts">${question.tiles.map((t) => `<button class="opt" type="button" data-tile="${t}" ${checked ? "disabled" : ""}>${t}</button>`).join("")}</div>
             <p class="fb${checked ? (picks.every((p, i) => p === question.answer[i]) ? " ok" : " no") : ""}" aria-live="polite"></p>

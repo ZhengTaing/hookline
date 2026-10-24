@@ -47,7 +47,7 @@ export type RushQuestion =
    * Tap tiles into the empty slots, in order. `given` holds the filled slots (null = empty),
    * `answer` the whole row, `tiles` the choices (decoys allowed), `labels` small text under each slot.
    */
-  | { kind: "order"; prompt: string; given: (string | null)[]; answer: string[]; tiles: string[]; labels?: string[]; visual?: Visual; sound?: Sound; miss: string };
+  | { kind: "order"; prompt: string; given: (string | null)[]; answer: string[]; tiles: string[]; labels?: string[]; visual?: Visual; sound?: Sound; miss: string; /** "list": one row per slot with its label beside it, for long names. */ layout?: "row" | "list" };
 
 export interface SongRound {
   notes: [number, number];
