@@ -87,8 +87,10 @@ export async function hydrateArtists(root: ParentNode): Promise<void> {
     if (!src || !card.isConnected) return;
     const img = new Image();
     img.alt = artist;
+    // A lazy image only loads once it is in the page, so add it now and drop the name on load.
     img.loading = "lazy";
-    img.onload = () => card.querySelector(".artist-photo")!.replaceChildren(img);
+    img.onload = () => card.querySelector(".artist-photo span")?.remove();
     img.src = src;
+    card.querySelector(".artist-photo")!.append(img);
   });
 }
