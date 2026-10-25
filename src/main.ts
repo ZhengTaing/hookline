@@ -10,6 +10,7 @@ import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
 import { renderResults } from "./views/results";
+import { chapterSong, hydrateSongCard, renderSongCard } from "./views/song-card";
 import { mountReview } from "./views/review";
 import { renderChapter, renderToday } from "./views/today";
 
@@ -134,7 +135,10 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
   const chapter = result.lessonId.startsWith("practice-")
     ? Number(result.lessonId.slice("practice-".length))
     : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
-  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress)));
+  // Finishing a chapter's last section shows a song from the playlist that uses the chapter's idea.
+  const song = COURSE[chapter - 1]?.lessons.at(-1)?.id === result.lessonId ? chapterSong(chapter) : undefined;
+  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress), song ? renderSongCard(song) : ""));
+  void hydrateSongCard(app);
   lastHash = `lesson/${result.lessonId}`;
   app.querySelector(".content")?.classList.add("nav-tab");
   window.scrollTo(0, 0);

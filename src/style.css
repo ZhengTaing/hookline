@@ -369,6 +369,30 @@ button, input { font: inherit; color: inherit; }
 .skel-group { display: grid; gap: 12px; }
 .sk { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--soft) 0, var(--line) 50%, var(--soft) 100%) 0 0 / 640px 100%; animation: shimmer 1.2s linear infinite; }
 
+/* Playlist song card on a chapter's finish screen. Its color comes from the album art. */
+.song-card { --song-tint: #3a1f2b; display: grid; gap: 14px; padding: 18px; border-radius: 20px; background: var(--song-tint); color: #fff; animation: rise .5s ease both; transition: background .6s ease; }
+.song-top { display: flex; gap: 14px; align-items: center; }
+.song-art { width: 104px; height: 104px; flex-shrink: 0; border-radius: 12px; background: rgba(0, 0, 0, .35); display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box; font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, .7); overflow: hidden; box-shadow: 0 14px 30px rgba(0, 0, 0, .35); }
+.song-art img { width: 104px; height: 104px; margin: -10px; object-fit: cover; animation: pop .5s ease both; }
+.song-head h2 { margin: 2px 0; font-size: 22px; line-height: 1.15; }
+.song-head p { margin: 0; color: rgba(255, 255, 255, .8); }
+.song-head .song-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .75); }
+.song-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.song-chips span { padding: 4px 10px; border-radius: 12px; background: rgba(255, 255, 255, .16); font-size: 13px; font-weight: 600; }
+.song-play { display: flex; align-items: center; gap: 12px; }
+.song-play[hidden] { display: none; }
+.song-preview { width: 44px; height: 44px; flex-shrink: 0; border: 0; border-radius: 50%; background: #fff; cursor: pointer; position: relative; }
+.song-preview::after { content: ""; position: absolute; left: 17px; top: 14px; border-left: 13px solid #111; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+.song-preview.on::after { left: 15px; top: 14px; width: 4px; height: 16px; border: 0; border-left: 4px solid #111; border-right: 4px solid #111; }
+.song-preview.on { animation: pulse 1.6s infinite; }
+.song-bar { flex: 1; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .25); overflow: hidden; }
+.song-bar i { display: block; width: 0; height: 100%; background: #fff; transition: width .25s linear; }
+.song-text { margin: 0; line-height: 1.5; color: rgba(255, 255, 255, .92); }
+.song-guitar { padding: 12px 14px; border-radius: 14px; background: rgba(0, 0, 0, .22); }
+.song-guitar b { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.song-guitar p { margin: 6px 0 0; line-height: 1.5; }
+.song-card .song-link { background: #fff; color: #111; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
