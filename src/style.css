@@ -572,3 +572,4 @@ button, input { font: inherit; color: inherit; }
 @media (prefers-color-scheme: dark) {
   .today-card, .next-unlock, .artist-teaser { border: 1px solid #2f2f2f; }
 }
+.today-next .quest-tag { margin-top: 4px; }
