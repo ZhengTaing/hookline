@@ -97,7 +97,7 @@ describe("course path", () => {
     expect(moved.length).toBeGreaterThan(0);
     for (const l of moved) {
       for (const s of l.steps) expect(gameTypes.has(s.type), `${l.id} has a ${s.type} step`).toBe(false);
-      expect(l.steps.some((s) => s.type === "practice" && s.title === "Use it in real songs"), `${l.id} has no real-song step`).toBe(true);
+      expect(l.steps.some((s) => s.type === "realSong" || (s.type === "practice" && s.title === "Use it in real songs")), `${l.id} has no real-song step`).toBe(true);
     }
   });
 

@@ -21,7 +21,7 @@ function chordParts(symbol: string): { pc: number; root: string; shape: number[]
   return { pc, root: mm[1] + (mm[2] ?? ""), shape: shapes[mm[3] ?? ""] };
 }
 
-function chordsSound(symbols: string[]): Sound {
+export function chordsSound(symbols: string[]): Sound {
   return {
     kind: "progression",
     gap: 0.9,
