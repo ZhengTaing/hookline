@@ -1,4 +1,5 @@
-import { supabase } from "./supabase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { cloud } from "./firebase";
 
 export interface ReviewItem {
   /** The front of the card: a question, or a fact to remember when there's no back. */
@@ -37,12 +38,13 @@ function normalize(data: unknown): Progress {
   };
 }
 
-/** Progress is one JSON row per user in the `progress` table, or browser storage in guest mode. */
+/** Progress is one Firestore document per user, `progress/{uid}`, or browser storage in guest mode. */
 export async function loadProgress(userId: string | null): Promise<Progress> {
-  if (supabase && userId) {
-    const { data, error } = await supabase.from("progress").select("data").eq("user_id", userId).maybeSingle();
-    if (error) throw error;
-    return normalize(data?.data);
+  if (cloud && userId) {
+    const snap = await getDoc(doc(cloud.db, "progress", userId));
+    if (snap.exists()) return normalize(snap.data().data);
+    // First sign-in: start from whatever was played on this device as a guest.
+    return loadProgress(null);
   }
   try {
     // Test builds carry a reset tag; a new tag starts guest progress over.
@@ -58,11 +60,8 @@ export async function loadProgress(userId: string | null): Promise<Progress> {
 }
 
 export async function saveProgress(userId: string | null, progress: Progress): Promise<void> {
-  if (supabase && userId) {
-    const { error } = await supabase
-      .from("progress")
-      .upsert({ user_id: userId, data: progress, updated_at: new Date().toISOString() });
-    if (error) throw error;
+  if (cloud && userId) {
+    await setDoc(doc(cloud.db, "progress", userId), { data: progress, updatedAt: new Date().toISOString() });
     return;
   }
   try {

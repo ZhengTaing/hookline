@@ -1,4 +1,4 @@
-export function renderLogin(message = "", mode: "signin" | "signup" = "signin"): string {
+export function renderLogin(message = ""): string {
   return `
     <section class="login">
       <div class="brand">
@@ -6,18 +6,9 @@ export function renderLogin(message = "", mode: "signin" | "signup" = "signin"):
         <h1>Hookline</h1>
         <p>Music theory for guitar players, a few minutes a day.</p>
       </div>
-      <form id="login-form" novalidate>
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" required />
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password"
-          autocomplete="${mode === "signup" ? "new-password" : "current-password"}" minlength="8" required />
-        <button class="btn" type="submit">${mode === "signup" ? "Create account" : "Log in"}</button>
-        <p class="form-msg" role="status">${message}</p>
-      </form>
-      <button class="link" type="button" id="toggle-mode" data-mode="${mode}">
-        ${mode === "signup" ? "Already have an account? Log in" : "First time here? Create your account"}
-      </button>
+      <button class="btn" type="button" id="google">Continue with Google</button>
+      <p class="form-msg" role="status">${message}</p>
+      <button class="link" type="button" id="guest">Skip for now. Progress stays on this device</button>
     </section>
   `;
 }

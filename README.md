@@ -1,6 +1,6 @@
 # Hookline
 
-A personal music theory course for guitar players. Short daily lessons you can hear, ear training, and a streak for showing up. It's a plain website hosted on GitHub Pages, with login and saved progress from Supabase.
+A personal music theory course for guitar players. Short daily lessons you can hear, ear training, and a streak for showing up. It's a plain website hosted on GitHub Pages, with Google sign-in and saved progress from Firebase.
 
 ## Run it locally
 
@@ -9,25 +9,34 @@ npm install
 npm run dev
 ```
 
-Without Supabase values the site runs in **guest mode** and keeps progress in the browser. To use login locally, copy `.env.example` to `.env` and fill in the two values.
+Until the Firebase config in [`src/firebase.ts`](src/firebase.ts) is filled in, the site runs in **guest mode** and keeps progress in the browser.
 
 ## One-time setup
 
-### 1. Supabase (login and saved progress)
+### 1. Firebase (sign-in and saved progress)
 
-1. Create a free project at [supabase.com](https://supabase.com).
-2. In **SQL Editor**, run [`supabase/schema.sql`](supabase/schema.sql).
-3. In **Authentication > URL Configuration**, set **Site URL** to the GitHub Pages address (for example `https://zhengtaing.github.io/hookline/`).
-4. In **Project Settings > API**, copy the **Project URL** and the **anon public** key.
-5. After you've created your own account on the site, you can turn off **Allow new users to sign up** under **Authentication > Sign In / Providers** so nobody else can register.
+1. Create a free project at [console.firebase.google.com](https://console.firebase.google.com).
+2. **Authentication**: enable the **Google** provider, and add `zhengtaing.github.io` under **Settings > Authorized domains**.
+3. **Firestore Database**: create a database in production mode, then publish these rules:
 
-The anon key is meant to be public. Your data is protected by the row level security rules in `schema.sql`.
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{db}/documents {
+       match /progress/{uid} {
+         allow read, write: if request.auth != null && request.auth.uid == uid;
+       }
+     }
+   }
+   ```
+
+4. **Project settings > Your apps**: register a web app and paste its `firebaseConfig` into `src/firebase.ts`. These values are meant to be public; the rules above protect the data.
+
+Progress is one document per user at `progress/{uid}`. On first sign-in, progress already played on that device as a guest carries over.
 
 ### 2. GitHub Pages
 
-1. In the repo, go to **Settings > Pages** and set **Source** to **GitHub Actions**.
-2. In **Settings > Secrets and variables > Actions > Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-3. Push to `main`. The workflow tests, builds and publishes the site.
+In the repo, go to **Settings > Pages** and set **Source** to **GitHub Actions**. Every push to `main` tests, builds and publishes the site.
 
 ## Scripts
 

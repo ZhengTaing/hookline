@@ -1,11 +1,11 @@
 import "./style.css";
-import type { Session } from "@supabase/supabase-js";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from "firebase/auth";
 import { ICONS } from "./icons";
 import { COURSE, chapterPractice, findLesson } from "./lessons/content";
 import { answerCard, applyResult, nextLessonId } from "./progress";
 import { emptyProgress, loadProgress, saveProgress, type Progress } from "./store";
 import { currentStreak, dayKey, recordVisit } from "./streak";
-import { supabase } from "./supabase";
+import { cloud } from "./firebase";
 import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
@@ -41,8 +41,10 @@ function tomorrow(): string {
 }
 
 function shell(tab: Tab, body: string): void {
-  const account = supabase
+  const account = cloud && userId
     ? `<button class="link" type="button" id="sign-out">Log out</button>`
+    : cloud
+    ? `<button class="link" type="button" id="sign-in">Sign in</button>`
     : `<span class="muted">Guest mode</span>`;
   app.innerHTML = `
     <header class="top">
@@ -58,8 +60,9 @@ function shell(tab: Tab, body: string): void {
     </nav>
   `;
   document.querySelector("#sign-out")?.addEventListener("click", async () => {
-    await supabase?.auth.signOut();
+    if (cloud) await signOut(cloud.auth);
   });
+  document.querySelector("#sign-in")?.addEventListener("click", () => showLogin());
 }
 
 async function finishLesson(result: LessonResult, title: string): Promise<void> {
@@ -165,52 +168,43 @@ async function enter(id: string | null, userEmail = ""): Promise<void> {
   }
 }
 
-function showLogin(message = "", mode: "signin" | "signup" = "signin"): void {
+function showLogin(message = ""): void {
   signedIn = false;
-  app.innerHTML = renderLogin(message, mode);
-  const form = document.querySelector<HTMLFormElement>("#login-form")!;
-  const msg = form.querySelector<HTMLParagraphElement>(".form-msg")!;
-
-  document.querySelector("#toggle-mode")!.addEventListener("click", () => {
-    showLogin("", mode === "signup" ? "signin" : "signup");
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!supabase) return;
-    const data = new FormData(form);
-    const creds = { email: String(data.get("email")), password: String(data.get("password")) };
-    if (creds.password.length < 8) {
-      msg.textContent = "Use a password with at least 8 characters.";
-      return;
-    }
-    msg.textContent = mode === "signup" ? "Creating your account..." : "Logging in...";
-    const { data: result, error } =
-      mode === "signup" ? await supabase.auth.signUp(creds) : await supabase.auth.signInWithPassword(creds);
-    if (error) {
-      msg.textContent = error.message;
-    } else if (mode === "signup" && !result.session) {
-      msg.textContent = "Check your email to confirm your account, then log in.";
+  app.innerHTML = renderLogin(message);
+  const msg = app.querySelector<HTMLParagraphElement>(".form-msg")!;
+  app.querySelector("#google")!.addEventListener("click", async () => {
+    if (!cloud) return;
+    msg.textContent = "Signing in...";
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(cloud.auth, provider);
+    } catch (e) {
+      const code = (e as { code?: string }).code ?? "";
+      // Some phone browsers block popups; fall back to a full-page sign-in.
+      if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment")
+        await signInWithRedirect(cloud.auth, provider);
+      else msg.textContent = code === "auth/popup-closed-by-user" ? "" : "Sign-in didn't work. Try again.";
     }
   });
+  app.querySelector("#guest")!.addEventListener("click", () => void enter(null));
 }
 
 async function start(): Promise<void> {
-  if (!supabase) {
+  if (!cloud) {
     await enter(null);
     return;
   }
   let activeUser: string | null | undefined;
-  const handle = (session: Session | null) => {
-    const id = session?.user.id ?? null;
+  onAuthStateChanged(cloud.auth, (user) => {
+    const id = user?.uid ?? null;
     if (id === activeUser) return;
+    const first = activeUser === undefined;
     activeUser = id;
-    // Deferred: Supabase can deadlock if its own calls run inside the auth callback.
-    setTimeout(() => (session ? void enter(session.user.id, session.user.email ?? "") : showLogin()), 0);
-  };
-  supabase.auth.onAuthStateChange((_event, session) => handle(session));
-  const { data } = await supabase.auth.getSession();
-  handle(data.session);
+    if (user) void enter(user.uid, user.email ?? "");
+    // Signed out: offer sign-in on first load, otherwise drop back to guest progress.
+    else if (first) showLogin();
+    else void enter(null);
+  });
 }
 
 window.addEventListener("hashchange", () => {
