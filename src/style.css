@@ -445,3 +445,5 @@ button, input { font: inherit; color: inherit; }
 .artist-card.locked .artist-photo { outline: 2px dashed #bdbdbd; outline-offset: -2px; }
 .artist-card.locked .artist-photo img { filter: grayscale(1) brightness(.55); }
 .artist-card:not(.locked) .artist-photo { box-shadow: 0 0 0 3px #c2255c; }
+.artist-link { font-size: 12px; font-weight: 700; color: #1db954; text-decoration: none; }
+.artist-card.locked.spotify .artist-photo img { filter: none; }
