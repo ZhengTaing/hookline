@@ -20,6 +20,12 @@ export interface Progress {
   review: ReviewItem[];
   /** Artists unlocked by passing chapter challenges, in unlock order. */
   artists?: string[];
+  /** Artist cards: rarity (0 Common to 3 Legendary) and the featured-section count their quest started from. */
+  cards?: Record<string, { r: number; q: number }>;
+  /** Today's lesson counts and claimed daily quests. */
+  today?: { day: string; sections: number; xp: number; claimed: number[] };
+  /** The week (its Monday) the weekly card pack was last opened. */
+  packWeek?: string;
 }
 
 const GUEST_KEY = "hookline.progress";
@@ -38,6 +44,9 @@ function normalize(data: unknown): Progress {
     best: d.best && typeof d.best === "object" ? d.best : {},
     review: Array.isArray(d.review) ? d.review : [],
     artists: Array.isArray(d.artists) ? d.artists : [],
+    ...(d.cards && typeof d.cards === "object" ? { cards: d.cards } : {}),
+    ...(d.today && typeof d.today === "object" ? { today: d.today } : {}),
+    ...(typeof d.packWeek === "string" ? { packWeek: d.packWeek } : {}),
   };
 }
 

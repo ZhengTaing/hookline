@@ -1,3 +1,4 @@
+import { DAILY, PACK_STREAK, QUEST_GOAL, RARITIES, RARITY_HOW, SETS, activeQuest, packState, questFor, rarityOf, todayStats } from "../cards";
 import { UNLOCK_ORDER } from "../lessons/challenge";
 import type { Progress } from "../store";
 import { artFor } from "./song-card";
@@ -16,17 +17,31 @@ export async function artistPhoto(artist: string): Promise<string | undefined> {
 }
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+const GEMS = ["⚪", "🔷", "🟣", "🌟"];
 
-const tile = (a: string, i: number, owned: string[], next?: string) => {
-  const have = owned.includes(a);
-  const status = have ? "Unlocked" : a === next ? "Next unlock" : "Locked";
+/** A collectible card. A null rarity is a card you don't own yet. */
+export function cardHtml(artist: string, rarity: number | null, extra = ""): string {
+  const n = UNLOCK_ORDER.indexOf(artist) + 1;
+  const cls = rarity === null ? "locked" : `r${rarity}`;
   return `
-    <div class="artist-card${have ? "" : " locked"}${a === next ? " next" : ""}" data-artist="${esc(a)}" style="--i:${Math.min(i, 12)}">
-      <div class="artist-photo"><span>${esc(a)}</span></div>
-      <b>${esc(a)}</b>
-      <small>#${i + 1} · ${status}</small>
+    <div class="acard ${cls} ${extra}" data-artist="${esc(artist)}" role="button" tabindex="0">
+      <div class="artist-photo"><span>${esc(artist)}</span></div>
+      <div class="acard-top"><span>#${n}</span><span>${rarity === null ? "🔒" : GEMS[rarity]}</span></div>
+      <b>${esc(artist)}</b>
     </div>`;
-};
+}
+
+/** The card flipping in, for challenge results and card packs. */
+export function revealHtml(artist: string, rarity: number, note: string): string {
+  return `
+    <div class="reveal r${rarity}">
+      <div class="reveal-rays"></div>
+      ${cardHtml(artist, rarity, "flip-in")}
+      <span class="rarity-tag r${rarity}">${RARITIES[rarity]} pull</span>
+      <b>${esc(artist)}</b>
+      <small>${note}</small>
+    </div>`;
+}
 
 /** A teaser on the Learn page: the next artist to unlock, linking to the Artists tab. */
 export function renderArtistTeaser(progress: Progress): string {
@@ -35,54 +50,158 @@ export function renderArtistTeaser(progress: Progress): string {
   if (!next) return "";
   return `
     <a class="artist-teaser" href="#artists">
-      ${tile(next, UNLOCK_ORDER.indexOf(next), owned, next)}
-      <span><small>Next artist to unlock</small><b>${esc(next)}</b><small>Pass a chapter challenge. A perfect score unlocks two. ${owned.length} of ${UNLOCK_ORDER.length} collected →</small></span>
+      ${cardHtml(next, null)}
+      <span><small>Next card to unlock</small><b>${esc(next)}</b><small>Pass a chapter challenge. A perfect score pulls Epic cards. ${owned.length} of ${UNLOCK_ORDER.length} collected →</small></span>
     </a>`;
 }
 
-/** The Artists tab: every artist you can unlock, newest unlock first, then the whole list. */
-export function renderCollection(progress: Progress): string {
-  const owned = progress.artists ?? [];
-  const next = UNLOCK_ORDER.find((a) => !owned.includes(a));
-  const newest = owned[owned.length - 1];
-  const feature = newest ?? next;
+function renderQuests(p: Progress, today: string): string {
+  const quest = activeQuest(p);
+  const t = todayStats(p, today);
+  const pack = packState(p, today);
+  const daily = DAILY.map((q, i) => {
+    const have = Math.min(t[q.of], q.goal);
+    const claimed = t.claimed.includes(i);
+    const reward = claimed
+      ? `<span class="quest-reward done">✓</span>`
+      : have >= q.goal
+        ? `<button class="quest-reward claim" data-claim="${i}">Claim +${q.xp}</button>`
+        : `<span class="quest-reward">+${q.xp} XP</span>`;
+    return `
+      <div class="quest${have >= q.goal && !claimed ? " ready" : ""}">
+        <span class="quest-icon">${["📖", "⚡", "🎯"][i]}</span>
+        <div><div class="quest-line"><b>${q.title}</b><small>${have}/${q.goal}</small></div><div class="qbar"><i style="width:${(have / q.goal) * 100}%"></i></div></div>
+        ${reward}
+      </div>`;
+  }).join("");
+  const days = Math.min(pack.streak, PACK_STREAK);
   return `
-    <section class="collection">
-      <p class="eyebrow">${owned.length} of ${UNLOCK_ORDER.length} collected</p>
-      <h1>Your artists</h1>
+    <section class="quests">
+      <h2>Quests</h2>
       ${
-        feature
-          ? `<div class="artist-hero" data-artist="${esc(feature)}">
-              <div class="artist-photo"><span>${esc(feature)}</span></div>
-              <p class="song-eyebrow">${newest ? "Newest unlock" : "Your first unlock"}</p>
-              <h2>${esc(feature)}</h2>
-              ${newest && next ? `<p class="muted">Next up: <b>${esc(next)}</b>. Pass a chapter challenge to unlock them. A perfect score unlocks two.</p>` : ""}
-              ${newest ? "" : `<p class="muted">Pass any chapter challenge to unlock them. A perfect score unlocks two.</p>`}
+        quest
+          ? `<div class="artist-quest" data-artist="${esc(quest.artist)}">
+              ${cardHtml(quest.artist, rarityOf(p, quest.artist))}
+              <div>
+                <small>Artist quest · ${esc(quest.artist)}</small>
+                <b>Finish ${QUEST_GOAL} sections with ${esc(quest.artist)} songs</b>
+                <div class="qbar"><i style="width:${(quest.done / QUEST_GOAL) * 100}%"></i></div>
+                <small>${quest.done}/${QUEST_GOAL} · Levels the card up to ${RARITIES[rarityOf(p, quest.artist) + 1]}</small>
+              </div>
             </div>`
           : ""
       }
-      <div class="unlock-bar"><i style="width:${(owned.length / UNLOCK_ORDER.length) * 100}%"></i></div>
-      <div class="artist-grid">${UNLOCK_ORDER.map((a, i) => tile(a, i, owned, next)).join("")}</div>
-      <p class="credit">The 50 artists you have the most songs from in your playlists. Photos: Spotify.</p>
+      ${daily}
+      <div class="quest weekly${pack.ready ? " ready" : ""}">
+        <span class="quest-icon">🔥</span>
+        <div><div class="quest-line"><b>${PACK_STREAK}-day streak</b><small>${pack.claimed ? "Done this week" : `${days}/${PACK_STREAK}`}</small></div>
+          <div class="qdays">${Array.from({ length: PACK_STREAK }, (_, i) => `<i class="${i < days || pack.claimed ? "on" : ""}"></i>`).join("")}</div></div>
+        ${pack.ready ? `<button class="quest-reward claim" id="open-pack">Open pack</button>` : `<span class="quest-reward pack">🎴 Pack</span>`}
+      </div>
     </section>`;
 }
 
-/** Fills artist photos (and Spotify links) into rendered cards. */
-export async function hydrateArtists(root: ParentNode): Promise<void> {
-  const fromSpotify = await spotify();
-  root.querySelectorAll<HTMLElement>(".artist-card, .artist-hero").forEach(async (card) => {
-    const artist = card.dataset.artist ?? "";
-    const sp = fromSpotify[artist];
-    // Spotify's rules: its photos stay unaltered and link back to Spotify.
-    if (sp?.url && !card.closest("a")) {
-      const link = document.createElement("a");
-      link.href = sp.url;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.className = "artist-link";
-      link.textContent = "Open in Spotify";
-      card.append(link);
+function renderAlbum(p: Progress, next?: string): string {
+  const owned = p.artists ?? [];
+  const current = Math.max(0, SETS.findIndex(([, a, b]) => UNLOCK_ORDER.slice(a, b).some((x) => !owned.includes(x))));
+  const pages = SETS.map(([name, a, b], i) => {
+    const set = UNLOCK_ORDER.slice(a, b);
+    const have = set.filter((x) => owned.includes(x)).length;
+    const full = have === set.length;
+    return {
+      chip: `<button class="set-chip${i === current ? " on" : ""}${full ? " full" : ""}" data-set="${i}">${name} ${have}/${set.length}</button>`,
+      page: `
+        <div class="album-page${full ? " full" : ""}" data-page="${i}"${i === current ? "" : " hidden"}>
+          <div class="album-head"><b>${name} set</b><small>${full ? "Set complete ✨" : `${have}/${set.length} filled`}</small></div>
+          <div class="album-grid">${set.map((x) => cardHtml(x, owned.includes(x) ? rarityOf(p, x) : null, x === next ? "next" : "")).join("")}</div>
+        </div>`,
+    };
+  });
+  return `
+    <section class="album">
+      <h2>Album</h2>
+      <div class="set-chips">${pages.map((x) => x.chip).join("")}</div>
+      ${pages.map((x) => x.page).join("")}
+      <p class="credit">⚪ Common · 🔷 Rare · 🟣 Epic · 🌟 Legendary. Fill a set for a holo page. Photos: Spotify.</p>
+    </section>`;
+}
+
+/** The Artists tab: the next unlock, quests, then the album of all 50 cards. */
+export function renderCollection(progress: Progress, today: string): string {
+  const owned = progress.artists ?? [];
+  const next = UNLOCK_ORDER.find((a) => !owned.includes(a));
+  return `
+    <section class="collection">
+      <div class="collection-head"><h1>Artists</h1><small>${owned.length} of ${UNLOCK_ORDER.length}</small></div>
+      ${
+        next
+          ? `<div class="next-unlock">
+              ${cardHtml(next, null)}
+              <div><small>Next unlock</small><b>${esc(next)}</b><span>Pass your next chapter challenge</span><div class="unlock-bar"><i style="width:${(owned.length / UNLOCK_ORDER.length) * 100}%"></i></div></div>
+            </div>`
+          : ""
+      }
+      ${renderQuests(progress, today)}
+      ${renderAlbum(progress, next)}
+    </section>`;
+}
+
+function showSheet(progress: Progress, artist: string, url?: string): void {
+  const owned = progress.artists?.includes(artist);
+  const r = owned ? rarityOf(progress, artist) : null;
+  const quest = owned ? questFor(progress, artist) : null;
+  const sheet = document.createElement("div");
+  sheet.className = "card-sheet";
+  sheet.innerHTML = `
+    <div class="card-sheet-body">
+      ${cardHtml(artist, r, "big")}
+      <span class="rarity-tag ${r === null ? "" : `r${r}`}">${r === null ? "Locked" : RARITIES[r]}</span>
+      ${quest ? `<p class="muted">Artist quest: ${quest.done}/${QUEST_GOAL} sections with their songs to reach ${RARITIES[r! + 1]}.</p>` : ""}
+      <ol class="rarity-ladder">${RARITIES.map((name, i) => `<li class="r${i}${r !== null && i <= r ? " have" : ""}"><b>${GEMS[i]} ${name}</b><small>${RARITY_HOW[i]}</small></li>`).join("")}</ol>
+      ${url ? `<a class="artist-link" href="${url}" target="_blank" rel="noopener">Open in Spotify</a>` : ""}
+      <button class="btn ghost" data-close>Close</button>
+    </div>`;
+  sheet.addEventListener("click", (e) => {
+    if (e.target === sheet || (e.target as HTMLElement).closest("[data-close]")) sheet.remove();
+  });
+  document.body.append(sheet);
+  void hydrateArtists(sheet);
+}
+
+/** Pops a card reveal over the page, for opening a card pack. */
+export function showReveal(artist: string, rarity: number, note: string): void {
+  const sheet = document.createElement("div");
+  sheet.className = "card-sheet dark";
+  sheet.innerHTML = `<div class="card-sheet-body">${revealHtml(artist, rarity, note)}<button class="btn on-dark-btn" data-close>Put in album</button></div>`;
+  sheet.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("[data-close]")) sheet.remove();
+  });
+  document.body.append(sheet);
+  void hydrateArtists(sheet);
+}
+
+/** Wires the Artists tab: set chips, card details, quest claims and the card pack. */
+export function wireCollection(root: HTMLElement, progress: Progress, on: { claim: (i: number) => void; openPack: () => void }): void {
+  root.addEventListener("click", async (e) => {
+    const el = e.target as HTMLElement;
+    const chip = el.closest<HTMLElement>("[data-set]");
+    if (chip) {
+      root.querySelectorAll(".set-chip").forEach((c) => c.classList.toggle("on", c === chip));
+      root.querySelectorAll<HTMLElement>(".album-page").forEach((pg) => (pg.hidden = pg.dataset.page !== chip.dataset.set));
+      return;
     }
+    const claim = el.closest<HTMLElement>("[data-claim]");
+    if (claim) return on.claim(Number(claim.dataset.claim));
+    if (el.closest("#open-pack")) return on.openPack();
+    const card = el.closest<HTMLElement>(".album .acard, .artist-quest, .next-unlock .acard");
+    if (card) showSheet(progress, card.dataset.artist ?? "", (await spotify())[card.dataset.artist ?? ""]?.url);
+  });
+}
+
+/** Fills artist photos into rendered cards. */
+export async function hydrateArtists(root: ParentNode): Promise<void> {
+  root.querySelectorAll<HTMLElement>(".acard").forEach(async (card) => {
+    const artist = card.dataset.artist ?? "";
     const src = await artistPhoto(artist);
     if (!src || !card.isConnected) return;
     const img = new Image();

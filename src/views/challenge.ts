@@ -1,4 +1,12 @@
 import type { LessonResult } from "./lesson";
+import { revealHtml } from "./artists";
+
+const RARITY_NOTE = [
+  "Pass on a 3+ day streak for Rare, or get a perfect score for Epic.",
+  "Your 3+ day streak made this a Rare card.",
+  "Your perfect score made this an Epic card.",
+  "Legendary!",
+];
 
 const COLORS = ["#c2255c", "#6b3fa0", "#2f6f9f"];
 
@@ -40,6 +48,7 @@ export function renderChallengeResults(
   pass: number,
   hasNext: boolean,
   extraArtist?: string,
+  rarity = 0,
 ): string {
   const passed = result.total > 0 && result.correct / result.total >= pass;
   return `
@@ -52,7 +61,7 @@ export function renderChallengeResults(
       </div>
       ${
         unlocked
-          ? `<div class="unlock"><p class="song-eyebrow">Artist unlocked</p><div class="unlock-art" data-artist="${unlocked}"></div><b>${unlocked}</b><span>${extraArtist ? `Perfect score! ${extraArtist} unlocked too.` : "They join your Artists tab. A perfect score unlocks two."}</span></div>`
+          ? `<div class="unlock">${revealHtml(unlocked, rarity, extraArtist ? `Perfect score! ${extraArtist} joins your album too.` : RARITY_NOTE[rarity])}</div>`
           : `<p class="muted">${passed ? `Passed. You've collected all ${total} artists.` : `Get ${Math.round(pass * 100)}% or more to unlock an artist. Play it again when you're ready.`}</p>`
       }
       <div class="unlock-count"><span>Artists unlocked</span><span>${owned} of ${total}</span></div>
