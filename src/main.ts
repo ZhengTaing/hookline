@@ -11,16 +11,17 @@ import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
 import { renderResults } from "./views/results";
 import { renderChallengeIntro, renderChallengeResults } from "./views/challenge";
-import { hydrateArtists, renderArtistCards } from "./views/artists";
-import { artFor, hydrateSongs, renderSectionSongs } from "./views/song-card";
+import { artistPhoto, hydrateArtists, renderArtistTeaser, renderCollection } from "./views/artists";
+import { hydrateSongs, renderSectionSongs } from "./views/song-card";
 import { PASS, STREAK_BONUS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
 import { mountReview } from "./views/review";
 import { renderChapter, renderToday } from "./views/today";
 
-type Tab = "learn" | "practice" | "songs" | "chords" | "quiz";
+type Tab = "learn" | "practice" | "artists" | "songs" | "chords" | "quiz";
 const TABS: { id: Tab; label: string }[] = [
   { id: "learn", label: "Learn" },
   { id: "practice", label: "Review" },
+  { id: "artists", label: "Artists" },
   { id: "songs", label: "My songs" },
   { id: "chords", label: "Chords" },
   { id: "quiz", label: "Quiz" },
@@ -141,18 +142,21 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
   let extra = "";
   if (run?.[1] === "challenge") {
     // A passed challenge unlocks the next artist on the list; a streak of 2+ days adds bonus XP.
+    // A perfect score unlocks a second artist too.
     const owned = progress.artists ?? [];
-    const unlocked = result.total && result.correct / result.total >= PASS ? nextArtist(owned) : undefined;
+    const score = result.total ? result.correct / result.total : 0;
+    const unlocked = score >= PASS ? nextArtist(owned) : undefined;
+    const extraArtist = unlocked && score === 1 ? nextArtist([...owned, unlocked]) : undefined;
     const bonus = streak >= 2 ? STREAK_BONUS : 0;
-    progress = { ...progress, xp: progress.xp + bonus, artists: unlocked ? [...owned, unlocked] : owned };
+    progress = { ...progress, xp: progress.xp + bonus, artists: [...owned, ...[unlocked, extraArtist].filter((a): a is string => !!a)] };
     shell(
       "learn",
-      renderChallengeResults(result, chapter, challengeRounds(chapter), { days: streak, bonus }, unlocked, progress.artists!.length, UNLOCK_ORDER.length, PASS, chapter < COURSE.length),
+      renderChallengeResults(result, chapter, challengeRounds(chapter), { days: streak, bonus }, unlocked, progress.artists!.length, UNLOCK_ORDER.length, PASS, chapter < COURSE.length, extraArtist),
     );
     if (unlocked) {
-      void artFor(unlocked).then((src) => {
+      void artistPhoto(unlocked).then((src) => {
         const box = app.querySelector(".unlock-art");
-        if (src && box) box.innerHTML = `<img src="${src.replace("600x600", "300x300")}" alt="">`;
+        if (src && box) box.innerHTML = `<img src="${src}" alt="">`;
       });
     }
     lastHash = `challenge/${chapter}/play`;
@@ -262,8 +266,15 @@ function route(): void {
   }
 
   const tab = (TABS.some((t) => t.id === hash) ? hash : "learn") as Tab;
-  shell(tab, tab === "learn" ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated, renderArtistCards(progress)) : renderPlaceholder(tab));
-  if (tab === "learn") void hydrateArtists(app);
+  shell(
+    tab,
+    tab === "learn"
+      ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated, renderArtistTeaser(progress))
+      : tab === "artists"
+        ? renderCollection(progress)
+        : renderPlaceholder(tab),
+  );
+  if (tab === "learn" || tab === "artists") void hydrateArtists(app);
   if (tab === "learn") celebrated = true;
   enterPage(tab);
 }

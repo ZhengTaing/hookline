@@ -2,73 +2,92 @@ import { UNLOCK_ORDER } from "../lessons/challenge";
 import type { Progress } from "../store";
 import { artFor } from "./song-card";
 
-/** Wikipedia article for each artist shown so far (a trial with the first two unlocks). */
-const WIKI: Record<string, string> = { "Olivia Rodrigo": "Olivia_Rodrigo", aespa: "Aespa" };
+/** Spotify photos and links found at deploy time (see scripts/fetch-artists.mjs). */
+type SpotifyArtist = { image: string; url?: string };
+let spotifyLoad: Promise<Record<string, SpotifyArtist>> | null = null;
+const spotify = () =>
+  (spotifyLoad ??= fetch(`${import.meta.env.BASE_URL}artist-meta.json`)
+    .then((r): Promise<Record<string, SpotifyArtist>> => (r.ok ? r.json() : Promise.resolve({})))
+    .catch((): Record<string, SpotifyArtist> => ({})));
 
-const SHOWN = UNLOCK_ORDER.filter((a) => WIKI[a]);
+/** An artist's Spotify photo, or one of their album covers if Spotify had none. */
+export async function artistPhoto(artist: string): Promise<string | undefined> {
+  return (await spotify())[artist]?.image ?? (await artFor(artist))?.replace("600x600", "300x300");
+}
 
-/** "Your artists": a big photo card for each artist, unlocked by passing chapter challenges. */
-export function renderArtistCards(progress: Progress): string {
+const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+
+const tile = (a: string, i: number, owned: string[], next?: string) => {
+  const have = owned.includes(a);
+  const status = have ? "Unlocked" : a === next ? "Next unlock" : "Locked";
+  return `
+    <div class="artist-card${have ? "" : " locked"}${a === next ? " next" : ""}" data-artist="${esc(a)}" style="--i:${Math.min(i, 12)}">
+      <div class="artist-photo"><span>${esc(a)}</span></div>
+      <b>${esc(a)}</b>
+      <small>#${i + 1} · ${status}</small>
+    </div>`;
+};
+
+/** A teaser on the Learn page: the next artist to unlock, linking to the Artists tab. */
+export function renderArtistTeaser(progress: Progress): string {
   const owned = progress.artists ?? [];
   const next = UNLOCK_ORDER.find((a) => !owned.includes(a));
-  const cards = SHOWN.map((a) => {
-    const have = owned.includes(a);
-    const status = have ? "Unlocked" : a === next ? "Next unlock · pass a chapter challenge" : "Locked";
-    return `
-      <div class="artist-card${have ? "" : " locked"}" data-artist="${a}">
-        <div class="artist-photo"><span>${a}</span></div>
-        <b>${a}</b>
-        <small>${status}</small>
-      </div>`;
-  }).join("");
+  if (!next) return "";
   return `
-    <section class="artists">
-      <h2>Your artists <small>${owned.length} of ${UNLOCK_ORDER.length}</small></h2>
-      <div class="artist-grid">${cards}</div>
-      <p class="credit">Photos: Wikipedia</p>
+    <a class="artist-teaser" href="#artists">
+      ${tile(next, UNLOCK_ORDER.indexOf(next), owned, next)}
+      <span><small>Next artist to unlock</small><b>${esc(next)}</b><small>Pass a chapter challenge. A perfect score unlocks two. ${owned.length} of ${UNLOCK_ORDER.length} collected →</small></span>
+    </a>`;
+}
+
+/** The Artists tab: every artist you can unlock, newest unlock first, then the whole list. */
+export function renderCollection(progress: Progress): string {
+  const owned = progress.artists ?? [];
+  const next = UNLOCK_ORDER.find((a) => !owned.includes(a));
+  const newest = owned[owned.length - 1];
+  const feature = newest ?? next;
+  return `
+    <section class="collection">
+      <p class="eyebrow">${owned.length} of ${UNLOCK_ORDER.length} collected</p>
+      <h1>Your artists</h1>
+      ${
+        feature
+          ? `<div class="artist-hero" data-artist="${esc(feature)}">
+              <div class="artist-photo"><span>${esc(feature)}</span></div>
+              <p class="song-eyebrow">${newest ? "Newest unlock" : "Your first unlock"}</p>
+              <h2>${esc(feature)}</h2>
+              ${newest && next ? `<p class="muted">Next up: <b>${esc(next)}</b>. Pass a chapter challenge to unlock them. A perfect score unlocks two.</p>` : ""}
+              ${newest ? "" : `<p class="muted">Pass any chapter challenge to unlock them. A perfect score unlocks two.</p>`}
+            </div>`
+          : ""
+      }
+      <div class="unlock-bar"><i style="width:${(owned.length / UNLOCK_ORDER.length) * 100}%"></i></div>
+      <div class="artist-grid">${UNLOCK_ORDER.map((a, i) => tile(a, i, owned, next)).join("")}</div>
+      <p class="credit">The 50 artists you have the most songs from in your playlists. Photos: Spotify.</p>
     </section>`;
 }
 
-/** Spotify photos found at deploy time (see scripts/fetch-artists.mjs), if any. */
-type SpotifyArtists = Record<string, { image: string; url?: string }>;
-let spotifyLoad: Promise<SpotifyArtists> | null = null;
-const spotify = () =>
-  (spotifyLoad ??= fetch(`${import.meta.env.BASE_URL}artist-meta.json`)
-    .then((r): Promise<SpotifyArtists> => (r.ok ? r.json() : Promise.resolve({})))
-    .catch((): SpotifyArtists => ({})));
-
-/** Loads each card's photo: Spotify first, then Wikipedia, then the artist's album art. */
+/** Fills artist photos (and Spotify links) into rendered cards. */
 export async function hydrateArtists(root: ParentNode): Promise<void> {
   const fromSpotify = await spotify();
-  const credit = root.querySelector(".artists .credit");
-  if (credit && Object.keys(fromSpotify).length) credit.textContent = "Photos: Spotify";
-  root.querySelectorAll<HTMLElement>(".artist-card").forEach(async (card) => {
+  root.querySelectorAll<HTMLElement>(".artist-card, .artist-hero").forEach(async (card) => {
     const artist = card.dataset.artist ?? "";
     const sp = fromSpotify[artist];
-    if (sp) {
-      // Spotify's rules: show its photos unaltered (no grey filter) and link back to Spotify.
-      card.classList.add("spotify");
-      // Spotify asks that its content links back to Spotify.
+    // Spotify's rules: its photos stay unaltered and link back to Spotify.
+    if (sp?.url && !card.closest("a")) {
       const link = document.createElement("a");
-      link.href = sp.url ?? "https://open.spotify.com";
+      link.href = sp.url;
       link.target = "_blank";
       link.rel = "noopener";
       link.className = "artist-link";
       link.textContent = "Open in Spotify";
       card.append(link);
     }
-    let src: string | undefined = sp?.image;
-    if (!src) try {
-      const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${WIKI[artist]}`);
-      const d = r.ok ? await r.json() : {};
-      src = d.thumbnail?.source ?? d.originalimage?.source;
-    } catch {
-      src = undefined;
-    }
-    src ??= await artFor(artist);
+    const src = await artistPhoto(artist);
     if (!src || !card.isConnected) return;
     const img = new Image();
     img.alt = artist;
+    img.loading = "lazy";
     img.onload = () => card.querySelector(".artist-photo")!.replaceChildren(img);
     img.src = src;
   });
