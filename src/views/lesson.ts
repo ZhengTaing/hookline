@@ -17,7 +17,22 @@ export interface LessonResult {
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
 
+let soundingTimer = 0;
+
+/** About how long a sound lasts, in seconds, so play buttons can pulse while it plays. */
+function length(sound: Sound): number {
+  if (sound.kind === "melodic") return sound.notes.length * (sound.gap ?? 0.5) + 0.8;
+  if (sound.kind === "chord") return 1.2;
+  if (sound.kind === "progression") return sound.chords.length * (sound.gap ?? 0.9) + 0.8;
+  if (sound.kind === "rhythm") return sound.beats.reduce((a, b) => a + Math.abs(b), 0) * (60 / sound.bpm) + 0.3;
+  if (sound.kind === "withChord") return (sound.gap ?? 0.5) * sound.notes.length + 0.6;
+  return 0;
+}
+
 function play(sound: Sound): void {
+  document.body.classList.add("sounding");
+  clearTimeout(soundingTimer);
+  soundingTimer = window.setTimeout(() => document.body.classList.remove("sounding"), length(sound) * 1000);
   if (sound.kind === "melodic") melodic(sound.notes, sound.gap);
   if (sound.kind === "chord") chord(sound.notes);
   if (sound.kind === "progression") sound.chords.forEach((c, i) => chord(c, i * (sound.gap ?? 0.9)));

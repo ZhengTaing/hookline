@@ -16,7 +16,8 @@ function chapterOf(lessonId: string): Unit | undefined {
 const CREDIT = `<p class="credit">Lessons adapted from Robert Hutchinson, <em>Music Theory for the 21st-Century Classroom</em>, under the GNU Free Documentation License.</p>`;
 
 /** The Learn tab: streak, what's next, and every chapter of the book. */
-export function renderToday(progress: Progress, today: string, isNewToday: boolean): string {
+/** `celebrate` animates today's streak (only the first time the page shows on a new day). */
+export function renderToday(progress: Progress, today: string, isNewToday: boolean, celebrate = false): string {
   const streak = currentStreak(progress.visits, today);
   const best = bestStreak(progress.visits);
   const days = recentDays(progress.visits, today, 14);
@@ -25,10 +26,11 @@ export function renderToday(progress: Progress, today: string, isNewToday: boole
   const due = dueCards(progress, today).length;
 
   const dots = days
-    .map((d) => `<i class="dot${d.visited ? " on" : ""}${d.day === today ? " today" : ""}" title="${d.day}"></i>`)
+    .map((d) => `<i class="dot${d.visited ? " on" : ""}${d.day === today ? ` today${celebrate ? " pop" : ""}` : ""}" title="${d.day}"></i>`)
     .join("");
 
   const chapters = COURSE.map((unit, ui) => {
+    const i = Math.min(ui, 12);
     const done = unit.lessons.filter((l) => progress.completedLessons.includes(l.id)).length;
     const total = unit.lessons.length;
     const current = unit.lessons.some((l) => l.id === nextId);
@@ -39,14 +41,14 @@ export function renderToday(progress: Progress, today: string, isNewToday: boole
       <span class="unit-text"><strong>${unit.title}</strong><small>${unit.chapter} · ${done ? `${done} of ${total}` : total} sections</small>
       <span class="meter"><i style="width:${(done / total) * 100}%"></i></span></span>
       <em>${label}</em>`;
-    return `<li class="unit ${state}"><a href="#chapter/${ui + 1}">${inner}</a></li>`;
+    return `<li class="unit ${state}" style="--i:${i}"><a href="#chapter/${ui + 1}">${inner}</a></li>`;
   }).join("");
 
   return `
     <section class="today">
       <p class="eyebrow">${isNewToday ? "You showed up. That counts." : "Welcome back"}</p>
       <div class="streak">
-        <span class="streak-n">${streak}</span>
+        <span class="streak-n${celebrate ? " flip" : ""}">${streak}</span>
         <span class="streak-label">day${streak === 1 ? "" : "s"} in a row<br /><small>Best: ${best} · ${progress.xp} XP</small></span>
       </div>
       <div class="dots" aria-label="Last 14 days">${dots}</div>
@@ -74,7 +76,7 @@ export function renderChapter(progress: Progress, n: number): string {
   const firstOpen = unit.lessons.find((l) => !progress.completedLessons.includes(l.id) && isUnlocked(progress, l.id));
 
   const rows = unit.lessons
-    .map((l) => {
+    .map((l, li) => {
       const done = progress.completedLessons.includes(l.id);
       const open = isUnlocked(progress, l.id);
       const state = done ? "done" : l.id === nextId ? "next" : open ? "open" : "locked";
@@ -84,8 +86,8 @@ export function renderChapter(progress: Progress, n: number): string {
         <span class="unit-text"><strong>${l.title}</strong><small>${l.summary}</small>${game}</span>
         <em>${label}</em>`;
       return open
-        ? `<li class="unit ${state}"><a href="#lesson/${l.id}">${inner}</a></li>`
-        : `<li class="unit ${state}"><span class="row">${inner}</span></li>`;
+        ? `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><a href="#lesson/${l.id}">${inner}</a></li>`
+        : `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><span class="row">${inner}</span></li>`;
     })
     .join("");
 

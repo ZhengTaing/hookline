@@ -321,3 +321,54 @@ button, input { font: inherit; color: inherit; }
 .rhythm rect, .rhythm circle { fill: var(--ink); }
 .rhythm .time { font: 700 24px Manrope, sans-serif; fill: var(--ink); }
 .rhythm .tuplet { font: 700 13px Manrope, sans-serif; fill: var(--ink); }
+
+/* Motion: page moves, list ripples, small touches. Everything here stops under "reduce motion". */
+@keyframes in-r { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes in-l { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes bar-fill { from { width: 0; } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ink) 45%, transparent); } 70%, 100% { box-shadow: 0 0 0 9px transparent; } }
+@keyframes pop { 0% { transform: scale(.4); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@keyframes flip-in { from { opacity: 0; transform: rotateX(90deg); } to { opacity: 1; transform: none; } }
+@keyframes ring { from { transform: scale(1); opacity: .5; } to { transform: scale(1.6); opacity: 0; } }
+@keyframes shimmer { from { background-position: -320px 0; } to { background-position: 320px 0; } }
+
+.content.nav-fwd { animation: in-r .32s cubic-bezier(.2, .8, .2, 1) both; }
+.content.nav-back { animation: in-l .32s cubic-bezier(.2, .8, .2, 1) both; }
+.content.nav-tab { animation: fade-in .25s ease both; }
+.lesson-root.sheet { animation: sheet-up .4s cubic-bezier(.2, .9, .2, 1) both; }
+
+.units > li { animation: rise .38s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 40ms + 60ms); }
+.unit-text .meter i { animation: bar-fill .8s .25s cubic-bezier(.2, .8, .2, 1) both; }
+.unit.next .unit-n { animation: pulse 1.8s ease-out infinite; }
+
+.tabs { isolation: isolate; }
+.tabs a { position: relative; z-index: 1; transition: color .2s; }
+.tab-pill { position: absolute; left: 0; top: 6px; height: 46px; border-radius: 14px; background: var(--soft); z-index: 0; transition: transform .32s cubic-bezier(.2, .8, .2, 1); pointer-events: none; }
+
+.streak-n.flip { display: inline-block; animation: flip-in .5s .15s cubic-bezier(.2, .8, .2, 1) both; }
+.dot.today.pop { animation: pop .45s .3s cubic-bezier(.2, .8, .2, 1) both; }
+.big-n { font-variant-numeric: tabular-nums; }
+
+.flash { perspective: 900px; border: 0; padding: 0; background: none; display: block; }
+.flash-inner { display: grid; min-height: 260px; transition: transform .5s cubic-bezier(.2, .8, .2, 1); transform-style: preserve-3d; }
+.flash.flipped .flash-inner { transform: rotateY(180deg); }
+.flash-face { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 14px; justify-content: center; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--bg); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flash-rear { transform: rotateY(180deg); background: var(--soft); }
+[data-grade]:not([hidden]) { animation: rise .3s .2s cubic-bezier(.2, .8, .2, 1) both; }
+
+.play-big { position: relative; }
+.sounding .play-big::before, .sounding .play-big::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--ink); animation: ring 1.2s ease-out infinite; pointer-events: none; }
+.sounding .play-big::after { animation-delay: .4s; }
+
+.btn, .opt, .chip, .slot, .duel button, .play-big, .unit > a, .flash, .tap { transition: transform .12s ease, background-color .2s, color .2s, border-color .2s; }
+.btn:active, .opt:active, .chip:active, .slot:active, .duel button:active, .play-big:active, .unit > a:active, .flash:active { transform: scale(.97); }
+
+.skel-group { display: grid; gap: 12px; }
+.sk { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--soft) 0, var(--line) 50%, var(--soft) 100%) 0 0 / 640px 100%; animation: shimmer 1.2s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

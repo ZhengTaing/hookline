@@ -28,10 +28,16 @@ export function mountReview(root: HTMLElement, progress: Progress, today: string
   root.innerHTML = `
     <section class="review">
       <p class="eyebrow">Review · ${due.length} due</p>
-      <button class="flash" type="button" data-flip>
-        <span class="flash-front">${isFact ? card.text : "Remember this?"}</span>
-        <span class="flash-back" hidden>${isFact ? card.back : card.text}</span>
-        <small class="hint">Tap to see the answer</small>
+      <button class="flash" type="button" data-flip aria-label="Flip the card">
+        <span class="flash-inner">
+          <span class="flash-face">
+            <span class="flash-front">${isFact ? card.text : "Remember this?"}</span>
+            <small class="hint">Tap to see the answer</small>
+          </span>
+          <span class="flash-face flash-rear">
+            <span class="flash-back">${isFact ? card.back : card.text}</span>
+          </span>
+        </span>
       </button>
       <div class="row push" data-grade hidden>
         <button class="btn ghost" type="button" data-again>Again tomorrow</button>
@@ -39,8 +45,7 @@ export function mountReview(root: HTMLElement, progress: Progress, today: string
       </div>
     </section>`;
   root.querySelector("[data-flip]")!.addEventListener("click", () => {
-    root.querySelector<HTMLElement>(".flash-back")!.hidden = false;
-    root.querySelector<HTMLElement>(".flash .hint")!.hidden = true;
+    root.querySelector<HTMLElement>(".flash")!.classList.add("flipped");
     root.querySelector<HTMLElement>("[data-grade]")!.hidden = false;
   });
   root.querySelector("[data-again]")!.addEventListener("click", () => onAnswer(card.text, false));
