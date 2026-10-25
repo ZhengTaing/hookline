@@ -3,99 +3,496 @@
     "listen": "Trace the melody with your hand while it plays: up when it climbs, down when it falls. That's pitch.",
     "guitar": "Play the low E string open, then the high E string open. Same letter, two octaves apart in pitch.",
     "songs": [
-      { "title": "Golden", "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast" },
-      { "title": "vampire", "artist": "Olivia Rodrigo" },
-      { "title": "like JENNIE", "artist": "JENNIE" }
+      {
+        "title": "Golden",
+        "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast"
+      },
+      {
+        "title": "vampire",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "like JENNIE",
+        "artist": "JENNIE"
+      }
     ]
   },
   "1.2": {
     "listen": "Hum the first note of the chorus, then find it on your guitar and name its letter, A to G.",
     "guitar": "Play the open strings from low to high and say each letter out loud: E A D G B E.",
     "songs": [
-      { "title": "Whiplash", "artist": "aespa" },
-      { "title": "drivers license", "artist": "Olivia Rodrigo" },
-      { "title": "Supernova", "artist": "aespa" }
+      {
+        "title": "Whiplash",
+        "artist": "aespa"
+      },
+      {
+        "title": "drivers license",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Supernova",
+        "artist": "aespa"
+      }
     ]
   },
   "1.3": {
     "listen": "Sing the hook, then sing it again higher or lower until it's comfortable. Same notes in a different octave.",
     "guitar": "Play A on the open A string, then A at fret 2 of the G string. They're an octave apart.",
     "songs": [
-      { "title": "How Sweet", "artist": "NewJeans" },
-      { "title": "good 4 u", "artist": "Olivia Rodrigo" },
-      { "title": "Magnetic", "artist": "ILLIT" }
+      {
+        "title": "How Sweet",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "good 4 u",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Magnetic",
+        "artist": "ILLIT"
+      }
     ]
   },
   "1.4": {
     "listen": "While it plays, try F and then F♯ on your guitar. One of them clashes and one fits. A sharp is one fret higher.",
     "guitar": "On the high E string, F is fret 1 and F♯ is fret 2. One fret is one half step.",
     "songs": [
-      { "title": "Super Shy", "artist": "NewJeans" },
-      { "title": "traitor", "artist": "Olivia Rodrigo" },
-      { "title": "Rockstar", "artist": "LISA" }
+      {
+        "title": "Super Shy",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "traitor",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Rockstar",
+        "artist": "LISA"
+      }
     ]
   },
   "1.5": {
     "listen": "Find the song's home note on your guitar. If that fret is a sharp or flat, give it both of its names.",
     "guitar": "Fret 4 on the A string is C♯, and it's also D♭. One fret, two names.",
     "songs": [
-      { "title": "On The Ground", "artist": "ROSÉ", "note": "In D♭ major. D♭ is also called C♯." },
-      { "title": "ANTIFRAGILE", "artist": "LE SSERAFIM" },
-      { "title": "positions", "artist": "Ariana Grande" }
+      {
+        "title": "On The Ground",
+        "artist": "ROSÉ",
+        "note": "In D♭ major. D♭ is also called C♯."
+      },
+      {
+        "title": "ANTIFRAGILE",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "positions",
+        "artist": "Ariana Grande"
+      }
     ]
   },
   "2.1": {
     "listen": "Slide one finger up a string one fret at a time while it plays. Each fret is a half step. Stop when a note fits the song.",
     "guitar": "On the B string, fret 1 to fret 2 is a half step, and fret 1 to fret 3 is a whole step.",
     "songs": [
-      { "title": "Armageddon", "artist": "aespa" },
-      { "title": "deja vu", "artist": "Olivia Rodrigo" },
-      { "title": "I AM", "artist": "IVE" }
+      {
+        "title": "Armageddon",
+        "artist": "aespa"
+      },
+      {
+        "title": "deja vu",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "I AM",
+        "artist": "IVE"
+      }
     ]
   },
   "2.2": {
     "listen": "Find the home note, then sing do-re-mi up from it. If the scale fits the song, the song is in a major key.",
     "guitar": "Play the C major scale in open position: C (A string, fret 3), D, E, F, G, A, B, C.",
     "songs": [
-      { "title": "like JENNIE", "artist": "JENNIE" },
-      { "title": "How Sweet", "artist": "NewJeans" },
-      { "title": "we can't be friends (wait for your love)", "artist": "Ariana Grande" }
+      {
+        "title": "like JENNIE",
+        "artist": "JENNIE"
+      },
+      {
+        "title": "How Sweet",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "we can't be friends (wait for your love)",
+        "artist": "Ariana Grande"
+      }
     ]
   },
   "2.3": {
     "listen": "Each of these is in a major key. Count the flats in its key signature.",
     "guitar": "Put a capo on fret 1 and play the open C major scale. Now you're playing D♭ major, with five flats.",
     "songs": [
-      { "title": "drivers license", "artist": "Olivia Rodrigo", "note": "B♭ major: 2 flats (B♭, E♭)." },
-      { "title": "vampire", "artist": "Olivia Rodrigo", "note": "F major: 1 flat (B♭)." },
-      { "title": "On The Ground", "artist": "ROSÉ", "note": "D♭ major: 5 flats (B♭ E♭ A♭ D♭ G♭)." }
+      {
+        "title": "drivers license",
+        "artist": "Olivia Rodrigo",
+        "note": "B♭ major: 2 flats (B♭, E♭)."
+      },
+      {
+        "title": "vampire",
+        "artist": "Olivia Rodrigo",
+        "note": "F major: 1 flat (B♭)."
+      },
+      {
+        "title": "On The Ground",
+        "artist": "ROSÉ",
+        "note": "D♭ major: 5 flats (B♭ E♭ A♭ D♭ G♭)."
+      }
     ]
   },
   "3.1": {
     "listen": "Play a minor song and a major song back to back. The minor one has a lowered 3rd, so home sounds darker.",
     "guitar": "Strum Am, then A. The only change is one note: the 3rd, C or C♯.",
     "songs": [
-      { "title": "good 4 u", "artist": "Olivia Rodrigo", "note": "F♯ minor." },
-      { "title": "drivers license", "artist": "Olivia Rodrigo", "note": "B♭ major, for comparison." },
-      { "title": "Lovesick Girls", "artist": "BLACKPINK", "note": "Chorus loops D♯m, C♯, F♯, B. Does it feel at home on D♯m or F♯?" }
+      {
+        "title": "good 4 u",
+        "artist": "Olivia Rodrigo",
+        "note": "F♯ minor."
+      },
+      {
+        "title": "drivers license",
+        "artist": "Olivia Rodrigo",
+        "note": "B♭ major, for comparison."
+      },
+      {
+        "title": "Lovesick Girls",
+        "artist": "BLACKPINK",
+        "note": "Chorus loops D♯m, C♯, F♯, B. Does it feel at home on D♯m or F♯?"
+      }
     ]
   },
   "3.2": {
     "listen": "Relative keys share a key signature. Every major key has a minor key that starts on its 6th note.",
     "guitar": "Put a capo on fret 4 and strum Bm, A, D, G. Those shapes sound as Lovesick Girls' D♯m, C♯, F♯, B.",
     "songs": [
-      { "title": "good 4 u", "artist": "Olivia Rodrigo", "note": "F♯ minor has 3 sharps, the same as its relative, A major." },
-      { "title": "drivers license", "artist": "Olivia Rodrigo", "note": "B♭ major, but it ends on G minor, its relative minor." },
-      { "title": "Lovesick Girls", "artist": "BLACKPINK", "note": "D♯ minor and F♯ major share 6 sharps." }
+      {
+        "title": "good 4 u",
+        "artist": "Olivia Rodrigo",
+        "note": "F♯ minor has 3 sharps, the same as its relative, A major."
+      },
+      {
+        "title": "drivers license",
+        "artist": "Olivia Rodrigo",
+        "note": "B♭ major, but it ends on G minor, its relative minor."
+      },
+      {
+        "title": "Lovesick Girls",
+        "artist": "BLACKPINK",
+        "note": "D♯ minor and F♯ major share 6 sharps."
+      }
     ]
   },
   "3.3": {
     "listen": "Hum the home note (the tonic), then the note five steps above it (the dominant). Hear how the dominant wants to go home?",
     "guitar": "In A minor: play A (open A string), then E (open low E string or fret 2 on the D string). Tonic, then dominant.",
     "songs": [
-      { "title": "DRIP", "artist": "BABYMONSTER" },
-      { "title": "brutal", "artist": "Olivia Rodrigo" },
-      { "title": "Gnarly", "artist": "KATSEYE" }
+      {
+        "title": "DRIP",
+        "artist": "BABYMONSTER"
+      },
+      {
+        "title": "brutal",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Gnarly",
+        "artist": "KATSEYE"
+      }
+    ]
+  },
+  "4.1": {
+    "listen": "Count 1, 2, 3, 4 along with the beat. Where does your count start over? That's the start of a bar.",
+    "guitar": "Strum Em down on every beat, 4 strums per bar, and count out loud.",
+    "songs": [
+      {
+        "title": "JUMP",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Gabriela",
+        "artist": "KATSEYE"
+      },
+      {
+        "title": "drop dead",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "4.2": {
+    "listen": "Clap along with the kick drum, then try clapping twice as fast. You've gone from quarter notes to eighth notes.",
+    "guitar": "Hold Em for 4 beats (a whole note), then strum it 2, 4 and 8 times in the same space.",
+    "songs": [
+      {
+        "title": "Bubble Gum",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "CLICK",
+        "artist": "JISOO"
+      },
+      {
+        "title": "Midas Touch",
+        "artist": "KISS OF LIFE"
+      }
+    ]
+  },
+  "4.3": {
+    "listen": "Find a note the singer holds in the chorus. Count how many beats it lasts. Longer than one value? That's a dot or a tie.",
+    "guitar": "Strum G, let it ring for 1½ beats (a dotted quarter), then strum again on the 'and' of 2.",
+    "songs": [
+      {
+        "title": "Messy",
+        "artist": "ROSÉ"
+      },
+      {
+        "title": "stupid song",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "petal",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "4.4": {
+    "listen": "Tap the beat. Does it feel like 1-2, 1-2 or like 1-2-3, 1-2-3? That's the meter.",
+    "guitar": "Strum C as a waltz (1-2-3), then in 4 (1-2-3-4). Feel how different they are.",
+    "songs": [
+      {
+        "title": "TKO",
+        "artist": "IVE"
+      },
+      {
+        "title": "Gameboy",
+        "artist": "KATSEYE"
+      },
+      {
+        "title": "honeybee",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "4.5": {
+    "listen": "Try fitting three even claps into one beat of the song. That's a triplet: three in the space of two.",
+    "guitar": "Mute the strings with your fretting hand and strum three even strokes per beat: tri-pl-et, tri-pl-et.",
+    "songs": [
+      {
+        "title": "Cobra",
+        "artist": "LISA"
+      },
+      {
+        "title": "METRONOME",
+        "artist": "izna"
+      },
+      {
+        "title": "kiss me",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "4.6": {
+    "listen": "Write the rhythm of the hook's first bar so each beat is easy to see. Group the notes beat by beat.",
+    "guitar": "Play the hook's rhythm on one muted string while counting the beats out loud.",
+    "songs": [
+      {
+        "title": "Pink Venom",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Hit 'Em",
+        "artist": "MEOVV"
+      },
+      {
+        "title": "my way",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "5.1": {
+    "listen": "Sing the first two notes of the chorus. Count the letter names from one to the other, both included. That's the interval's size.",
+    "guitar": "On the A string, fret 0 to fret 2 is a 2nd (A to B), and fret 0 to fret 4 is a 3rd (A to C♯).",
+    "songs": [
+      {
+        "title": "Girls Will Be Girls",
+        "artist": "ITZY"
+      },
+      {
+        "title": "Strategy",
+        "artist": "TWICE"
+      },
+      {
+        "title": "the cure",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "5.2": {
+    "listen": "Hum the home note, then the highest note of the hook. Count up the major scale from home to name the interval.",
+    "guitar": "A perfect 5th: the open A string, then fret 2 on the D string (E).",
+    "songs": [
+      {
+        "title": "Born Again (feat. Doja Cat & RAYE)",
+        "artist": "LISA"
+      },
+      {
+        "title": "CELEBRATION",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "big feelings",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "5.3": {
+    "listen": "Pick a note from the hook and build a major 3rd above it on your guitar. Does it fit the song?",
+    "guitar": "Major 3rd: fret 3 on the A string (C), then fret 2 on the D string (E).",
+    "songs": [
+      {
+        "title": "ONE SPARK",
+        "artist": "TWICE"
+      },
+      {
+        "title": "DDI RO RI",
+        "artist": "MEOVV"
+      },
+      {
+        "title": "purple",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "5.4": {
+    "listen": "Sing a leap up from the hook, then sing it with the top note dropped an octave. The interval flips: a 3rd becomes a 6th.",
+    "guitar": "C up to E is a 3rd (A string fret 3, D string fret 2). E up to C is a 6th (D string fret 2, B string fret 1). 3 + 6 = 9.",
+    "songs": [
+      {
+        "title": "Mono (feat. skaiwater)",
+        "artist": "i-dle"
+      },
+      {
+        "title": "FLOWER",
+        "artist": "JISOO"
+      },
+      {
+        "title": "hate that i made you love me",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "5.5": {
+    "listen": "Listen for a tense, edgy spot in the song. Augmented and diminished intervals, like the tritone, often make that sound.",
+    "guitar": "A tritone: the open A string with fret 1 on the D string (D♯). Then resolve to E (D string, fret 2).",
+    "songs": [
+      {
+        "title": "start a war",
+        "artist": "JENNIE"
+      },
+      {
+        "title": "Switchblade (feat. Ty Dolla $ign)",
+        "artist": "aespa"
+      },
+      {
+        "title": "maggots for brains",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "6.1": {
+    "listen": "Find one chord that fits the chorus, then name its root, 3rd and 5th.",
+    "guitar": "Strum C, then play its notes one at a time: C (A string, fret 3), E (D string, fret 2), G (open G).",
+    "songs": [
+      {
+        "title": "Queencard",
+        "artist": "i-dle"
+      },
+      {
+        "title": "SUGAR HONEY ICE TEA",
+        "artist": "BABYMONSTER"
+      },
+      {
+        "title": "u + me = <3",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "6.2": {
+    "listen": "Look up the song's chords and read each symbol: a plain letter is major, m is minor, ° is diminished, + is augmented.",
+    "guitar": "Strum C, then Cm (barre at fret 3, Am shape). Hear the 3rd drop a half step.",
+    "songs": [
+      {
+        "title": "CRAZY",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "Kiss & Tell",
+        "artist": "ITZY"
+      },
+      {
+        "title": "oh well",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "6.3": {
+    "listen": "Listen to the bass. Does it always play the chord's root, or does it sometimes sit on the 3rd or 5th? That's an inversion.",
+    "guitar": "Play C/E: the open C shape, but strum from the open low E string so E is in the bass.",
+    "songs": [
+      {
+        "title": "It's Me",
+        "artist": "ILLIT"
+      },
+      {
+        "title": "Less than a Lover",
+        "artist": "JENNIE"
+      },
+      {
+        "title": "Body to Body",
+        "artist": "BTS"
+      }
+    ]
+  },
+  "6.4": {
+    "listen": "Pick one chord from the song and name three things: its root, its quality and its bass note.",
+    "guitar": "Strum Am and name it: root A, minor, A in the bass. Then play it from the low E string: Am/E.",
+    "songs": [
+      {
+        "title": "ETA",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "LOUD",
+        "artist": "NMIXX"
+      },
+      {
+        "title": "stay",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "6.5": {
+    "listen": "Listen for a chord that sounds open and unsettled before it lands. Swapping the 3rd for a 4th or 2nd makes that sus sound.",
+    "guitar": "Strum D, then Dsus4 (fret 3 on the high E string), then back to D.",
+    "songs": [
+      {
+        "title": "Love Me Like This",
+        "artist": "NMIXX"
+      },
+      {
+        "title": "Cherish (My Love)",
+        "artist": "ILLIT"
+      },
+      {
+        "title": "Same Old Love",
+        "artist": "Selena Gomez"
+      }
     ]
   }
 }
