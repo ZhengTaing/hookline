@@ -1,5 +1,5 @@
 import { parseNote } from "../music";
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 10, non-chord tones: melody notes that aren't in the chord. Each kind is defined by how

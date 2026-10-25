@@ -1,5 +1,5 @@
 import { parseNote } from "../music";
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 22, modulation: changing key. Guitarists change key by sliding shapes up the neck, so the

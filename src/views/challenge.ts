@@ -1,5 +1,6 @@
 import type { LessonResult } from "./lesson";
 import { revealHtml } from "./artists";
+import type { ChallengeReward } from "../rewards";
 
 const RARITY_NOTE = [
   "Pass on a 3+ day streak for Rare, or get a perfect score for Epic.",
@@ -37,33 +38,41 @@ export function renderChallengeIntro(n: number, chapterTitle: string, rounds: { 
     </section>`;
 }
 
-export function renderChallengeResults(
-  result: LessonResult,
-  n: number,
-  rounds: { name: string }[],
-  streak: { days: number; bonus: number },
-  unlocked: string | undefined,
-  owned: number,
-  total: number,
-  pass: number,
-  hasNext: boolean,
-  extraArtist?: string,
-  rarity = 0,
-): string {
+export interface ChallengeResultsView {
+  result: LessonResult;
+  chapter: number;
+  rounds: { name: string }[];
+  streak: { days: number; bonus: number };
+  owned: number;
+  total: number;
+  pass: number;
+  hasNext: boolean;
+  reward: Pick<ChallengeReward, "unlocked" | "extra" | "upgraded" | "rarity" | "replay">;
+}
+
+export function renderChallengeResults(v: ChallengeResultsView): string {
+  const { result, chapter: n, rounds, streak, owned, total, pass, hasNext, reward } = v;
   const passed = result.total > 0 && result.correct / result.total >= pass;
+  const card = reward.unlocked
+    ? `<div class="unlock">${revealHtml(reward.unlocked, reward.rarity, reward.extra ? `Perfect score! ${reward.extra} joins your album too.` : RARITY_NOTE[reward.rarity])}</div>`
+    : reward.upgraded
+      ? `<div class="unlock">${revealHtml(reward.upgraded, 2, "Card upgraded to Epic. A perfect replay can still upgrade this chapter's card.")}</div>`
+      : `<p class="muted">${
+          !passed
+            ? `Get ${Math.round(pass * 100)}% or more to ${reward.replay ? "pass" : "unlock an artist"}. Play it again when you're ready.`
+            : reward.replay
+              ? "Replays give XP. New cards come from your first pass of each chapter, and a perfect replay upgrades this chapter's card to Epic."
+              : `Passed. You've collected all ${total} artists.`
+        }</p>`;
   return `
     <section class="challenge-results dark-panel">
-      <p class="muted">Chapter ${n} challenge complete · ${result.correct} of ${result.total}</p>
+      <p class="muted">Chapter ${n} challenge${reward.replay ? " · replay" : ""} · ${result.correct} of ${result.total}</p>
       <div><span class="big-n">+${result.xp + streak.bonus}</span><span class="muted"> XP</span></div>
       <div class="round-xp">
         ${rounds.map((r, i) => `<div><span>${r.name}</span><b>+${result.stepXp?.[i] ?? 0}</b></div>`).join("")}
         ${streak.bonus ? `<div><span>Streak bonus (${streak.days} days)</span><b>+${streak.bonus}</b></div>` : ""}
       </div>
-      ${
-        unlocked
-          ? `<div class="unlock">${revealHtml(unlocked, rarity, extraArtist ? `Perfect score! ${extraArtist} joins your album too.` : RARITY_NOTE[rarity])}</div>`
-          : `<p class="muted">${passed ? `Passed. You've collected all ${total} artists.` : `Get ${Math.round(pass * 100)}% or more to unlock an artist. Play it again when you're ready.`}</p>`
-      }
+      ${card}
       <div class="unlock-count"><span>Artists unlocked</span><span>${owned} of ${total}</span></div>
       <div class="unlock-bar"><i style="width:${(owned / total) * 100}%"></i></div>
       ${hasNext ? `<a class="btn on-dark-btn" href="#chapter/${n + 1}">On to chapter ${n + 1}</a>` : ""}

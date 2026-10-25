@@ -1,5 +1,5 @@
 import { parseNote } from "../music";
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 8, seventh chords. One more 3rd on top of a triad, so the activities stack the 7th,

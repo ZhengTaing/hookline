@@ -1,5 +1,5 @@
 import { parseNote } from "../music";
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 7, chords in a key. Roman numerals turn chords into numbers, so the activities number the

@@ -1,5 +1,5 @@
 import { parseNote } from "../music";
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 15, creating contrast: how a new section sounds different by changing one or more

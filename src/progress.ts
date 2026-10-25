@@ -1,4 +1,5 @@
 import { allLessons } from "./lessons/content";
+import type { Lesson, RushQuestion } from "./lessons/types";
 import type { Progress, ReviewItem } from "./store";
 import type { LessonResult } from "./views/lesson";
 
@@ -57,4 +58,21 @@ export function answerCard(progress: Progress, text: string, remembered: boolean
       return { ...r, box, due: addDays(today, remembered ? REVIEW_GAPS[box - 1] : 1) };
     }),
   };
+}
+
+/** Most questions in a weak-spot run. */
+export const WEAK_MAX = 12;
+
+/** Questions you missed before (their misses are review cards), from finished sections, as one practice run. */
+export function weakPractice(progress: Progress): Lesson | undefined {
+  const missed = new Set(progress.review.map((r) => r.text));
+  const seen = new Set<string>();
+  const questions = allLessons()
+    .filter((l) => progress.completedLessons.includes(l.id))
+    .flatMap((l) => l.steps.flatMap((s): RushQuestion[] => (s.type === "practice" || s.type === "rush" ? s.questions : [])))
+    .filter((q) => "miss" in q && typeof q.miss === "string" && missed.has(q.miss) && !seen.has(q.miss) && !!seen.add(q.miss))
+    .slice(0, WEAK_MAX);
+  return questions.length
+    ? { id: "practice-weak", section: "weak", title: "Weak-spot practice", summary: "Questions you missed before", steps: [{ type: "practice", title: "Weak spots", questions }] }
+    : undefined;
 }

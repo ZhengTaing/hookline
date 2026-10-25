@@ -1,4 +1,4 @@
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 9, chord progressions. This chapter is about how chords move, so the activities put

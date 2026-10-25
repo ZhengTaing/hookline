@@ -1,4 +1,4 @@
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 17, secondary dominants: major or 7th chords that act as V of a chord other than I. Pop

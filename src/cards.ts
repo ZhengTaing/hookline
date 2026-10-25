@@ -1,8 +1,8 @@
 import sectionSongs from "./data/section-songs.json";
 import { UNLOCK_ORDER } from "./lessons/challenge";
-import { addDays } from "./progress";
-import type { Progress } from "./store";
+import { addDays, dueCards } from "./progress";
 import { currentStreak } from "./streak";
+import type { Progress } from "./store";
 
 export const RARITIES = ["Common", "Rare", "Epic", "Legendary"] as const;
 
@@ -29,6 +29,7 @@ export const DAILY = [
   { title: "Finish 1 section", goal: 1, of: "sections", xp: 20 },
   { title: "Earn 60 XP", goal: 60, of: "xp", xp: 20 },
   { title: "Finish 3 sections", goal: 3, of: "sections", xp: 30 },
+  { title: "Review your cards", goal: 3, of: "reviews", xp: 20 },
 ] as const;
 
 /** Streak days for the weekly card pack. */
@@ -96,7 +97,8 @@ export function levelCards(p: Progress): { progress: Progress; upgraded: string[
 
 /** Today's lesson counts, reset each day. */
 export function todayStats(p: Progress, today: string) {
-  return p.today?.day === today ? p.today : { day: today, sections: 0, xp: 0, claimed: [] as number[] };
+  const t = p.today?.day === today ? p.today : { day: today, sections: 0, xp: 0, claimed: [] as number[] };
+  return { ...t, reviews: t.reviews ?? 0 };
 }
 
 /** Counts a finished lesson toward today's quests. */
@@ -105,10 +107,16 @@ export function countToday(p: Progress, today: string, xp: number, section: bool
   return { ...p, today: { ...t, sections: t.sections + (section ? 1 : 0), xp: t.xp + xp } };
 }
 
+/** A daily quest's goal today: the review quest asks for up to 3 of the cards actually due. */
+export function goalOf(p: Progress, today: string, i: number): number {
+  const q = DAILY[i];
+  return q.of === "reviews" ? Math.max(1, Math.min(q.goal, todayStats(p, today).reviews + dueCards(p, today).length)) : q.goal;
+}
+
 export function claimDaily(p: Progress, today: string, i: number): Progress {
   const t = todayStats(p, today);
   const q = DAILY[i];
-  if (!q || t.claimed.includes(i) || t[q.of] < q.goal) return p;
+  if (!q || t.claimed.includes(i) || t[q.of] < goalOf(p, today, i)) return p;
   return { ...p, xp: p.xp + q.xp, today: { ...t, claimed: [...t.claimed, i] } };
 }
 
@@ -119,14 +127,37 @@ export function weekOf(today: string): string {
 }
 
 export function packState(p: Progress, today: string): { streak: number; ready: boolean; claimed: boolean } {
-  const streak = currentStreak(p.visits, today);
+  const streak = currentStreak([...(p.learnDays ?? []), ...(p.frozen ?? [])], today);
   const claimed = p.packWeek === weekOf(today);
   return { streak, claimed, ready: !claimed && streak >= PACK_STREAK && UNLOCK_ORDER.some((a) => !p.artists?.includes(a)) };
 }
 
-/** Opens the weekly card pack: the next artist joins as Rare. */
+/** Opens the weekly card pack: the next artist joins as Rare, and you get a streak freeze. */
 export function openPack(p: Progress, today: string): { progress: Progress; artist?: string } {
   if (!packState(p, today).ready) return { progress: p };
   const artist = UNLOCK_ORDER.find((a) => !p.artists?.includes(a))!;
-  return { progress: { ...addCards(p, [artist], 1), packWeek: weekOf(today) }, artist };
+  return { progress: { ...addCards(p, [artist], 1), packWeek: weekOf(today), freezes: Math.min(2, (p.freezes ?? 0) + 1) }, artist };
+}
+
+/** Album sets you have filled. */
+export function fullSets(p: Progress): number[] {
+  return SETS.flatMap(([, a, b], i) => (UNLOCK_ORDER.slice(a, b).every((x) => p.artists?.includes(x)) ? [i] : []));
+}
+
+/** Artists of the full sets whose song mix is on. */
+export function mixArtists(p: Progress): string[] {
+  const full = fullSets(p);
+  return (p.setMix ?? []).filter((i) => full.includes(i)).flatMap((i) => UNLOCK_ORDER.slice(SETS[i][1], SETS[i][2]));
+}
+
+/** One extra song for a section from the set mix: a song already picked for another section, by a mix artist. */
+export function mixSong(sectionId: string, artists: string[]): { title: string; artist: string } | undefined {
+  if (!artists.length || !SONGS[sectionId]) return undefined;
+  const own = new Set(SONGS[sectionId].songs.map((s) => s.artist));
+  const pool = Object.values(SONGS)
+    .flatMap((x) => x.songs as { title: string; artist: string }[])
+    .filter((s, i, all) => artists.some((a) => features(s.artist, a)) && !own.has(s.artist) && all.findIndex((o) => o.title === s.title) === i);
+  if (!pool.length) return undefined;
+  const n = sectionId.split(".").reduce((a, x) => a * 31 + Number(x), 7);
+  return pool[n % pool.length];
 }
