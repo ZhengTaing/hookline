@@ -4,6 +4,8 @@ import type { Lesson, Unit } from "../lessons/types";
 import { dueCards, isUnlocked, nextLessonId } from "../progress";
 import type { Progress } from "../store";
 import { bestStreak, currentStreak, recentDays } from "../streak";
+import { DAILY, featuredSections, goalOf, questFor, rarityOf, todayStats } from "../cards";
+import { streakDays } from "../rewards";
 
 /** Rough minutes for a section: the summary and a check, or a full game lesson. */
 function minutes(lesson: Lesson): number {
@@ -19,15 +21,18 @@ const CREDIT = `<p class="credit">Lessons adapted from Robert Hutchinson, <em>Mu
 /** The Learn tab: streak, what's next, and every chapter of the book. */
 /** `celebrate` animates today's streak (only the first time the page shows on a new day). */
 export function renderToday(progress: Progress, today: string, isNewToday: boolean, celebrate = false, extra = ""): string {
-  const streak = currentStreak(progress.visits, today);
-  const best = bestStreak(progress.visits);
-  const days = recentDays(progress.visits, today, 14);
+  const learned = streakDays(progress);
+  const frozen = new Set(progress.frozen ?? []);
+  const streak = currentStreak(learned, today);
+  const best = bestStreak(learned);
+  const days = recentDays(learned, today, 14);
+  const t = todayStats(progress, today);
   const nextId = nextLessonId(progress);
   const next = nextId ? chapterOf(nextId)?.lessons.find((l) => l.id === nextId) : undefined;
   const due = dueCards(progress, today).length;
 
   const dots = days
-    .map((d) => `<i class="dot${d.visited ? " on" : ""}${d.day === today ? ` today${celebrate ? " pop" : ""}` : ""}" title="${d.day}"></i>`)
+    .map((d) => `<i class="dot${d.visited ? " on" : ""}${frozen.has(d.day) ? " frozen" : ""}${d.day === today ? ` today${celebrate ? " pop" : ""}` : ""}" title="${d.day}"></i>`)
     .join("");
 
   const chapters = COURSE.map((unit, ui) => {
@@ -46,18 +51,26 @@ export function renderToday(progress: Progress, today: string, isNewToday: boole
   }).join("");
 
   return `
-    <section class="today">
-      <p class="eyebrow">${isNewToday ? "You showed up. That counts." : "Welcome back"}</p>
+    <section class="today today-card">
+      <div class="today-head"><span>Today</span><span>🔥 ${streak} lesson day${streak === 1 ? "" : "s"}${progress.freezes ? ` · ❄️ ${progress.freezes}` : ""}</span></div>
       <div class="streak">
         <span class="streak-n${celebrate ? " flip" : ""}">${streak}</span>
-        <span class="streak-label">day${streak === 1 ? "" : "s"} in a row<br /><small>Best: ${best} · ${progress.xp} XP</small></span>
+        <span class="streak-label">day${streak === 1 ? "" : "s"} in a row<br /><small>${isNewToday ? "Finish a section to keep it going" : `Best: ${best}`} · ${progress.xp} XP</small></span>
       </div>
       <div class="dots" aria-label="Last 14 days">${dots}</div>
       ${
         next
-          ? `<a class="btn" href="#lesson/${next.id}">Continue ${next.id} · ${next.title}</a>`
+          ? `<div class="today-next"><small>Next section · ${chapterOf(next.id)?.chapter ?? ""}</small><b>${next.id} ${next.title}</b></div>
+            <a class="btn" href="#lesson/${next.id}">Continue</a>`
           : `<p class="muted">You've finished the whole book.</p>`
       }
+      <a class="today-quests" href="#artists" aria-label="Today's quests">
+        ${DAILY.map((q, i) =>
+          q.of === "reviews" && !due && !t.reviews
+            ? ""
+            : `<span class="${t.claimed.includes(i) ? "done" : t[q.of] >= goalOf(progress, today, i) ? "ready" : ""}"><b>${["📖", "⚡", "🎯", "↻"][i]} ${Math.min(t[q.of], goalOf(progress, today, i))}/${goalOf(progress, today, i)}</b><small>${q.title.replace(/^\w+ \d+ /, "")}</small></span>`,
+        ).join("")}
+      </a>
       ${due ? `<a class="btn ghost" href="#practice">Review ${due} card${due === 1 ? "" : "s"}</a>` : ""}
     </section>
     ${extra}
@@ -83,8 +96,11 @@ export function renderChapter(progress: Progress, n: number): string {
       const state = done ? "done" : l.id === nextId ? "next" : open ? "open" : "locked";
       const label = done ? "Done" : l.id === nextId ? "Now" : "";
       const game = l.steps.some((s) => s.type === "rush") ? `<span class="tag">Game</span>` : "";
+      // Sections that move an artist quest forward wear that artist's badge.
+      const quest = done ? undefined : (progress.artists ?? []).find((a) => questFor(progress, a) && featuredSections(a).includes(l.id));
+      const badge = quest ? `<span class="tag quest-tag">${["⚪", "🔷", "🟣", "🌟"][rarityOf(progress, quest)]} ${quest} quest</span>` : "";
       const inner = `<span class="unit-n">${l.id}</span>
-        <span class="unit-text"><strong>${l.title}</strong><small>${l.summary}</small>${game}</span>
+        <span class="unit-text"><strong>${l.title}</strong><small>${l.summary}</small>${game}${badge}</span>
         <em>${label}</em>`;
       return open
         ? `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><a href="#lesson/${l.id}">${inner}</a></li>`

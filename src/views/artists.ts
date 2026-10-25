@@ -1,4 +1,5 @@
-import { DAILY, PACK_STREAK, QUEST_GOAL, RARITIES, RARITY_HOW, SETS, activeQuest, packState, questFor, rarityOf, todayStats } from "../cards";
+import { DAILY, PACK_STREAK, goalOf, QUEST_GOAL, RARITIES, RARITY_HOW, SETS, activeQuest, packState, questFor, rarityOf, todayStats } from "../cards";
+import { dueCards } from "../progress";
 import { UNLOCK_ORDER } from "../lessons/challenge";
 import type { Progress } from "../store";
 import { artFor } from "./song-card";
@@ -59,18 +60,22 @@ function renderQuests(p: Progress, today: string): string {
   const quest = activeQuest(p);
   const t = todayStats(p, today);
   const pack = packState(p, today);
+  const due = dueCards(p, today).length;
   const daily = DAILY.map((q, i) => {
-    const have = Math.min(t[q.of], q.goal);
+    // The review quest only shows on days with cards to review.
+    if (q.of === "reviews" && !due && !t.reviews) return "";
+    const goal = goalOf(p, today, i);
+    const have = Math.min(t[q.of], goal);
     const claimed = t.claimed.includes(i);
     const reward = claimed
       ? `<span class="quest-reward done">✓</span>`
-      : have >= q.goal
+      : have >= goal
         ? `<button class="quest-reward claim" data-claim="${i}">Claim +${q.xp}</button>`
         : `<span class="quest-reward">+${q.xp} XP</span>`;
     return `
-      <div class="quest${have >= q.goal && !claimed ? " ready" : ""}">
-        <span class="quest-icon">${["📖", "⚡", "🎯"][i]}</span>
-        <div><div class="quest-line"><b>${q.title}</b><small>${have}/${q.goal}</small></div><div class="qbar"><i style="width:${(have / q.goal) * 100}%"></i></div></div>
+      <div class="quest${have >= goal && !claimed ? " ready" : ""}">
+        <span class="quest-icon">${["📖", "⚡", "🎯", "↻"][i]}</span>
+        <div><div class="quest-line"><b>${q.title}</b><small>${have}/${goal}</small></div><div class="qbar"><i style="width:${(have / goal) * 100}%"></i></div></div>
         ${reward}
       </div>`;
   }).join("");
@@ -98,6 +103,7 @@ function renderQuests(p: Progress, today: string): string {
           <div class="qdays">${Array.from({ length: PACK_STREAK }, (_, i) => `<i class="${i < days || pack.claimed ? "on" : ""}"></i>`).join("")}</div></div>
         ${pack.ready ? `<button class="quest-reward claim" id="open-pack">Open pack</button>` : `<span class="quest-reward pack">🎴 Pack</span>`}
       </div>
+      <p class="credit">Each pack also gives a ❄️ streak freeze, which covers one missed day. You have ${p.freezes ?? 0} of 2.</p>
     </section>`;
 }
 
@@ -114,6 +120,11 @@ function renderAlbum(p: Progress, next?: string): string {
         <div class="album-page${full ? " full" : ""}" data-page="${i}"${i === current ? "" : " hidden"}>
           <div class="album-head"><b>${name} set</b><small>${full ? "Set complete ✨" : `${have}/${set.length} filled`}</small></div>
           <div class="album-grid">${set.map((x) => cardHtml(x, owned.includes(x) ? rarityOf(p, x) : null, x === next ? "next" : "")).join("")}</div>
+          ${
+            full
+              ? `<button class="set-mix${p.setMix?.includes(i) ? " on" : ""}" data-mix="${i}"><span><b>${name} mix</b><small>Each section adds a song by these ${set.length} artists</small></span><i></i></button>`
+              : `<p class="credit">Fill this set to unlock the ${name} mix: an extra song by its artists in every section.</p>`
+          }
         </div>`,
     };
   });
@@ -181,7 +192,7 @@ export function showReveal(artist: string, rarity: number, note: string): void {
 }
 
 /** Wires the Artists tab: set chips, card details, quest claims and the card pack. */
-export function wireCollection(root: HTMLElement, progress: Progress, on: { claim: (i: number) => void; openPack: () => void }): void {
+export function wireCollection(root: HTMLElement, progress: Progress, on: { claim: (i: number) => void; openPack: () => void; toggleMix: (i: number) => void }): void {
   root.addEventListener("click", async (e) => {
     const el = e.target as HTMLElement;
     const chip = el.closest<HTMLElement>("[data-set]");
@@ -190,6 +201,8 @@ export function wireCollection(root: HTMLElement, progress: Progress, on: { clai
       root.querySelectorAll<HTMLElement>(".album-page").forEach((pg) => (pg.hidden = pg.dataset.page !== chip.dataset.set));
       return;
     }
+    const mix = el.closest<HTMLElement>("[data-mix]");
+    if (mix) return on.toggleMix(Number(mix.dataset.mix));
     const claim = el.closest<HTMLElement>("[data-claim]");
     if (claim) return on.claim(Number(claim.dataset.claim));
     if (el.closest("#open-pack")) return on.openPack();

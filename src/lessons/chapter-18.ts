@@ -1,4 +1,4 @@
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 18, secondary diminished chords: vii° (or ø7, °7) of a chord other than I. Their root is

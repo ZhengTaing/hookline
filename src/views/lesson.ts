@@ -20,6 +20,9 @@ export interface LessonResult {
   stepXp?: number[];
 }
 
+/** Bonus XP for a right answer given without opening the hint. */
+export const NO_HINT_XP = 5;
+
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
 
 let soundingTimer = 0;
@@ -93,6 +96,9 @@ export function runLesson(
   // Chapter challenges get colored round bars, a running XP count and song cards.
   const challenge = lesson.id.startsWith("challenge-");
   let cleanup: (() => void) | null = null;
+  // Opening a 💡 Hint costs the no-hint bonus for that question. (Toggle doesn't bubble, so listen while capturing.)
+  let hintUsed = false;
+  root.addEventListener("toggle", (e) => (e.target as HTMLElement).matches?.("details.tip") && (hintUsed = true), true);
 
   const score = (ok: boolean, xp: number, miss: string) => {
     result.total++;
@@ -248,6 +254,7 @@ export function runLesson(
     let q = 0;
     let combo = 0;
     let points = 0;
+    hintUsed = false;
     let locked = false;
     let finished = false;
     const multiplier = () => Math.min(1 + Math.floor(combo / 2), 4);
@@ -271,7 +278,10 @@ export function runLesson(
         result.bestCombo = Math.max(result.bestCombo, combo);
         points += 10 * multiplier();
       } else combo = 0;
-      score(ok, ok ? (challenge ? XP_PER_ANSWER : untimed ? 5 : 10 * multiplier()) : 0, miss);
+      // Untimed practice: answering right without opening the hint earns a bonus.
+      const bonus = ok && untimed && !challenge && !!order[q].tip && !hintUsed ? NO_HINT_XP : 0;
+      score(ok, ok ? (challenge ? XP_PER_ANSWER : untimed ? 5 + bonus : 10 * multiplier()) : 0, miss);
+      if (bonus) root.querySelector(".fb")?.insertAdjacentHTML("afterend", `<p class="fb ok no-hint">+5 · +${bonus} no-hint bonus</p>`);
       locked = true;
       if (untimed) {
         const btn = root.querySelector<HTMLButtonElement>("[data-next]")!;
@@ -280,6 +290,7 @@ export function runLesson(
           if (q < order.length - 1) {
             q++;
             locked = false;
+            hintUsed = false;
             draw();
           } else next();
         });

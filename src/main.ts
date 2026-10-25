@@ -2,30 +2,27 @@ import "./style.css";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from "firebase/auth";
 import { ICONS } from "./icons";
 import { COURSE, chapterPractice, findLesson } from "./lessons/content";
-import { answerCard, applyResult, nextLessonId } from "./progress";
+import { answerCard, applyResult, nextLessonId, weakPractice } from "./progress";
 import { emptyProgress, loadProgress, saveProgress, type Progress } from "./store";
-import { currentStreak, dayKey, recordVisit } from "./streak";
+import { dayKey, recordVisit } from "./streak";
 import { cloud } from "./firebase";
 import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
-import { renderPlaceholder } from "./views/placeholder";
 import { renderResults } from "./views/results";
 import { renderChallengeIntro, renderChallengeResults } from "./views/challenge";
 import { hydrateArtists, renderArtistTeaser, renderCollection, showReveal, wireCollection } from "./views/artists";
-import { RARITIES, addCards, claimDaily, countToday, levelCards, openPack, unlockRarity } from "./cards";
+import { RARITIES, claimDaily, countToday, levelCards, mixArtists, mixSong, openPack } from "./cards";
+import { challengeReward, lessonStreak, recordLearnDay, reviewReward, useFreeze } from "./rewards";
 import { hydrateSongs, renderSectionSongs } from "./views/song-card";
-import { PASS, STREAK_BONUS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
+import { PASS, UNLOCK_ORDER, challengeRounds, chapterChallenge } from "./lessons/challenge";
 import { mountReview } from "./views/review";
 import { renderChapter, renderToday } from "./views/today";
 
-type Tab = "learn" | "practice" | "artists" | "songs" | "chords" | "quiz";
+type Tab = "learn" | "practice" | "artists";
 const TABS: { id: Tab; label: string }[] = [
   { id: "learn", label: "Learn" },
   { id: "practice", label: "Review" },
   { id: "artists", label: "Artists" },
-  { id: "songs", label: "My songs" },
-  { id: "chords", label: "Chords" },
-  { id: "quiz", label: "Quiz" },
 ];
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -134,48 +131,52 @@ function shell(tab: Tab, body: string): void {
   document.querySelector("#sign-in")?.addEventListener("click", () => showLogin());
 }
 
+/** Shows a "couldn't save" note at the top of a page. */
+function saveFailed(where: string, text: string): void {
+  const note = document.createElement("p");
+  note.className = "fb no";
+  note.textContent = text;
+  app.querySelector(where)?.prepend(note);
+}
+
 async function finishLesson(result: LessonResult, title: string): Promise<void> {
   stopLesson = null;
+  const today = dayKey(new Date());
   const run = /^(practice|challenge)-(\d+)$/.exec(result.lessonId);
-  // Quests: today's counts, then any artist cards whose quest this section finished.
-  progress = countToday(applyResult(progress, result, tomorrow()), dayKey(new Date()), result.xp, !run);
+  const section = !/^(practice|challenge)-/.test(result.lessonId);
+  const priorBest = progress.best[result.lessonId] ?? 0;
+  // Quests: today's counts, the streak's learning day, then any artist cards whose quest this section finished.
+  progress = recordLearnDay(countToday(applyResult(progress, result, tomorrow()), today, result.xp, section), today);
   const leveled = levelCards(progress);
   progress = leveled.progress;
   const chapter = run ? Number(run[2]) : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
-  const streak = currentStreak(progress.visits, dayKey(new Date()));
+  const streak = lessonStreak(progress, today);
   let extra = "";
   if (run?.[1] === "challenge") {
-    // A passed challenge unlocks the next artist on the list; a streak of 2+ days adds bonus XP.
-    // A perfect score unlocks a second artist too.
-    const owned = progress.artists ?? [];
-    const score = result.total ? result.correct / result.total : 0;
-    const unlocked = score >= PASS ? nextArtist(owned) : undefined;
-    const extraArtist = unlocked && score === 1 ? nextArtist([...owned, unlocked]) : undefined;
-    const bonus = streak >= 2 ? STREAK_BONUS : 0;
-    const rarity = unlockRarity(score, streak);
-    progress = addCards({ ...progress, xp: progress.xp + bonus }, [unlocked, extraArtist].filter((a): a is string => !!a), rarity);
+    const reward = challengeReward(progress, chapter, result.correct, result.total, streak, priorBest);
+    progress = reward.progress;
     shell(
       "learn",
-      renderChallengeResults(result, chapter, challengeRounds(chapter), { days: streak, bonus }, unlocked, progress.artists!.length, UNLOCK_ORDER.length, PASS, chapter < COURSE.length, extraArtist, rarity),
+      renderChallengeResults({
+        result, chapter, rounds: challengeRounds(chapter), streak: { days: streak, bonus: reward.bonus },
+        owned: progress.artists!.length, total: UNLOCK_ORDER.length, pass: PASS, hasNext: chapter < COURSE.length, reward,
+      }),
     );
     void hydrateArtists(app);
     lastHash = `challenge/${chapter}/play`;
     window.scrollTo(0, 0);
-    countUp(app.querySelector<HTMLElement>(".big-n"), result.xp + bonus, "+");
+    countUp(app.querySelector<HTMLElement>(".big-n"), result.xp + reward.bonus, "+");
     try {
       await saveProgress(userId, progress);
     } catch {
-      const note = document.createElement("p");
-      note.className = "fb no";
-      note.textContent = "Your result couldn't be saved. Check your connection, then play the challenge again.";
-      app.querySelector(".challenge-results")?.prepend(note);
+      saveFailed(".challenge-results", "Your result couldn't be saved. Check your connection, then play the challenge again.");
     }
     return;
-  } else if (!run) {
+  } else if (section) {
     // Every section ends with songs from the playlist; a chapter's last section opens its challenge.
     const last = COURSE[chapter - 1]?.lessons.at(-1)?.id === result.lessonId;
     extra =
-      renderSectionSongs(result.lessonId) +
+      renderSectionSongs(result.lessonId, mixSong(result.lessonId, mixArtists(progress))) +
       (last && chapterChallenge(chapter) ? `<a class="btn challenge-btn" href="#challenge/${chapter}">Start the chapter ${chapter} challenge</a>` : "");
   }
   shell("learn", renderResults(result, streak, title, chapter, nextLessonId(progress), extra));
@@ -189,10 +190,7 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
   try {
     await saveProgress(userId, progress);
   } catch {
-    const note = document.createElement("p");
-    note.className = "fb no";
-    note.textContent = "Your result couldn't be saved. Check your connection, then play the lesson again.";
-    app.querySelector(".results")?.prepend(note);
+    saveFailed(".results", "Your result couldn't be saved. Check your connection, then play the lesson again.");
   }
 }
 
@@ -228,7 +226,7 @@ function route(): void {
 
   if (hash.startsWith("drill/") || hash.startsWith("challenge/")) {
     const n = Number(hash.split("/")[1]);
-    const drill = hash.startsWith("drill/") ? chapterPractice(n) : chapterChallenge(n);
+    const drill = hash === "drill/weak" ? weakPractice(progress) : hash.startsWith("drill/") ? chapterPractice(n) : chapterChallenge(n);
     if (drill) {
       app.innerHTML = `<main class="lesson-root sheet"></main>`;
       lastHash = hash;
@@ -237,7 +235,7 @@ function route(): void {
         app.querySelector<HTMLElement>(".lesson-root")!,
         drill,
         (result) => void finishLesson(result, drill.title),
-        () => (location.hash = `#chapter/${n}`),
+        () => (location.hash = hash === "drill/weak" ? "#practice" : `#chapter/${n}`),
       );
       return;
     }
@@ -255,14 +253,9 @@ function route(): void {
     enterPage(hash);
     const today = dayKey(new Date());
     mountReview(app.querySelector<HTMLElement>(".review-root")!, progress, today, (text, remembered) => {
-      progress = answerCard(progress, text, remembered, today);
+      progress = reviewReward(answerCard(progress, text, remembered, today), today, remembered);
       route();
-      saveProgress(userId, progress).catch(() => {
-        const note = document.createElement("p");
-        note.className = "fb no";
-        note.textContent = "Couldn't save your review. Check your connection.";
-        app.querySelector(".review")?.prepend(note);
-      });
+      saveProgress(userId, progress).catch(() => saveFailed(".review", "Couldn't save your review. Check your connection."));
     });
     return;
   }
@@ -272,17 +265,20 @@ function route(): void {
     tab,
     tab === "learn"
       ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated, renderArtistTeaser(progress))
-      : tab === "artists"
-        ? renderCollection(progress, dayKey(new Date()))
-        : renderPlaceholder(tab),
+      : renderCollection(progress, dayKey(new Date())),
   );
   if (tab === "learn" || tab === "artists") void hydrateArtists(app);
   if (tab === "artists") {
     const save = () => {
       route();
-      saveProgress(userId, progress).catch(() => undefined);
+      saveProgress(userId, progress).catch(() => saveFailed(".collection", "Couldn't save. Check your connection, then try again."));
     };
     wireCollection(app.querySelector<HTMLElement>(".collection")!, progress, {
+      toggleMix: (i) => {
+        const on = progress.setMix ?? [];
+        progress = { ...progress, setMix: on.includes(i) ? on.filter((x) => x !== i) : [...on, i] };
+        save();
+      },
       claim: (i) => {
         progress = claimDaily(progress, dayKey(new Date()), i);
         save();
@@ -291,7 +287,7 @@ function route(): void {
         const opened = openPack(progress, dayKey(new Date()));
         progress = opened.progress;
         save();
-        if (opened.artist) showReveal(opened.artist, 1, "Your weekly streak pack. Every pack card is Rare.");
+        if (opened.artist) showReveal(opened.artist, 1, "Your weekly streak pack: a Rare card and a streak freeze.");
       },
     });
   }
@@ -313,7 +309,8 @@ async function enter(id: string | null, userEmail = ""): Promise<void> {
     const today = dayKey(new Date());
     isNewToday = !progress.visits.includes(today);
     if (isNewToday) {
-      progress = { ...progress, visits: recordVisit(progress.visits, today) };
+      // A saved streak freeze covers yesterday if you missed it.
+      progress = useFreeze({ ...progress, visits: recordVisit(progress.visits, today) }, today);
       await saveProgress(userId, progress);
     }
     signedIn = true;

@@ -1,4 +1,4 @@
-import { chordsSound } from "./mix-v2";
+import { chordsSound } from "./chords-sound";
 import type { RushQuestion, Sound, Step, StoryCard } from "./types";
 
 // Chapter 12, song form. Form is the map of a whole song, so the activities lay song sections out

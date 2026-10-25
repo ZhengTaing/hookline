@@ -30,7 +30,7 @@ describe("cards", () => {
   });
   it("opens the weekly pack on a 5-day streak", () => {
     const visits = ["2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25"];
-    const { progress, artist } = openPack({ ...emptyProgress(), visits }, "2026-10-25");
+    const { progress, artist } = openPack({ ...emptyProgress(), learnDays: visits }, "2026-10-25");
     expect(artist).toBe("Olivia Rodrigo");
     expect(rarityOf(progress, "Olivia Rodrigo")).toBe(1);
     expect(openPack(progress, "2026-10-25").artist).toBeUndefined();

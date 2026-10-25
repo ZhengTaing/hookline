@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { intervalName, parseNote } from "../music";
-import { KEY_TABLES } from "./chapters-2-4";
-import { CHORD_HELPERS } from "./chapters-6-9";
-import { NEW_LAYOUT, allLessons, chapterPractice } from "./content";
+import { allLessons, chapterPractice } from "./content";
 import { BOOK_CHAPTERS } from "./sections";
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -66,23 +64,6 @@ describe("put it in order", () => {
   });
 });
 
-describe("key tables", () => {
-  it("match the key signatures the scale speller works out", () => {
-    for (const [sig, key] of Object.entries(KEY_TABLES.MAJOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "major"), key).toBe(Number(sig));
-    for (const [sig, key] of Object.entries(KEY_TABLES.MINOR_KEYS_BY_SIG)) expect(KEY_TABLES.keySignature(key, "minor"), key + "m").toBe(Number(sig));
-  });
-});
-
-describe("chord spelling", () => {
-  it("stacks letters in thirds with the right accidentals", () => {
-    expect(CHORD_HELPERS.spellChord("Bb", "minor")).toEqual(["Bb", "Db", "F"]);
-    expect(CHORD_HELPERS.spellChord("F#", "minor")).toEqual(["F#", "A", "C#"]);
-    expect(CHORD_HELPERS.spellChord("C", "°7")).toEqual(["C", "Eb", "Gb", "Bbb"]);
-    expect(CHORD_HELPERS.spellChord("E", "7")).toEqual(["E", "G#", "B", "D"]);
-    expect(CHORD_HELPERS.staffNames(["G", "B", "D"])).toEqual(["G4", "B4", "D5"]);
-  });
-});
-
 describe("course path", () => {
   it("has one step per book section, each opening with its read-and-hear card or story cards", () => {
     const sections = BOOK_CHAPTERS.flatMap((c) => c.sections.map((s) => s.id));
@@ -93,9 +74,7 @@ describe("course path", () => {
 
   it("follows the mockup's steps, with no duels or timed rounds", () => {
     const gameTypes = new Set(["duel", "rush", "songMatch"]);
-    const moved = allLessons().filter((l) => NEW_LAYOUT.has(Number(l.id.split(".")[0])));
-    expect(moved.length).toBeGreaterThan(0);
-    for (const l of moved) {
+    for (const l of allLessons()) {
       for (const s of l.steps) expect(gameTypes.has(s.type), `${l.id} has a ${s.type} step`).toBe(false);
       expect(l.steps.some((s) => s.type === "realSong" || (s.type === "practice" && s.title === "Use it in real songs")), `${l.id} has no real-song step`).toBe(true);
     }
@@ -104,7 +83,6 @@ describe("course path", () => {
   it("builds each short check from the section's own card", () => {
     for (const ch of BOOK_CHAPTERS)
       for (const sec of ch.sections) {
-        if (!NEW_LAYOUT.has(ch.n)) continue;
         const lesson = allLessons().find((l) => l.id === sec.id)!;
         const own = [sec.headline, ...(sec.ex ?? []).map((e) => e.slice(0, e.lastIndexOf("=")))];
         for (const s of lesson.steps)

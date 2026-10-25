@@ -27,10 +27,13 @@ const searchUrl = (s: Song) => `https://music.apple.com/us/search?term=${encodeU
 const shortArtist = (a: string) => (a.length > 28 ? a.split(",")[0] : a);
 
 /** "Hear it in your playlist": a section's songs, each with art, a preview and an Apple Music link. */
-export function renderSectionSongs(sectionId: string): string {
+/** `mix` is one extra song from a full album set whose song mix is on. */
+export function renderSectionSongs(sectionId: string, mix?: { title: string; artist: string }): string {
   const found = songsFor(sectionId);
   if (!found) return "";
-  const { pick, songs } = found;
+  const { pick } = found;
+  const extra = mix && findSong(mix.title, mix.artist);
+  const songs = extra ? [...found.songs, { ...extra, note: "✨ From your set mix" }] : found.songs;
   return `
     <section class="song-list">
       <h2>Hear it in your playlist</h2>

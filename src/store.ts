@@ -23,9 +23,19 @@ export interface Progress {
   /** Artist cards: rarity (0 Common to 3 Legendary) and the featured-section count their quest started from. */
   cards?: Record<string, { r: number; q: number }>;
   /** Today's lesson counts and claimed daily quests. */
-  today?: { day: string; sections: number; xp: number; claimed: number[] };
+  today?: { day: string; sections: number; xp: number; reviews?: number; claimed: number[] };
   /** The week (its Monday) the weekly card pack was last opened. */
   packWeek?: string;
+  /** Days with a finished lesson or review: the streak counts these, not visits. */
+  learnDays?: string[];
+  /** Missed days covered by a streak freeze, and freezes saved up. */
+  frozen?: string[];
+  freezes?: number;
+  /** Chapters whose challenge has been passed, and the card each first pass unlocked. */
+  cleared?: number[];
+  chapterCard?: Record<string, string>;
+  /** Album sets whose song mix is switched on in lessons. */
+  setMix?: number[];
 }
 
 const GUEST_KEY = "hookline.progress";
@@ -47,6 +57,13 @@ function normalize(data: unknown): Progress {
     ...(d.cards && typeof d.cards === "object" ? { cards: d.cards } : {}),
     ...(d.today && typeof d.today === "object" ? { today: d.today } : {}),
     ...(typeof d.packWeek === "string" ? { packWeek: d.packWeek } : {}),
+    // Before lesson days were tracked, the streak counted visits; start from those.
+    learnDays: Array.isArray(d.learnDays) ? d.learnDays : Array.isArray(d.visits) ? d.visits : [],
+    frozen: Array.isArray(d.frozen) ? d.frozen : [],
+    freezes: typeof d.freezes === "number" ? d.freezes : 0,
+    cleared: Array.isArray(d.cleared) ? d.cleared : [],
+    chapterCard: d.chapterCard && typeof d.chapterCard === "object" ? d.chapterCard : {},
+    setMix: Array.isArray(d.setMix) ? d.setMix : [],
   };
 }
 
