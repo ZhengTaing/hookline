@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - name: Fetch song art and links from Apple
+        run: node scripts/fetch-songs.mjs || echo "Song lookup failed; the site falls back to search links"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

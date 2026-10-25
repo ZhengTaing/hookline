@@ -1,0 +1,20 @@
+{
+  "1": {
+    "title": "How You Like That",
+    "artist": "BLACKPINK",
+    "listen": "Pitch is how high or low a sound is. While it plays, pick out the lowest part (the bass) and the highest part (the voices). Two notes can share a letter name and still sit in different octaves.",
+    "guitar": "Play A on the open A string, then the A an octave higher at fret 2 of the G string. Same letter, higher pitch: that's an octave."
+  },
+  "2": {
+    "title": "On The Ground",
+    "artist": "ROSÉ",
+    "listen": "This song is in D♭ major, a key with five flats. Hum the note the chorus settles on. That's D♭, the first note of its major scale.",
+    "guitar": "Put a capo on fret 1 and play the open C major scale (C D E F G A B C). The capo moves every note up a half step, so now you're playing the D♭ major scale."
+  },
+  "3": {
+    "title": "Lovesick Girls",
+    "artist": "BLACKPINK",
+    "listen": "The chorus loops D♯m, C♯, F♯ and B. All four chords fit the six-sharp key signature shared by D♯ minor and F♯ major, which are relative keys. Does the loop feel at home on D♯m (minor) or on F♯ (major)?",
+    "guitar": "Put a capo on fret 4 and strum Bm, A, D and G. With the capo, those shapes sound as D♯m, C♯, F♯ and B."
+  }
+}
