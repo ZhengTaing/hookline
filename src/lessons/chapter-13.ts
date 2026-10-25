@@ -28,9 +28,9 @@ const PERIOD_KINDS = ["Parallel period", "Contrasting period", "Phrase group", "
 export const CHAPTER_13: Record<string, Step[]> = {
   "13.1": [
     story(
-      staffCard("The strongest full stop in music is the perfect authentic cadence (PAC): V to I, both chords in root position, with the tonic on top.", ["C3", "E3", "G3", "C4", "C5"], PAC, true),
-      staffCard("Change any part and it's an imperfect authentic cadence (IAC). Here the top note is E, not C, so it sounds less final.", ["C3", "C4", "G4", "E5"], IAC_TOP, true),
-      staffCard("This one ends with E in the bass (an inversion), so it's also an IAC. Still V to I, just not as solid.", ["E3", "G3", "C4", "C5"], IAC_INV, true),
+      staffCard("The strongest full stop in music is the perfect authentic cadence (PAC): V to I, both chords in root position, with the tonic on top.", ["E4", "G4", "C5"], PAC, true),
+      staffCard("Change any part and it's an imperfect authentic cadence (IAC). Here the top note is E, not C, so it sounds less final.", ["C4", "G4", "E5"], IAC_TOP, true),
+      staffCard("This one ends with E in the bass (an inversion), so it's also an IAC. Still V to I, just not as solid.", ["E4", "G4", "C5"], IAC_INV, true),
     ),
     practice(
       "Name it by ear",
@@ -39,7 +39,7 @@ export const CHAPTER_13: Record<string, Step[]> = {
     ),
     practice(
       "Name it",
-      { kind: "choice", prompt: "This last chord is C major with E in the bass. Is the cadence a PAC?", options: ["Yes", "No, it's an IAC"], answer: "No, it's an IAC", visual: { type: "staff", notes: ["E3", "G3", "C4", "C5"], chord: true }, sound: IAC_INV, miss: "A PAC needs both chords in root position. With E in the bass it's an IAC" },
+      { kind: "choice", prompt: "This last chord is C major with E in the bass. Is the cadence a PAC?", options: ["Yes", "No, it's an IAC"], answer: "No, it's an IAC", visual: { type: "staff", notes: ["E4", "G4", "C5"], chord: true }, sound: IAC_INV, miss: "A PAC needs both chords in root position. With E in the bass it's an IAC" },
     ),
     practice(
       "Play it on the guitar",

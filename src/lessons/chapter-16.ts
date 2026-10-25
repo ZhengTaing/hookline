@@ -12,9 +12,9 @@ const card = (text: string, left: string, right: string, label: string, sound: S
 const story = (...cards: StoryCard[]): Step => ({ type: "story", cards });
 const practice = (title: string, ...questions: RushQuestion[]): Step => ({ type: "practice", title, questions });
 
-const ROOT = ["C3", "E3", "G3", "C4"];
-const FIRST = ["E3", "G3", "C4", "E4"];
-const SECOND = ["G3", "C4", "E4", "G4"];
+const ROOT = ["C4", "E4", "G4", "C5"];
+const FIRST = ["E4", "G4", "C5", "E5"];
+const SECOND = ["G4", "C5", "E5", "G5"];
 const FIGURES = ["5/3 (no figure)", "6", "6/4"];
 const CAD64 = voiced(["G2", "G3", "C4", "E4"], ["G2", "G3", "B3", "D4"], ["C3", "G3", "C4", "E4"]);
 
