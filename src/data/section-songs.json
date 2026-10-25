@@ -1,0 +1,101 @@
+{
+  "1.1": {
+    "listen": "Trace the melody with your hand while it plays: up when it climbs, down when it falls. That's pitch.",
+    "guitar": "Play the low E string open, then the high E string open. Same letter, two octaves apart in pitch.",
+    "songs": [
+      { "title": "Golden", "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast" },
+      { "title": "vampire", "artist": "Olivia Rodrigo" },
+      { "title": "like JENNIE", "artist": "JENNIE" }
+    ]
+  },
+  "1.2": {
+    "listen": "Hum the first note of the chorus, then find it on your guitar and name its letter, A to G.",
+    "guitar": "Play the open strings from low to high and say each letter out loud: E A D G B E.",
+    "songs": [
+      { "title": "Whiplash", "artist": "aespa" },
+      { "title": "drivers license", "artist": "Olivia Rodrigo" },
+      { "title": "Supernova", "artist": "aespa" }
+    ]
+  },
+  "1.3": {
+    "listen": "Sing the hook, then sing it again higher or lower until it's comfortable. Same notes in a different octave.",
+    "guitar": "Play A on the open A string, then A at fret 2 of the G string. They're an octave apart.",
+    "songs": [
+      { "title": "How Sweet", "artist": "NewJeans" },
+      { "title": "good 4 u", "artist": "Olivia Rodrigo" },
+      { "title": "Magnetic", "artist": "ILLIT" }
+    ]
+  },
+  "1.4": {
+    "listen": "While it plays, try F and then F♯ on your guitar. One of them clashes and one fits. A sharp is one fret higher.",
+    "guitar": "On the high E string, F is fret 1 and F♯ is fret 2. One fret is one half step.",
+    "songs": [
+      { "title": "Super Shy", "artist": "NewJeans" },
+      { "title": "traitor", "artist": "Olivia Rodrigo" },
+      { "title": "Rockstar", "artist": "LISA" }
+    ]
+  },
+  "1.5": {
+    "listen": "Find the song's home note on your guitar. If that fret is a sharp or flat, give it both of its names.",
+    "guitar": "Fret 4 on the A string is C♯, and it's also D♭. One fret, two names.",
+    "songs": [
+      { "title": "On The Ground", "artist": "ROSÉ", "note": "In D♭ major. D♭ is also called C♯." },
+      { "title": "ANTIFRAGILE", "artist": "LE SSERAFIM" },
+      { "title": "positions", "artist": "Ariana Grande" }
+    ]
+  },
+  "2.1": {
+    "listen": "Slide one finger up a string one fret at a time while it plays. Each fret is a half step. Stop when a note fits the song.",
+    "guitar": "On the B string, fret 1 to fret 2 is a half step, and fret 1 to fret 3 is a whole step.",
+    "songs": [
+      { "title": "Armageddon", "artist": "aespa" },
+      { "title": "deja vu", "artist": "Olivia Rodrigo" },
+      { "title": "I AM", "artist": "IVE" }
+    ]
+  },
+  "2.2": {
+    "listen": "Find the home note, then sing do-re-mi up from it. If the scale fits the song, the song is in a major key.",
+    "guitar": "Play the C major scale in open position: C (A string, fret 3), D, E, F, G, A, B, C.",
+    "songs": [
+      { "title": "like JENNIE", "artist": "JENNIE" },
+      { "title": "How Sweet", "artist": "NewJeans" },
+      { "title": "we can't be friends (wait for your love)", "artist": "Ariana Grande" }
+    ]
+  },
+  "2.3": {
+    "listen": "Each of these is in a major key. Count the flats in its key signature.",
+    "guitar": "Put a capo on fret 1 and play the open C major scale. Now you're playing D♭ major, with five flats.",
+    "songs": [
+      { "title": "drivers license", "artist": "Olivia Rodrigo", "note": "B♭ major: 2 flats (B♭, E♭)." },
+      { "title": "vampire", "artist": "Olivia Rodrigo", "note": "F major: 1 flat (B♭)." },
+      { "title": "On The Ground", "artist": "ROSÉ", "note": "D♭ major: 5 flats (B♭ E♭ A♭ D♭ G♭)." }
+    ]
+  },
+  "3.1": {
+    "listen": "Play a minor song and a major song back to back. The minor one has a lowered 3rd, so home sounds darker.",
+    "guitar": "Strum Am, then A. The only change is one note: the 3rd, C or C♯.",
+    "songs": [
+      { "title": "good 4 u", "artist": "Olivia Rodrigo", "note": "F♯ minor." },
+      { "title": "drivers license", "artist": "Olivia Rodrigo", "note": "B♭ major, for comparison." },
+      { "title": "Lovesick Girls", "artist": "BLACKPINK", "note": "Chorus loops D♯m, C♯, F♯, B. Does it feel at home on D♯m or F♯?" }
+    ]
+  },
+  "3.2": {
+    "listen": "Relative keys share a key signature. Every major key has a minor key that starts on its 6th note.",
+    "guitar": "Put a capo on fret 4 and strum Bm, A, D, G. Those shapes sound as Lovesick Girls' D♯m, C♯, F♯, B.",
+    "songs": [
+      { "title": "good 4 u", "artist": "Olivia Rodrigo", "note": "F♯ minor has 3 sharps, the same as its relative, A major." },
+      { "title": "drivers license", "artist": "Olivia Rodrigo", "note": "B♭ major, but it ends on G minor, its relative minor." },
+      { "title": "Lovesick Girls", "artist": "BLACKPINK", "note": "D♯ minor and F♯ major share 6 sharps." }
+    ]
+  },
+  "3.3": {
+    "listen": "Hum the home note (the tonic), then the note five steps above it (the dominant). Hear how the dominant wants to go home?",
+    "guitar": "In A minor: play A (open A string), then E (open low E string or fret 2 on the D string). Tonic, then dominant.",
+    "songs": [
+      { "title": "DRIP", "artist": "BABYMONSTER" },
+      { "title": "brutal", "artist": "Olivia Rodrigo" },
+      { "title": "Gnarly", "artist": "KATSEYE" }
+    ]
+  }
+}

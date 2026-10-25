@@ -18,6 +18,8 @@ export interface Progress {
   /** Best lesson score (XP earned in one run), by lesson id. */
   best: Record<string, number>;
   review: ReviewItem[];
+  /** Artists unlocked by passing chapter challenges, in unlock order. */
+  artists?: string[];
 }
 
 const GUEST_KEY = "hookline.progress";
@@ -35,6 +37,7 @@ function normalize(data: unknown): Progress {
     xp: typeof d.xp === "number" ? d.xp : 0,
     best: d.best && typeof d.best === "object" ? d.best : {},
     review: Array.isArray(d.review) ? d.review : [],
+    artists: Array.isArray(d.artists) ? d.artists : [],
   };
 }
 

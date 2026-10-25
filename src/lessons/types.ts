@@ -7,6 +7,8 @@ export type Sound =
   | { kind: "withChord"; chord: number[]; notes: number[]; gap?: number }
   /** Clicks in rhythm: durations in beats (negative = rest), with an optional pitch for each note. */
   | { kind: "rhythm"; beats: number[]; bpm: number; pitches?: number[] }
+  /** A 30-second preview of a playlist song (see src/songs.ts). */
+  | { kind: "song"; title: string; artist: string }
   | { kind: "none" };
 
 export interface StoryCard {

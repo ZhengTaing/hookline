@@ -1,3 +1,4 @@
+import { chapterChallenge } from "../lessons/challenge";
 import { COURSE, chapterPractice } from "../lessons/content";
 import type { Lesson, Unit } from "../lessons/types";
 import { dueCards, isUnlocked, nextLessonId } from "../progress";
@@ -106,6 +107,7 @@ export function renderChapter(progress: Progress, n: number): string {
             : `<p class="muted">Finish the earlier chapters to open this one.</p>`
       }
       ${chapterPractice(n) ? `<a class="btn ghost" href="#drill/${n}">Practice this chapter's questions</a>` : ""}
+      ${chapterChallenge(n) ? `<a class="btn" href="#challenge/${n}">Chapter challenge: songs from your playlists</a>` : ""}
       ${n < COURSE.length ? `<a class="btn ghost" href="#chapter/${n + 1}">Next chapter: ${COURSE[n].title}</a>` : ""}
     </section>`;
 }

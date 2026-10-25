@@ -1,0 +1,62 @@
+{
+  "artists": ["Olivia Rodrigo", "aespa", "NewJeans", "Ariana Grande", "BLACKPINK", "ITZY", "TWICE", "Selena Gomez", "2NE1", "LISA", "JENNIE", "IVE", "LE SSERAFIM", "BABYMONSTER", "ILLIT", "KATSEYE"],
+  "chapters": {
+    "1": {
+      "rounds": [
+        { "title": "Round 1: Note detective", "drill": 4 },
+        {
+          "title": "Round 2: Two names, one note",
+          "questions": [
+            { "song": ["On The Ground", "ROSÉ"], "prompt": "On The Ground is in D♭ major. What's another name for D♭?", "options": ["C♯", "D♯", "C♭", "E♭"], "answer": "C♯", "miss": "D♭ and C♯ are the same key and the same fret" },
+            { "song": ["good 4 u", "Olivia Rodrigo"], "prompt": "good 4 u is in F♯ minor. What's another name for F♯?", "options": ["G♭", "F♭", "G♯", "E♯"], "answer": "G♭", "miss": "F♯ and G♭ are the same note" },
+            { "song": ["drivers license", "Olivia Rodrigo"], "prompt": "drivers license is in B♭ major. What's another name for B♭?", "options": ["A♯", "C♭", "A♭", "B♯"], "answer": "A♯", "miss": "B♭ and A♯ are the same note" }
+          ]
+        },
+        { "title": "Round 3: Name that intro", "intro": [["Golden", "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast"], ["Whiplash", "aespa"], ["like JENNIE", "JENNIE"], ["Supernova", "aespa"], ["vampire", "Olivia Rodrigo"]] }
+      ]
+    },
+    "2": {
+      "rounds": [
+        {
+          "title": "Round 1: Key detective",
+          "questions": [
+            { "song": ["drivers license", "Olivia Rodrigo"], "prompt": "Listen. Which major key is drivers license in?", "options": ["B♭ major", "F major", "D♭ major", "G major"], "answer": "B♭ major", "miss": "drivers license is in B♭ major" },
+            { "song": ["vampire", "Olivia Rodrigo"], "prompt": "Listen. Which major key is vampire in?", "options": ["F major", "B♭ major", "C major", "E major"], "answer": "F major", "miss": "vampire is in F major" },
+            { "song": ["On The Ground", "ROSÉ"], "prompt": "Listen. Which major key is On The Ground in?", "options": ["D♭ major", "D major", "A♭ major", "F major"], "answer": "D♭ major", "miss": "On The Ground is in D♭ major" }
+          ]
+        },
+        {
+          "title": "Round 2: Key signature spotter",
+          "questions": [
+            { "song": ["drivers license", "Olivia Rodrigo"], "prompt": "drivers license is in B♭ major. How many flats are in its key signature?", "options": ["1", "2", "3", "4"], "answer": "2", "miss": "B♭ major has 2 flats: B♭ and E♭" },
+            { "song": ["vampire", "Olivia Rodrigo"], "prompt": "vampire is in F major. How many flats are in its key signature?", "options": ["0", "1", "2", "3"], "answer": "1", "miss": "F major has 1 flat: B♭" },
+            { "song": ["On The Ground", "ROSÉ"], "prompt": "On The Ground is in D♭ major. How many flats are in its key signature?", "options": ["3", "4", "5", "6"], "answer": "5", "miss": "D♭ major has 5 flats: B♭ E♭ A♭ D♭ G♭" }
+          ]
+        },
+        { "title": "Round 3: Name that intro", "intro": [["Magnetic", "ILLIT"], ["Super Shy", "NewJeans"], ["Rockstar", "LISA"], ["Armageddon", "aespa"], ["we can't be friends (wait for your love)", "Ariana Grande"]] }
+      ]
+    },
+    "3": {
+      "rounds": [
+        {
+          "title": "Round 1: Key detective",
+          "questions": [
+            { "song": ["good 4 u", "Olivia Rodrigo"], "prompt": "Listen. Is good 4 u in a major key or a minor key?", "options": ["Major", "Minor"], "answer": "Minor", "miss": "good 4 u is in F♯ minor" },
+            { "song": ["drivers license", "Olivia Rodrigo"], "prompt": "Listen. Is drivers license in a major key or a minor key?", "options": ["Major", "Minor"], "answer": "Major", "miss": "drivers license is in B♭ major" },
+            { "song": ["vampire", "Olivia Rodrigo"], "prompt": "Listen. Is vampire in a major key or a minor key?", "options": ["Major", "Minor"], "answer": "Major", "miss": "vampire is in F major" },
+            { "song": ["On The Ground", "ROSÉ"], "prompt": "Listen. Is On The Ground in a major key or a minor key?", "options": ["Major", "Minor"], "answer": "Major", "miss": "On The Ground is in D♭ major" }
+          ]
+        },
+        {
+          "title": "Round 2: Relative key spotter",
+          "questions": [
+            { "song": ["good 4 u", "Olivia Rodrigo"], "prompt": "good 4 u is in F♯ minor. What's its relative major?", "options": ["A major", "F♯ major", "D major", "E major"], "answer": "A major", "miss": "F♯ minor and A major share 3 sharps" },
+            { "song": ["drivers license", "Olivia Rodrigo"], "prompt": "drivers license is in B♭ major. What's its relative minor?", "options": ["G minor", "B♭ minor", "D minor", "C minor"], "answer": "G minor", "miss": "B♭ major and G minor share 2 flats. The song even ends on G minor" },
+            { "song": ["vampire", "Olivia Rodrigo"], "prompt": "vampire is in F major. What's its relative minor?", "options": ["D minor", "F minor", "A minor", "G minor"], "answer": "D minor", "miss": "F major and D minor share 1 flat" }
+          ]
+        },
+        { "title": "Round 3: Name that intro", "intro": [["I AM", "IVE"], ["ANTIFRAGILE", "LE SSERAFIM"], ["Gnarly", "KATSEYE"], ["Mantra", "JENNIE"], ["SHEESH", "BABYMONSTER"]] }
+      ]
+    }
+  }
+}
