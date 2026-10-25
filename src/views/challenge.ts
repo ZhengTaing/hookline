@@ -11,7 +11,8 @@ const RARITY_NOTE = [
 
 const COLORS = ["#c2255c", "#6b3fa0", "#2f6f9f"];
 
-export function renderChallengeIntro(n: number, chapterTitle: string, rounds: { name: string; about: string; maxXp: number }[], pass: number): string {
+/** `replay` is set once the chapter is cleared: the card a perfect score would upgrade, or null if none. */
+export function renderChallengeIntro(n: number, chapterTitle: string, rounds: { name: string; about: string; maxXp: number }[], pass: number, replay?: { card: string | null }): string {
   const total = rounds.reduce((a, r) => a + r.maxXp / 10, 0);
   return `
     <section class="challenge-intro dark-panel">
@@ -31,7 +32,11 @@ export function renderChallengeIntro(n: number, chapterTitle: string, rounds: { 
         .join("")}
       <div class="round-card goal">
         <span class="round-n"></span>
-        <div><b>Win to unlock an artist</b><span>Get ${Math.ceil(total * pass)} of ${total} or more right</span></div>
+        ${
+          replay
+            ? `<div><b>Replay for XP</b><span>${replay.card ? `Get all ${total} right to upgrade ${replay.card} to Epic` : "You already have this chapter's card"}</span></div>`
+            : `<div><b>Win to unlock an artist</b><span>Get ${Math.ceil(total * pass)} of ${total} or more right. All ${total} pulls 2 Epic cards</span></div>`
+        }
       </div>
       <a class="btn pink-btn" href="#challenge/${n}/play">Start the challenge</a>
       <a class="btn ghost on-dark" href="#chapter/${n}">Back to the chapter</a>
@@ -54,14 +59,16 @@ export function renderChallengeResults(v: ChallengeResultsView): string {
   const { result, chapter: n, rounds, streak, owned, total, pass, hasNext, reward } = v;
   const passed = result.total > 0 && result.correct / result.total >= pass;
   const card = reward.unlocked
-    ? `<div class="unlock">${revealHtml(reward.unlocked, reward.rarity, reward.extra ? `Perfect score! ${reward.extra} joins your album too.` : RARITY_NOTE[reward.rarity])}</div>`
+    ? `<div class="unlock">${revealHtml(reward.unlocked, reward.rarity, RARITY_NOTE[reward.rarity])}${
+        reward.extra ? revealHtml(reward.extra, reward.rarity, `Perfect score! ${reward.extra} joins your album too.`) : ""
+      }</div>`
     : reward.upgraded
-      ? `<div class="unlock">${revealHtml(reward.upgraded, 2, "Card upgraded to Epic. A perfect replay can still upgrade this chapter's card.")}</div>`
+      ? `<div class="unlock">${revealHtml(reward.upgraded, 2, "Your perfect replay upgraded this card to Epic.")}</div>`
       : `<p class="muted">${
           !passed
             ? `Get ${Math.round(pass * 100)}% or more to ${reward.replay ? "pass" : "unlock an artist"}. Play it again when you're ready.`
             : reward.replay
-              ? "Replays give XP. New cards come from your first pass of each chapter, and a perfect replay upgrades this chapter's card to Epic."
+              ? "Replays give XP. New cards come from the first pass of each chapter."
               : `Passed. You've collected all ${total} artists.`
         }</p>`;
   return `

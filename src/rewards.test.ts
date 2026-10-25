@@ -58,3 +58,12 @@ describe("rewards", () => {
     expect(weakPractice(emptyProgress())).toBeUndefined();
   });
 });
+
+describe("replays from older progress", () => {
+  it("upgrades your first card below Epic when the chapter's card wasn't tracked", () => {
+    const p = { ...emptyProgress(), artists: ["Olivia Rodrigo", "aespa"], cards: { "Olivia Rodrigo": { r: 2, q: 0 }, aespa: { r: 0, q: 0 } }, cleared: [1] };
+    const r = challengeReward(p, 1, 10, 10, 0);
+    expect(r.upgraded).toBe("aespa");
+    expect(rarityOf(r.progress, "aespa")).toBe(2);
+  });
+});
