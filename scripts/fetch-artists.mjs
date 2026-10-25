@@ -11,10 +11,8 @@ if (!id || !secret) {
 
 const read = async (f) => JSON.parse(await readFile(new URL(`../src/data/${f}`, import.meta.url), "utf8"));
 const { artists: unlocks } = await read("challenges.json");
-// Every artist with two or more songs in the playlists, plus the unlock list.
-const counts = {};
-for (const s of await read("playlist.json")) counts[s.artist] = (counts[s.artist] ?? 0) + 1;
-const artists = [...new Set([...unlocks, ...Object.keys(counts).filter((a) => counts[a] >= 2)])];
+// The 50 artists in the unlock order (see src/data/challenges.json).
+const artists = unlocks;
 const auth = await fetch("https://accounts.spotify.com/api/token", {
   method: "POST",
   headers: { Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" },
@@ -28,22 +26,18 @@ for (const name of artists) {
   const url = `https://api.spotify.com/v1/search?type=artist&limit=5&q=${encodeURIComponent(name.split(/,| & /)[0])}`;
   const { artists: found } = await fetch(url, { headers: { Authorization: `Bearer ${auth.access_token}` } }).then((r) => r.json());
   const items = found?.items ?? [];
-  const hit = items.find((a) => a.name.toLowerCase() === name.toLowerCase()) ?? items[0];
+  // Only an exact name match: a near miss can be a different artist ("CL" found "Clarent").
+  const norm = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+  const want = norm(name.split(/,| & /)[0]);
+  const hit = items.find((a) => norm(a.name) === want);
   if (!hit?.images?.length) {
     console.warn(`No Spotify photo for ${name}`);
     continue;
   }
   // Spotify lists its images largest first.
-  meta[name] = { image: hit.images[0].url, url: hit.external_urls?.spotify, id: hit.id, spotifyName: hit.name, popularity: hit.popularity, followers: hit.followers?.total };
+  meta[name] = { image: hit.images[0].url, url: hit.external_urls?.spotify };
   console.log(`Found ${name} (${hit.name})`);
 }
-
-// The most popular artists by Spotify's popularity score, one entry per Spotify artist.
-const seen = new Set();
-const ranked = Object.entries(meta)
-  .sort(([, a], [, b]) => (b.popularity ?? 0) - (a.popularity ?? 0) || (b.followers ?? 0) - (a.followers ?? 0))
-  .filter(([, m]) => !seen.has(m.id) && seen.add(m.id));
-ranked.forEach(([name, m], i) => console.log(`RANK ${i + 1}. ${name} | ${m.spotifyName} | popularity ${m.popularity} | followers ${m.followers}`));
 
 await writeFile(new URL("../public/artist-meta.json", import.meta.url), JSON.stringify(meta, null, 1));
 console.log(`Wrote ${Object.keys(meta).length} artists to public/artist-meta.json`);

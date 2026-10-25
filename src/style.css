@@ -89,7 +89,7 @@ button, input { font: inherit; color: inherit; }
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   max-width: 560px;
   margin: 0 auto;
   background: var(--bg);
@@ -443,7 +443,19 @@ button, input { font: inherit; color: inherit; }
 .artist-photo { aspect-ratio: 4 / 5; border-radius: 18px; overflow: hidden; background: #2a2a2a; color: #fff; display: grid; place-items: center; font-size: 13px; }
 .artist-photo img { width: 100%; height: 100%; object-fit: cover; animation: fade-in .4s ease both; }
 .artist-card.locked .artist-photo { outline: 2px dashed #bdbdbd; outline-offset: -2px; }
-.artist-card.locked .artist-photo img { filter: grayscale(1) brightness(.55); }
 .artist-card:not(.locked) .artist-photo { box-shadow: 0 0 0 3px #c2255c; }
 .artist-link { font-size: 12px; font-weight: 700; color: #1db954; text-decoration: none; }
-.artist-card.locked.spotify .artist-photo img { filter: none; }
+
+.artist-card.next .artist-photo { outline-color: #c2255c; }
+.artist-teaser { display: grid; grid-template-columns: 110px 1fr; gap: 14px; align-items: center; padding: 12px; border-radius: 18px; background: var(--ink); color: var(--bg); text-decoration: none; }
+.artist-teaser .artist-card b, .artist-teaser .artist-card small { display: none; }
+.artist-teaser > span { display: grid; gap: 4px; }
+.artist-teaser > span b { font-size: 24px; letter-spacing: -0.5px; }
+.artist-teaser > span small { font-size: 12px; opacity: .8; }
+.collection { display: grid; gap: 14px; }
+.collection h1 { margin: 0; font-size: 32px; letter-spacing: -0.8px; }
+.artist-hero { display: grid; gap: 6px; }
+.artist-hero .artist-photo { aspect-ratio: 1; border-radius: 22px; }
+.artist-hero h2 { margin: 0; font-size: 44px; line-height: 1; letter-spacing: -1.5px; }
+.collection .unlock-bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.collection .unlock-bar i { display: block; height: 100%; background: #c2255c; }

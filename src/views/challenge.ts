@@ -39,6 +39,7 @@ export function renderChallengeResults(
   total: number,
   pass: number,
   hasNext: boolean,
+  extraArtist?: string,
 ): string {
   const passed = result.total > 0 && result.correct / result.total >= pass;
   return `
@@ -51,7 +52,7 @@ export function renderChallengeResults(
       </div>
       ${
         unlocked
-          ? `<div class="unlock"><p class="song-eyebrow">Artist unlocked</p><div class="unlock-art" data-artist="${unlocked}"></div><b>${unlocked}</b><span>Their badge joins your collection.</span></div>`
+          ? `<div class="unlock"><p class="song-eyebrow">Artist unlocked</p><div class="unlock-art" data-artist="${unlocked}"></div><b>${unlocked}</b><span>${extraArtist ? `Perfect score! ${extraArtist} unlocked too.` : "They join your Artists tab. A perfect score unlocks two."}</span></div>`
           : `<p class="muted">${passed ? `Passed. You've collected all ${total} artists.` : `Get ${Math.round(pass * 100)}% or more to unlock an artist. Play it again when you're ready.`}</p>`
       }
       <div class="unlock-count"><span>Artists unlocked</span><span>${owned} of ${total}</span></div>
