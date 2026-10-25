@@ -1,11 +1,11 @@
-import { chapterChallenge } from "../lessons/challenge";
+import { UNLOCK_ORDER, challengeRounds, chapterChallenge } from "../lessons/challenge";
 import { COURSE, chapterPractice } from "../lessons/content";
 import type { Lesson, Unit } from "../lessons/types";
 import { dueCards, isUnlocked, nextLessonId } from "../progress";
 import type { Progress } from "../store";
 import { bestStreak, currentStreak, recentDays } from "../streak";
 import { DAILY, featuredSections, goalOf, questFor, rarityOf, todayStats } from "../cards";
-import { streakDays } from "../rewards";
+import { isCleared, streakDays } from "../rewards";
 
 /** Rough minutes for a section: the summary and a check, or a full game lesson. */
 function minutes(lesson: Lesson): number {
@@ -65,6 +65,13 @@ export function renderToday(progress: Progress, today: string, _isNewToday: bool
             <a class="btn" href="#lesson/${next.id}">Continue</a>`
           : `<p class="muted">You've finished the whole book.</p>`
       }
+      ${(() => {
+        const open = openChallenges(progress);
+        const card = UNLOCK_ORDER.find((a) => !progress.artists?.includes(a));
+        return open.length && card
+          ? `<a class="btn pink-btn" href="#challenge/${open[0]}">🎴 Chapter ${open[0]} challenge: unlock ${card}${open.length > 1 ? ` (${open.length} waiting)` : ""}</a>`
+          : "";
+      })()}
       <a class="today-quests" href="#artists" aria-label="Today's quests">
         ${DAILY.map((q, i) =>
           q.of === "reviews" && !due && !t.reviews
@@ -79,7 +86,11 @@ export function renderToday(progress: Progress, today: string, _isNewToday: bool
         ? `<section class="course chapter-now">
             <h2>${current.chapter} · ${current.title}</h2>
             <ol class="units">${sectionRows(progress, current, nextId)}</ol>
-            <p class="credit">Badges mark sections with songs by an artist you own. Finish 3 of them to level up that card.</p>
+            <p class="credit">${
+              progress.artists?.length
+                ? "Badges mark sections with songs by an artist you own. Finish 3 of them to level up that card."
+                : "🔒 badges mark songs by your next artist. Pass a chapter challenge to collect them, then those sections count toward their quest."
+            }</p>
           </section>`
         : ""
     }
@@ -95,7 +106,20 @@ export function renderToday(progress: Progress, today: string, _isNewToday: bool
 function questBadge(progress: Progress, lessonId: string): string {
   if (progress.completedLessons.includes(lessonId)) return "";
   const quest = (progress.artists ?? []).find((a) => questFor(progress, a) && featuredSections(a).includes(lessonId));
-  return quest ? `<span class="tag quest-tag">${["⚪", "🔷", "🟣", "🌟"][rarityOf(progress, quest)]} ${quest} quest</span>` : "";
+  if (quest) return `<span class="tag quest-tag">${["⚪", "🔷", "🟣", "🌟"][rarityOf(progress, quest)]} ${quest} quest</span>`;
+  // Before you own them, the next artist's sections show a locked badge, so you can see what's coming.
+  const next = UNLOCK_ORDER.find((a) => !progress.artists?.includes(a));
+  return next && featuredSections(next).includes(lessonId) ? `<span class="tag quest-tag locked">🔒 ${next} quest</span>` : "";
+}
+
+/** Finished chapters whose challenge you haven't passed yet. */
+function openChallenges(progress: Progress): number[] {
+  return COURSE.flatMap((u, i) => {
+    const n = i + 1;
+    if (!chapterChallenge(n) || !u.lessons.every((l) => progress.completedLessons.includes(l.id))) return [];
+    const total = challengeRounds(n).reduce((a, r) => a + r.maxXp / 10, 0);
+    return isCleared(progress, n, total) ? [] : [n];
+  });
 }
 
 /** A chapter's sections as course-path rows. */
