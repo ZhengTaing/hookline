@@ -944,6 +944,309 @@
           ]
         }
       ]
+    },
+    "10": {
+      "rounds": [
+        {
+          "title": "Round 1: Non-chord tone detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Non-chord tone builder",
+          "about": "Build non-chord tones in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. A passing tone between B♭ and D is…",
+              "options": [
+                "C",
+                "E♭",
+                "A",
+                "F"
+              ],
+              "answer": "C",
+              "miss": "B♭ to D steps through C."
+            },
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. The upper neighbor of F is…",
+              "options": [
+                "G",
+                "E",
+                "A",
+                "B♭"
+              ],
+              "answer": "G",
+              "miss": "One step up from F in F major is G."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. A passing tone between F♯ and A is…",
+              "options": [
+                "G♯",
+                "G",
+                "B",
+                "E"
+              ],
+              "answer": "G♯",
+              "miss": "F♯ to A steps through G♯."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. Over its V chord (A♭), a 4–3 suspension holds D♭, then falls to…",
+              "options": [
+                "C",
+                "E♭",
+                "B♭",
+                "F"
+              ],
+              "answer": "C",
+              "miss": "The 4th above A♭ is D♭; it falls to the 3rd, C."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "How You Like That",
+              "BLACKPINK"
+            ],
+            [
+              "LOVE DIVE",
+              "IVE"
+            ],
+            [
+              "TOMBOY",
+              "i-dle"
+            ],
+            [
+              "Perfect Night",
+              "LE SSERAFIM"
+            ],
+            [
+              "bad idea right?",
+              "Olivia Rodrigo"
+            ]
+          ]
+        }
+      ]
+    },
+    "11": {
+      "rounds": [
+        {
+          "title": "Round 1: Melody detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Motive mover",
+          "about": "Move motives around in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. The motive F–G–A moved up a step becomes…",
+              "options": [
+                "G–A–B♭",
+                "G–A–B",
+                "E–F–G",
+                "A–B♭–C"
+              ],
+              "answer": "G–A–B♭",
+              "miss": "In F major the note after A is B♭."
+            },
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. The motive B♭–C–D moved down a step becomes…",
+              "options": [
+                "A–B♭–C",
+                "A–B–C♯",
+                "C–D–E♭",
+                "A♭–B♭–C"
+              ],
+              "answer": "A–B♭–C",
+              "miss": "One step below each note in B♭ major: A, B♭, C."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. Which is a fragment of the motive F♯–G♯–A–C♯?",
+              "options": [
+                "F♯–G♯",
+                "B–D",
+                "E–G",
+                "D–E"
+              ],
+              "answer": "F♯–G♯",
+              "miss": "A fragment is a piece of the motive itself: its first two notes."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. The motive D♭–F–A♭ moved up a 4th becomes…",
+              "options": [
+                "G♭–B♭–D♭",
+                "G–B–D",
+                "E♭–G♭–B♭",
+                "A♭–C–E♭"
+              ],
+              "answer": "G♭–B♭–D♭",
+              "miss": "A 4th up from D♭ is G♭, so the triad shape becomes G♭–B♭–D♭."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "ZEN",
+              "JENNIE"
+            ],
+            [
+              "Wind Ride",
+              "ITZY"
+            ],
+            [
+              "Strategy (feat. Megan Thee Stallion)",
+              "TWICE"
+            ],
+            [
+              "POLAROID",
+              "i-dle"
+            ],
+            [
+              "Elastigirl",
+              "LISA"
+            ]
+          ]
+        }
+      ]
+    },
+    "12": {
+      "rounds": [
+        {
+          "title": "Round 1: Form detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Form builder",
+          "about": "Build song forms in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. A 12-bar blues in F uses which three chords?",
+              "options": [
+                "F B♭ C",
+                "F G C",
+                "F Dm B♭",
+                "F C Dm"
+              ],
+              "answer": "F B♭ C",
+              "miss": "Blues uses I, IV and V: F, B♭, C."
+            },
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. An open section there ends on V, which is…",
+              "options": [
+                "F",
+                "B♭",
+                "E♭",
+                "Gm"
+              ],
+              "answer": "F",
+              "miss": "V in B♭ major is F."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. A closed section there ends on…",
+              "options": [
+                "F♯m",
+                "C♯",
+                "A",
+                "E"
+              ],
+              "answer": "F♯m",
+              "miss": "Closed means it lands home: the i chord, F♯m."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. A 12-bar blues there moves to IV at bar 5, which is…",
+              "options": [
+                "G♭",
+                "A♭",
+                "E♭m",
+                "B♭m"
+              ],
+              "answer": "G♭",
+              "miss": "IV in D♭ major is G♭."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "WILD",
+              "BABYMONSTER"
+            ],
+            [
+              "Crazy Over You",
+              "BLACKPINK"
+            ],
+            [
+              "Young, Dumb, Stupid",
+              "NMIXX"
+            ],
+            [
+              "Thunder",
+              "LISA"
+            ],
+            [
+              "You Never Know",
+              "BLACKPINK"
+            ]
+          ]
+        }
+      ]
     }
   }
 }
