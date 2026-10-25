@@ -9,9 +9,10 @@ import { cloud } from "./firebase";
 import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
-import { renderChallengeExtras, renderResults } from "./views/results";
-import { hydrateSongs, renderSectionSongs } from "./views/song-card";
-import { PASS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
+import { renderResults } from "./views/results";
+import { renderChallengeIntro, renderChallengeResults } from "./views/challenge";
+import { artFor, hydrateSongs, renderSectionSongs } from "./views/song-card";
+import { PASS, STREAK_BONUS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
 import { mountReview } from "./views/review";
 import { renderChapter, renderToday } from "./views/today";
 
@@ -135,13 +136,36 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
   progress = applyResult(progress, result, tomorrow());
   const run = /^(practice|challenge)-(\d+)$/.exec(result.lessonId);
   const chapter = run ? Number(run[2]) : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
+  const streak = currentStreak(progress.visits, dayKey(new Date()));
   let extra = "";
   if (run?.[1] === "challenge") {
-    // A passed challenge unlocks the next artist on the list.
+    // A passed challenge unlocks the next artist on the list; a streak of 2+ days adds bonus XP.
     const owned = progress.artists ?? [];
     const unlocked = result.total && result.correct / result.total >= PASS ? nextArtist(owned) : undefined;
-    if (unlocked) progress = { ...progress, artists: [...owned, unlocked] };
-    extra = renderChallengeExtras(result, challengeRounds(chapter), unlocked, (progress.artists ?? []).length, UNLOCK_ORDER.length, PASS);
+    const bonus = streak >= 2 ? STREAK_BONUS : 0;
+    progress = { ...progress, xp: progress.xp + bonus, artists: unlocked ? [...owned, unlocked] : owned };
+    shell(
+      "learn",
+      renderChallengeResults(result, chapter, challengeRounds(chapter), { days: streak, bonus }, unlocked, progress.artists!.length, UNLOCK_ORDER.length, PASS, chapter < COURSE.length),
+    );
+    if (unlocked) {
+      void artFor(unlocked).then((src) => {
+        const box = app.querySelector(".unlock-art");
+        if (src && box) box.innerHTML = `<img src="${src.replace("600x600", "300x300")}" alt="">`;
+      });
+    }
+    lastHash = `challenge/${chapter}/play`;
+    window.scrollTo(0, 0);
+    countUp(app.querySelector<HTMLElement>(".big-n"), result.xp + bonus, "+");
+    try {
+      await saveProgress(userId, progress);
+    } catch {
+      const note = document.createElement("p");
+      note.className = "fb no";
+      note.textContent = "Your result couldn't be saved. Check your connection, then play the challenge again.";
+      app.querySelector(".challenge-results")?.prepend(note);
+    }
+    return;
   } else if (!run) {
     // Every section ends with songs from the playlist; a chapter's last section opens its challenge.
     const last = COURSE[chapter - 1]?.lessons.at(-1)?.id === result.lessonId;
@@ -149,7 +173,7 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
       renderSectionSongs(result.lessonId) +
       (last && chapterChallenge(chapter) ? `<a class="btn challenge-btn" href="#challenge/${chapter}">Start the chapter ${chapter} challenge</a>` : "");
   }
-  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress), extra));
+  shell("learn", renderResults(result, streak, title, chapter, nextLessonId(progress), extra));
   void hydrateSongs(app);
   lastHash = `lesson/${result.lessonId}`;
   app.querySelector(".content")?.classList.add("nav-tab");
@@ -186,8 +210,17 @@ function route(): void {
     }
   }
 
+  // "challenge/2" is the challenge's intro; "challenge/2/play" runs it.
+  const intro = /^challenge\/(\d+)$/.exec(hash);
+  if (intro && chapterChallenge(Number(intro[1]))) {
+    const n = Number(intro[1]);
+    shell("learn", renderChallengeIntro(n, COURSE[n - 1].title, challengeRounds(n), PASS));
+    enterPage(hash);
+    return;
+  }
+
   if (hash.startsWith("drill/") || hash.startsWith("challenge/")) {
-    const n = Number(hash.slice(hash.indexOf("/") + 1));
+    const n = Number(hash.split("/")[1]);
     const drill = hash.startsWith("drill/") ? chapterPractice(n) : chapterChallenge(n);
     if (drill) {
       app.innerHTML = `<main class="lesson-root sheet"></main>`;
