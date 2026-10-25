@@ -374,6 +374,273 @@
           "about": "Speed round on 30-second intros"
         }
       ]
+    },
+    "4": {
+      "rounds": [
+        {
+          "title": "Round 1: Rhythm detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Key detective",
+          "about": "A recap: is the song major or minor?",
+          "questions": [
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "Listen. Is good 4 u in a major key or a minor key?",
+              "options": [
+                "Major",
+                "Minor"
+              ],
+              "answer": "Minor",
+              "miss": "good 4 u is in F♯ minor"
+            },
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "Listen. Is vampire in a major key or a minor key?",
+              "options": [
+                "Major",
+                "Minor"
+              ],
+              "answer": "Major",
+              "miss": "vampire is in F major"
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "Listen. Is On The Ground in a major key or a minor key?",
+              "options": [
+                "Major",
+                "Minor"
+              ],
+              "answer": "Major",
+              "miss": "On The Ground is in D♭ major"
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "JUMP",
+              "BLACKPINK"
+            ],
+            [
+              "Pink Venom",
+              "BLACKPINK"
+            ],
+            [
+              "Gabriela",
+              "KATSEYE"
+            ],
+            [
+              "CLICK",
+              "JISOO"
+            ],
+            [
+              "Bubble Gum",
+              "NewJeans"
+            ]
+          ]
+        }
+      ]
+    },
+    "5": {
+      "rounds": [
+        {
+          "title": "Round 1: Interval detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Intervals from home",
+          "about": "Name intervals inside the song's key",
+          "questions": [
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. From B♭ up to F, its 5th note, is a…",
+              "options": [
+                "Perfect 5th",
+                "Major 3rd",
+                "Perfect 4th",
+                "Major 6th"
+              ],
+              "answer": "Perfect 5th",
+              "miss": "B♭ up to F is a perfect 5th"
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. From F♯ up to A, its 3rd note, is a…",
+              "options": [
+                "Minor 3rd",
+                "Major 3rd",
+                "Major 2nd",
+                "Perfect 4th"
+              ],
+              "answer": "Minor 3rd",
+              "miss": "F♯ up to A is a minor 3rd, the 3rd of a minor scale"
+            },
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. From F up to A, its 3rd note, is a…",
+              "options": [
+                "Major 3rd",
+                "Minor 3rd",
+                "Perfect 4th",
+                "Major 2nd"
+              ],
+              "answer": "Major 3rd",
+              "miss": "F up to A is a major 3rd, the 3rd of a major scale"
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Girls Will Be Girls",
+              "ITZY"
+            ],
+            [
+              "Strategy",
+              "TWICE"
+            ],
+            [
+              "CELEBRATION",
+              "LE SSERAFIM"
+            ],
+            [
+              "ONE SPARK",
+              "TWICE"
+            ],
+            [
+              "Mono (feat. skaiwater)",
+              "i-dle"
+            ]
+          ]
+        }
+      ]
+    },
+    "6": {
+      "rounds": [
+        {
+          "title": "Round 1: Chord detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Home chord spotter",
+          "about": "Name the triad built on the song's home note",
+          "questions": [
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. Its home chord (the I chord) is…",
+              "options": [
+                "B♭",
+                "B♭m",
+                "F",
+                "Gm"
+              ],
+              "answer": "B♭",
+              "miss": "In B♭ major the home triad is B♭ major: B♭ D F"
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. Its home chord (the i chord) is…",
+              "options": [
+                "F♯m",
+                "F♯",
+                "A",
+                "C♯m"
+              ],
+              "answer": "F♯m",
+              "miss": "In F♯ minor the home triad is F♯ minor: F♯ A C♯"
+            },
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. Its home chord (the I chord) is…",
+              "options": [
+                "F",
+                "Fm",
+                "C",
+                "Dm"
+              ],
+              "answer": "F",
+              "miss": "In F major the home triad is F major: F A C"
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. Its home chord (the I chord) is…",
+              "options": [
+                "D♭",
+                "D♭m",
+                "A♭",
+                "B♭m"
+              ],
+              "answer": "D♭",
+              "miss": "In D♭ major the home triad is D♭ major: D♭ F A♭"
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Queencard",
+              "i-dle"
+            ],
+            [
+              "CRAZY",
+              "LE SSERAFIM"
+            ],
+            [
+              "ETA",
+              "NewJeans"
+            ],
+            [
+              "SUGAR HONEY ICE TEA",
+              "BABYMONSTER"
+            ],
+            [
+              "Kiss & Tell",
+              "ITZY"
+            ]
+          ]
+        }
+      ]
     }
   }
 }
