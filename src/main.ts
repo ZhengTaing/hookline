@@ -9,8 +9,9 @@ import { cloud } from "./firebase";
 import { runLesson, type LessonResult } from "./views/lesson";
 import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
-import { renderResults } from "./views/results";
-import { chapterSong, hydrateSongCard, renderSongCard } from "./views/song-card";
+import { renderChallengeExtras, renderResults } from "./views/results";
+import { hydrateSongs, renderSectionSongs } from "./views/song-card";
+import { PASS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
 import { mountReview } from "./views/review";
 import { renderChapter, renderToday } from "./views/today";
 
@@ -38,7 +39,7 @@ const calm = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
 /** How deep a page sits: tabs 0, a chapter 1, a lesson 2. Going deeper slides in from the right, back from the left. */
 function depthOf(hash: string): number {
-  return hash.startsWith("lesson/") || hash.startsWith("drill/") ? 2 : hash.startsWith("chapter/") ? 1 : 0;
+  return hash.startsWith("lesson/") || hash.startsWith("drill/") || hash.startsWith("challenge/") ? 2 : hash.startsWith("chapter/") ? 1 : 0;
 }
 
 /** Animate the new page in, based on where we came from. */
@@ -132,13 +133,24 @@ function shell(tab: Tab, body: string): void {
 async function finishLesson(result: LessonResult, title: string): Promise<void> {
   stopLesson = null;
   progress = applyResult(progress, result, tomorrow());
-  const chapter = result.lessonId.startsWith("practice-")
-    ? Number(result.lessonId.slice("practice-".length))
-    : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
-  // Finishing a chapter's last section shows a song from the playlist that uses the chapter's idea.
-  const song = COURSE[chapter - 1]?.lessons.at(-1)?.id === result.lessonId ? chapterSong(chapter) : undefined;
-  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress), song ? renderSongCard(song) : ""));
-  void hydrateSongCard(app);
+  const run = /^(practice|challenge)-(\d+)$/.exec(result.lessonId);
+  const chapter = run ? Number(run[2]) : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
+  let extra = "";
+  if (run?.[1] === "challenge") {
+    // A passed challenge unlocks the next artist on the list.
+    const owned = progress.artists ?? [];
+    const unlocked = result.total && result.correct / result.total >= PASS ? nextArtist(owned) : undefined;
+    if (unlocked) progress = { ...progress, artists: [...owned, unlocked] };
+    extra = renderChallengeExtras(result, challengeRounds(chapter), unlocked, (progress.artists ?? []).length, UNLOCK_ORDER.length, PASS);
+  } else if (!run) {
+    // Every section ends with songs from the playlist; a chapter's last section opens its challenge.
+    const last = COURSE[chapter - 1]?.lessons.at(-1)?.id === result.lessonId;
+    extra =
+      renderSectionSongs(result.lessonId) +
+      (last && chapterChallenge(chapter) ? `<a class="btn challenge-btn" href="#challenge/${chapter}">Start the chapter ${chapter} challenge</a>` : "");
+  }
+  shell("learn", renderResults(result, currentStreak(progress.visits, dayKey(new Date())), title, chapter, nextLessonId(progress), extra));
+  void hydrateSongs(app);
   lastHash = `lesson/${result.lessonId}`;
   app.querySelector(".content")?.classList.add("nav-tab");
   window.scrollTo(0, 0);
@@ -174,9 +186,9 @@ function route(): void {
     }
   }
 
-  if (hash.startsWith("drill/")) {
-    const n = Number(hash.slice("drill/".length));
-    const drill = chapterPractice(n);
+  if (hash.startsWith("drill/") || hash.startsWith("challenge/")) {
+    const n = Number(hash.slice(hash.indexOf("/") + 1));
+    const drill = hash.startsWith("drill/") ? chapterPractice(n) : chapterChallenge(n);
     if (drill) {
       app.innerHTML = `<main class="lesson-root sheet"></main>`;
       lastHash = hash;

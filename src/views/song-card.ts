@@ -1,76 +1,56 @@
-import playlist from "../data/playlist.json";
-import picks from "../data/chapter-songs.json";
+import sectionSongs from "../data/section-songs.json";
+import { findSong, loadSongMeta, playSong, songKey, stopSong, type Song } from "../songs";
 
-/** One song from the user's playlist export (play counts left out on purpose). */
-export interface Song {
-  title: string;
-  artist: string;
-  album: string;
-  year: number | null;
-  genre: string;
-  seconds: number | null;
-}
-
-/** What the deploy step found on Apple's iTunes Search API (see scripts/fetch-songs.mjs). */
-export interface SongMeta {
-  artwork?: string;
-  url?: string;
-  preview?: string;
-  released?: string;
-  genre?: string;
-  ms?: number;
-}
-
-export interface ChapterSong {
-  song: Song;
+interface SectionSongs {
   listen: string;
   guitar: string;
+  songs: { title: string; artist: string; note?: string }[];
 }
 
-const PICKS = picks as Record<string, { title: string; artist: string; listen: string; guitar: string }>;
-const PLAYLIST = playlist as Song[];
+const SECTIONS = sectionSongs as Record<string, SectionSongs>;
 
-/** The playlist song that closes chapter n, if one has been picked yet. */
-export function chapterSong(n: number): ChapterSong | undefined {
-  const pick = PICKS[String(n)];
-  const song = pick && PLAYLIST.find((s) => s.title === pick.title && s.artist === pick.artist);
-  return song && { song, listen: pick.listen, guitar: pick.guitar };
+/** The playlist songs picked for a section, if any have been picked yet. */
+export function songsFor(sectionId: string): { pick: SectionSongs; songs: (Song & { note?: string })[] } | undefined {
+  const pick = SECTIONS[sectionId];
+  if (!pick) return undefined;
+  const songs = pick.songs.flatMap((s) => {
+    const song = findSong(s.title, s.artist);
+    return song ? [{ ...song, note: s.note }] : [];
+  });
+  return songs.length ? { pick, songs } : undefined;
 }
 
-const key = (s: Song) => `${s.title}|${s.artist}`;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const time = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, "0")}`;
 const searchUrl = (s: Song) => `https://music.apple.com/us/search?term=${encodeURIComponent(`${s.title} ${s.artist}`)}`;
+/** Long credit lines ("HUNTR/X, EJAE, …") shortened to the first name. */
+const shortArtist = (a: string) => (a.length > 28 ? a.split(",")[0] : a);
 
-export function renderSongCard({ song, listen, guitar }: ChapterSong): string {
-  const chips = [song.year, song.genre, song.seconds ? time(song.seconds) : null].filter(Boolean);
+/** "Hear it in your playlist": a section's songs, each with art, a preview and an Apple Music link. */
+export function renderSectionSongs(sectionId: string): string {
+  const found = songsFor(sectionId);
+  if (!found) return "";
+  const { pick, songs } = found;
   return `
-    <article class="song-card" data-song="${esc(key(song))}">
-      <div class="song-top">
-        <div class="song-art"><span>${esc(song.album)}</span></div>
-        <div class="song-head">
-          <p class="song-eyebrow">Hear it in your playlist</p>
-          <h2>${esc(song.title)}</h2>
-          <p>${esc(song.artist)}</p>
-        </div>
-      </div>
-      <div class="song-chips">${chips.map((c) => `<span>${esc(String(c))}</span>`).join("")}</div>
-      <div class="song-play" hidden>
-        <button class="song-preview" type="button" aria-label="Play 30-second preview"></button>
-        <div class="song-bar"><i></i></div>
-      </div>
-      <p class="song-text"><b>Listen for:</b> ${esc(listen)}</p>
-      <div class="song-guitar"><b>Build it on guitar</b><p>${esc(guitar)}</p></div>
-      <a class="btn song-link" href="${searchUrl(song)}" target="_blank" rel="noopener">Open in Apple Music</a>
+    <article class="song-card">
+      <p class="song-eyebrow">Hear it in your playlist</p>
+      <p class="song-text">${esc(pick.listen)}</p>
+      ${songs
+        .map(
+          (s, i) => `
+        <div class="song-row" data-song="${esc(songKey(s.title, s.artist))}" style="--i:${i}">
+          <div class="song-art"></div>
+          <div class="song-head">
+            <a href="${searchUrl(s)}" target="_blank" rel="noopener"><b>${esc(s.title)}</b></a>
+            <span>${esc(shortArtist(s.artist))}${s.year ? ` · ${s.year}` : ""}${s.seconds ? ` · ${time(s.seconds)}` : ""}</span>
+            ${s.note ? `<span class="song-note">${esc(s.note)}</span>` : ""}
+          </div>
+          <button class="song-preview" type="button" aria-label="Play a preview of ${esc(s.title)}" hidden></button>
+        </div>`,
+        )
+        .join("")}
+      <div class="song-guitar"><b>Build it on guitar</b><p>${esc(pick.guitar)}</p></div>
     </article>`;
-}
-
-let metaLoad: Promise<Record<string, SongMeta>> | null = null;
-function loadMeta(): Promise<Record<string, SongMeta>> {
-  metaLoad ??= fetch(`${import.meta.env.BASE_URL}song-meta.json`)
-    .then((r) => (r.ok ? r.json() : {}))
-    .catch(() => ({}));
-  return metaLoad;
 }
 
 /** The album art's average color, darkened so white text stays readable on it. */
@@ -92,44 +72,43 @@ function tintFrom(img: HTMLImageElement): string | null {
   }
 }
 
-let playing: HTMLAudioElement | null = null;
-
-/** Fills a rendered song card with album art, the real link, a preview player and its color. */
-export async function hydrateSongCard(root: ParentNode): Promise<void> {
+/** Fills rendered song rows with album art, Apple Music links and preview buttons. */
+export async function hydrateSongs(root: ParentNode): Promise<void> {
+  const rows = [...root.querySelectorAll<HTMLElement>(".song-row")];
+  if (!rows.length) return;
+  const meta = await loadSongMeta();
   const card = root.querySelector<HTMLElement>(".song-card");
-  if (!card) return;
-  const meta = (await loadMeta())[card.dataset.song ?? ""];
-  if (!meta || !card.isConnected) return;
-  if (meta.url) card.querySelector<HTMLAnchorElement>(".song-link")!.href = meta.url;
-  if (meta.artwork) {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.alt = "";
-    img.onload = () => {
-      card.querySelector(".song-art")!.replaceChildren(img);
-      const tint = tintFrom(img);
-      if (tint) card.style.setProperty("--song-tint", tint);
-      card.classList.add("has-art");
-    };
-    img.src = meta.artwork;
-  }
-  if (meta.preview) {
-    const box = card.querySelector<HTMLElement>(".song-play")!;
-    const btn = box.querySelector<HTMLButtonElement>(".song-preview")!;
-    const bar = box.querySelector<HTMLElement>(".song-bar i")!;
-    box.hidden = false;
-    btn.addEventListener("click", () => {
-      if (playing && !playing.paused) {
-        playing.pause();
-        return;
-      }
-      playing ??= new Audio(meta.preview);
-      playing.ontimeupdate = () => (bar.style.width = `${(playing!.currentTime / (playing!.duration || 30)) * 100}%`);
-      playing.onplay = () => btn.classList.add("on");
-      playing.onpause = playing.onended = () => btn.classList.remove("on");
-      void playing.play();
-    });
-    // Stop the preview when the card leaves the page.
-    window.addEventListener("hashchange", () => { playing?.pause(); playing = null; }, { once: true });
-  }
+  rows.forEach((row, i) => {
+    const m = meta[row.dataset.song ?? ""];
+    if (!m || !row.isConnected) return;
+    if (m.url) row.querySelector("a")!.href = m.url;
+    if (m.artwork) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.alt = "";
+      img.onload = () => {
+        row.querySelector(".song-art")!.replaceChildren(img);
+        // The first song's art colors the whole card.
+        const tint = i === 0 ? tintFrom(img) : null;
+        if (tint && card) card.style.setProperty("--song-tint", tint);
+      };
+      img.src = m.artwork.replace("600x600", "200x200");
+    }
+    if (m.preview) {
+      const btn = row.querySelector<HTMLButtonElement>(".song-preview")!;
+      btn.hidden = false;
+      btn.addEventListener("click", async () => {
+        const on = btn.classList.contains("on");
+        root.querySelectorAll(".song-preview.on").forEach((b) => b.classList.remove("on"));
+        if (on) return stopSong();
+        const [title, artist] = (row.dataset.song ?? "").split("|");
+        const audio = await playSong(title, artist);
+        if (!audio) return;
+        btn.classList.add("on");
+        audio.onpause = audio.onended = () => btn.classList.remove("on");
+      });
+    }
+  });
+  // Stop any preview when leaving the page.
+  window.addEventListener("hashchange", stopSong, { once: true });
 }

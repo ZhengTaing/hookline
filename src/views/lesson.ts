@@ -2,6 +2,7 @@ import { chord, feedback, melodic, tone } from "../audio";
 import { INTERVAL_WORDS, NOTE_NAMES, displayName, fretMidi, intervalName, parseNote } from "../music";
 import type { DuelRound, Lesson, RushQuestion, Sound, Step, Visual } from "../lessons/types";
 import { fretboardSvg, rhythmSvg, staffSvg } from "../ui/notation";
+import { playSong, stopSong } from "../songs";
 
 export interface LessonResult {
   lessonId: string;
@@ -13,6 +14,8 @@ export interface LessonResult {
   missed: string[];
   /** The section's key fact, added as a review card. */
   fact?: { front: string; back: string };
+  /** XP earned in each step, for the chapter challenge's round-by-round results. */
+  stepXp?: number[];
 }
 
 const SIZE_WORDS: Record<number, string> = { 1: "unison", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th", 7: "7th", 8: "8ve" };
@@ -26,6 +29,7 @@ function length(sound: Sound): number {
   if (sound.kind === "progression") return sound.chords.length * (sound.gap ?? 0.9) + 0.8;
   if (sound.kind === "rhythm") return sound.beats.reduce((a, b) => a + Math.abs(b), 0) * (60 / sound.bpm) + 0.3;
   if (sound.kind === "withChord") return (sound.gap ?? 0.5) * sound.notes.length + 0.6;
+  if (sound.kind === "song") return 15;
   return 0;
 }
 
@@ -33,6 +37,7 @@ function play(sound: Sound): void {
   document.body.classList.add("sounding");
   clearTimeout(soundingTimer);
   soundingTimer = window.setTimeout(() => document.body.classList.remove("sounding"), length(sound) * 1000);
+  if (sound.kind === "song") playSong(sound.title, sound.artist, 15);
   if (sound.kind === "melodic") melodic(sound.notes, sound.gap);
   if (sound.kind === "chord") chord(sound.notes);
   if (sound.kind === "progression") sound.chords.forEach((c, i) => chord(c, i * (sound.gap ?? 0.9)));
@@ -90,6 +95,8 @@ export function runLesson(
     if (ok) {
       result.correct++;
       result.xp += xp;
+      result.stepXp ??= [];
+      result.stepXp[stepIndex] = (result.stepXp[stepIndex] ?? 0) + xp;
     } else {
       result.missed.push(miss);
     }
@@ -107,12 +114,14 @@ export function runLesson(
         <div class="lesson-body">${inner}</div>
       </div>`;
     root.querySelector("[data-exit]")!.addEventListener("click", () => {
+      stopSong();
       cleanup?.();
       onExit();
     });
   }
 
   function next(): void {
+    stopSong();
     cleanup?.();
     cleanup = null;
     stepIndex++;
