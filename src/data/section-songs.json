@@ -764,5 +764,347 @@
         "artist": "Selena Gomez"
       }
     ]
+  },
+  "10.1": {
+    "listen": "Pick a long held note in the melody and ask: is it in the chord underneath? If not, it's a non-chord tone.",
+    "guitar": "Hold a C chord and hum D over it. Hear the clash, then slide to C or E so it fits.",
+    "songs": [
+      {
+        "title": "How You Like That",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "bad idea right?",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "TOMBOY",
+        "artist": "i-dle"
+      }
+    ]
+  },
+  "10.2": {
+    "listen": "Listen for the melody walking step by step between two chord notes. The note in the middle is a passing tone.",
+    "guitar": "Over C, play C (A string, fret 3), D (open D), E (D string, fret 2). D is the passing tone.",
+    "songs": [
+      {
+        "title": "LOVE DIVE",
+        "artist": "IVE"
+      },
+      {
+        "title": "twilight zone",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "Perfect Night",
+        "artist": "LE SSERAFIM"
+      }
+    ]
+  },
+  "10.3": {
+    "listen": "Listen for a note that steps away and comes right back. That's a neighbor tone.",
+    "guitar": "Over G, play G (open G), A (G string, fret 2), G. A is the upper neighbor.",
+    "songs": [
+      {
+        "title": "Attention",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "Back to You",
+        "artist": "Selena Gomez"
+      },
+      {
+        "title": "Talk that Talk",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "10.4": {
+    "listen": "Listen for a note that leaps onto a clash, then steps down into the chord. That's an appoggiatura.",
+    "guitar": "Over C, play G (open G), leap to F (high E, fret 1), then step down to E (open high E).",
+    "songs": [
+      {
+        "title": "dandelion",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "After LIKE",
+        "artist": "IVE"
+      },
+      {
+        "title": "Pretty Savage",
+        "artist": "BLACKPINK"
+      }
+    ]
+  },
+  "10.5": {
+    "listen": "Listen for a note that steps away from a chord note, then leaps off the other way. That's an escape tone.",
+    "guitar": "Over G, play B (open B), step to C (B string, fret 1), then leap down to G (open G).",
+    "songs": [
+      {
+        "title": "Nxde",
+        "artist": "i-dle"
+      },
+      {
+        "title": "lacy",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Come Over",
+        "artist": "LE SSERAFIM"
+      }
+    ]
+  },
+  "10.6": {
+    "listen": "Listen for a note circled from above and below before it comes back. That's a double neighbor.",
+    "guitar": "Over C, play C (B string, fret 1), D (B string, fret 3), B (open B), C (B string, fret 1).",
+    "songs": [
+      {
+        "title": "ELEVEN",
+        "artist": "IVE"
+      },
+      {
+        "title": "warm",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "Queen of Hearts",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "10.7": {
+    "listen": "Listen for a melody note that shows up just before its chord does. That's an anticipation.",
+    "guitar": "Strum C for a bar. On the last half-beat, play a G note early, then strum G.",
+    "songs": [
+      {
+        "title": "Get Up",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "So Cynical (Badum)",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "past life",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "10.8": {
+    "listen": "Listen for one low note that stays put while the chords change above it. That's a pedal point.",
+    "guitar": "Let the open low E ring while you play E (022100), A/E (002220), and back to E.",
+    "songs": [
+      {
+        "title": "HOT SAUCE",
+        "artist": "BABYMONSTER"
+      },
+      {
+        "title": "ballad of a homeschooled girl",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "MEOW",
+        "artist": "MEOVV"
+      }
+    ]
+  },
+  "10.9": {
+    "listen": "Listen for a held note that clashes with the new chord, then slips down into it. That's a suspension.",
+    "guitar": "Play Dsus4 (xx0233), then D (xx0232). The G resolves down to F♯.",
+    "songs": [
+      {
+        "title": "Love To Hate Me",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "making the bed",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Hampstead",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "11.1": {
+    "listen": "Find the shortest catchy bit of the hook that keeps coming back. That's the motive.",
+    "guitar": "Play the motive C–D–E (A string fret 3, open D, D string fret 2) twice.",
+    "songs": [
+      {
+        "title": "ZEN",
+        "artist": "JENNIE"
+      },
+      {
+        "title": "SUPA DUPA LUV",
+        "artist": "BABYMONSTER"
+      },
+      {
+        "title": "logical",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "11.2": {
+    "listen": "Listen for the hook coming back a little different: higher, lower, or with a new rhythm.",
+    "guitar": "Play C–D–E, then move it up a step: D–E–F♯ (open D, D string frets 2 and 4).",
+    "songs": [
+      {
+        "title": "Wind Ride",
+        "artist": "ITZY"
+      },
+      {
+        "title": "Party O'Clock",
+        "artist": "NMIXX"
+      },
+      {
+        "title": "Seoul City",
+        "artist": "JENNIE"
+      }
+    ]
+  },
+  "11.3": {
+    "listen": "Listen for just the first two or three notes of the hook, repeated on their own. That's a fragment.",
+    "guitar": "Play C–D–E–G, then only the fragment C–D, C–D.",
+    "songs": [
+      {
+        "title": "PAXXWORD",
+        "artist": "NMIXX"
+      },
+      {
+        "title": "Elastigirl",
+        "artist": "LISA"
+      },
+      {
+        "title": "Trouble",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "11.4": {
+    "listen": "Count how many bars the first line lasts before the singer breathes. That's one phrase.",
+    "guitar": "Strum C, F, G, C, one bar each: a 4-bar phrase that ends at home.",
+    "songs": [
+      {
+        "title": "Strategy (feat. Megan Thee Stallion)",
+        "artist": "TWICE"
+      },
+      {
+        "title": "you seem pretty sad for a girl so in love",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Buscando Amor",
+        "artist": "Selena Gomez"
+      }
+    ]
+  },
+  "11.5": {
+    "listen": "Split the first line into two halves. Where's the small pause in the middle?",
+    "guitar": "Strum C, F (2 bars), pause, then G, C (2 bars). Each half is a subphrase.",
+    "songs": [
+      {
+        "title": "POLAROID",
+        "artist": "i-dle"
+      },
+      {
+        "title": "girl i’ve always been",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "THIS IS FOR",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "12.1": {
+    "listen": "Map the song: mark where each verse, pre-chorus and chorus starts.",
+    "guitar": "Play Am, F for a verse, then C, G for a chorus, and feel the lift.",
+    "songs": [
+      {
+        "title": "WILD",
+        "artist": "BABYMONSTER"
+      },
+      {
+        "title": "Bet You Wanna (feat. Cardi B)",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "so american",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "12.2": {
+    "listen": "Listen for one section twice, a contrasting one, then the first again: A A B A.",
+    "guitar": "Play C, Am, F, G twice (A A), then F, G (B), then C, Am, F, G (A).",
+    "songs": [
+      {
+        "title": "Crazy Over You",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "nowhere, nobody",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "VILLAIN DIES",
+        "artist": "i-dle"
+      }
+    ]
+  },
+  "12.3": {
+    "listen": "Does the second half start like the first, then go somewhere new? That's A B A C.",
+    "guitar": "Play C, G (A), F, G (B), C, G (A), F, C (C).",
+    "songs": [
+      {
+        "title": "Young, Dumb, Stupid",
+        "artist": "NMIXX"
+      },
+      {
+        "title": "Thunder",
+        "artist": "LISA"
+      },
+      {
+        "title": "Brave",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "12.4": {
+    "listen": "Count bars in the verse. Does the chord change to IV at bar 5, like a blues?",
+    "guitar": "Play a 12-bar blues in A: A for 4 bars, D for 2, A for 2, then E, D, A, E.",
+    "songs": [
+      {
+        "title": "Rapunzel (feat. Megan Thee Stallion)",
+        "artist": "LISA"
+      },
+      {
+        "title": "stranger",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "TOXIC",
+        "artist": "MEOVV"
+      }
+    ]
+  },
+  "12.5": {
+    "listen": "At the end of each section, does it land home (closed) or leave you hanging (open)?",
+    "guitar": "End a phrase on C (closed), then end one on G (open), and hear the difference.",
+    "songs": [
+      {
+        "title": "You Never Know",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "petal in the pavement",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "Dámelo To’ (feat. Myke Towers)",
+        "artist": "Selena Gomez"
+      }
+    ]
   }
 }
