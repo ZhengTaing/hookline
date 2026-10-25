@@ -263,7 +263,7 @@ function route(): void {
 
   const tab = (TABS.some((t) => t.id === hash) ? hash : "learn") as Tab;
   shell(tab, tab === "learn" ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated, renderArtistCards(progress)) : renderPlaceholder(tab));
-  if (tab === "learn") hydrateArtists(app);
+  if (tab === "learn") void hydrateArtists(app);
   if (tab === "learn") celebrated = true;
   enterPage(tab);
 }

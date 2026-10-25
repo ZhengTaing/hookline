@@ -27,6 +27,11 @@ jobs:
       - run: npm test
       - name: Fetch song art and links from Apple
         run: node scripts/fetch-songs.mjs || echo "Song lookup failed; the site falls back to search links"
+      - name: Fetch artist photos from Spotify
+        run: node scripts/fetch-artists.mjs || echo "Artist photo lookup failed; the site falls back to Wikipedia"
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -29,12 +29,36 @@ export function renderArtistCards(progress: Progress): string {
     </section>`;
 }
 
-/** Loads each card's photo from Wikipedia, falling back to the artist's album art. */
-export function hydrateArtists(root: ParentNode): void {
+/** Spotify photos found at deploy time (see scripts/fetch-artists.mjs), if any. */
+type SpotifyArtists = Record<string, { image: string; url?: string }>;
+let spotifyLoad: Promise<SpotifyArtists> | null = null;
+const spotify = () =>
+  (spotifyLoad ??= fetch(`${import.meta.env.BASE_URL}artist-meta.json`)
+    .then((r): Promise<SpotifyArtists> => (r.ok ? r.json() : Promise.resolve({})))
+    .catch((): SpotifyArtists => ({})));
+
+/** Loads each card's photo: Spotify first, then Wikipedia, then the artist's album art. */
+export async function hydrateArtists(root: ParentNode): Promise<void> {
+  const fromSpotify = await spotify();
+  const credit = root.querySelector(".artists .credit");
+  if (credit && Object.keys(fromSpotify).length) credit.textContent = "Photos: Spotify";
   root.querySelectorAll<HTMLElement>(".artist-card").forEach(async (card) => {
     const artist = card.dataset.artist ?? "";
-    let src: string | undefined;
-    try {
+    const sp = fromSpotify[artist];
+    if (sp) {
+      // Spotify's rules: show its photos unaltered (no grey filter) and link back to Spotify.
+      card.classList.add("spotify");
+      // Spotify asks that its content links back to Spotify.
+      const link = document.createElement("a");
+      link.href = sp.url ?? "https://open.spotify.com";
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.className = "artist-link";
+      link.textContent = "Open in Spotify";
+      card.append(link);
+    }
+    let src: string | undefined = sp?.image;
+    if (!src) try {
       const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${WIKI[artist]}`);
       const d = r.ok ? await r.json() : {};
       src = d.thumbnail?.source ?? d.originalimage?.source;
