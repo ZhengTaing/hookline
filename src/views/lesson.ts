@@ -125,7 +125,7 @@ export function runLesson(
       const viz = c.rhythm
         ? rhythmSvg(c.rhythm, c.time)
         : c.staff
-        ? staffSvg(c.staff, { keySig: c.keySig })
+        ? staffSvg(c.staff, { keySig: c.keySig, chord: c.chord })
         : c.left || c.right
           ? `<div class="viz"><span class="bubble fill">${c.left ?? ""}</span><span class="gap"><span>${c.label ?? ""}</span></span><span class="bubble">${c.right ?? ""}</span></div>`
           : `<div class="viz"><span class="bubble fill">♪</span></div>`;

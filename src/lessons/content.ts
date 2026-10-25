@@ -3,6 +3,7 @@ import { CHAPTER_2 } from "./chapter-2";
 import { CHAPTER_3 } from "./chapter-3";
 import { CHAPTER_4 } from "./chapter-4";
 import { CHAPTER_5 } from "./chapter-5";
+import { CHAPTER_6 } from "./chapter-6";
 import { CHAPTERS_2_4 } from "./chapters-2-4";
 import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
@@ -197,9 +198,9 @@ const GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLesson));
  * Chapters moved to the new lesson layout so far. The rest keep the earlier layout until
  * each one is checked, one chapter at a time.
  */
-export const NEW_LAYOUT = new Set([1, 2, 3, 4, 5]);
+export const NEW_LAYOUT = new Set([1, 2, 3, 4, 5, 6]);
 /** Hand-written steps for chapters in the new layout. */
-const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2, ...CHAPTER_3, ...CHAPTER_4, ...CHAPTER_5 };
+const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2, ...CHAPTER_3, ...CHAPTER_4, ...CHAPTER_5, ...CHAPTER_6 };
 const OLD_GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLessonV2));
 const order = (id: string) => id.split(".").map(Number);
 const atOrBefore = (a: string, b: string) => order(a)[0] < order(b)[0] || (order(a)[0] === order(b)[0] && order(a)[1] <= order(b)[1]);

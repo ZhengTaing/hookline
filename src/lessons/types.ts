@@ -19,6 +19,8 @@ export interface StoryCard {
   staff?: string[];
   /** Sharps (positive) or flats (negative) in the staff's key signature. */
   keySig?: number;
+  /** Stack the staff notes as one chord instead of left to right. */
+  chord?: boolean;
   /** Note values drawn on a rhythm line instead of a staff, with an optional time signature. */
   rhythm?: string[];
   time?: string;
