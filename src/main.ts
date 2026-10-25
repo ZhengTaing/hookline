@@ -12,7 +12,7 @@ import { renderResults } from "./views/results";
 import { renderChallengeIntro, renderChallengeResults } from "./views/challenge";
 import { hydrateArtists, renderArtistTeaser, renderCollection, showReveal, wireCollection } from "./views/artists";
 import { RARITIES, claimDaily, countToday, levelCards, mixArtists, mixSong, openPack } from "./cards";
-import { challengeReward, lessonStreak, recordLearnDay, reviewReward, useFreeze } from "./rewards";
+import { challengeReward, isCleared, lessonStreak, replayCard, recordLearnDay, reviewReward, useFreeze } from "./rewards";
 import { hydrateSongs, renderSectionSongs } from "./views/song-card";
 import { PASS, UNLOCK_ORDER, challengeRounds, chapterChallenge } from "./lessons/challenge";
 import { mountReview } from "./views/review";
@@ -219,7 +219,10 @@ function route(): void {
   const intro = /^challenge\/(\d+)$/.exec(hash);
   if (intro && chapterChallenge(Number(intro[1]))) {
     const n = Number(intro[1]);
-    shell("learn", renderChallengeIntro(n, COURSE[n - 1].title, challengeRounds(n), PASS));
+    const rounds = challengeRounds(n);
+    const total = rounds.reduce((a, r) => a + r.maxXp / 10, 0);
+    const replay = isCleared(progress, n, total) ? { card: replayCard(progress, n) ?? null } : undefined;
+    shell("learn", renderChallengeIntro(n, COURSE[n - 1].title, rounds, PASS, replay));
     enterPage(hash);
     return;
   }

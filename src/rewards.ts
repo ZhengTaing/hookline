@@ -48,6 +48,16 @@ export interface ChallengeReward {
   replay: boolean;
 }
 
+/** The card a perfect replay upgrades: the one this chapter unlocked, or for progress from before that was tracked, your first card below Epic. */
+export function replayCard(p: Progress, chapter: number): string | undefined {
+  const card = p.chapterCard?.[chapter];
+  if (card) return rarityOf(p, card) < 2 ? card : undefined;
+  return (p.artists ?? []).find((a) => rarityOf(p, a) < 2);
+}
+
+/** Whether this chapter's challenge was passed before. */
+export const isCleared = (p: Progress, chapter: number, total: number) => (p.cleared ?? []).includes(chapter) || (p.best[`challenge-${chapter}`] ?? 0) >= PASS * total * 10;
+
 /**
  * A finished challenge. Only the first pass of a chapter unlocks cards; replays give XP, and a
  * perfect replay upgrades the card that chapter unlocked. `priorBest` is the best XP before this run.
@@ -72,8 +82,8 @@ export function challengeReward(p: Progress, chapter: number, correct: number, t
     };
     return { progress, bonus, rarity, unlocked, extra, replay };
   }
-  const card = progress.chapterCard?.[chapter];
-  if (score === 1 && card && rarityOf(progress, card) < 2) {
+  const card = replayCard(progress, chapter);
+  if (score === 1 && card) {
     progress = { ...progress, cards: { ...progress.cards, [card]: { r: 2, q: progress.cards?.[card]?.q ?? 0 } } };
     return { progress, bonus, rarity: 2, upgraded: card, replay };
   }

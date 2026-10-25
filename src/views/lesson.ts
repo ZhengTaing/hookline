@@ -379,7 +379,7 @@ export function runLesson(
             <p class="fb${checked ? (picks.every((p, i) => p === question.answer[i]) ? " ok" : " no") : ""}" aria-live="polite"></p>
             <div class="row push">
               ${question.sound ? `<button class="btn ghost" type="button" data-sound>▶ Hear it</button>` : ""}
-              ${checked ? foot().replace(" push", "") : `<button class="btn" type="button" data-check ${picks.some((p) => p === null) ? "disabled" : ""}>Check</button>`}
+              ${checked ? foot().replace(" push", "") : `${tip()}<button class="btn" type="button" data-check ${picks.some((p) => p === null) ? "disabled" : ""}>Check</button>`}
             </div>`);
           const fb = root.querySelector(".fb")!;
           if (checked) {
