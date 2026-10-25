@@ -20,7 +20,7 @@ const CREDIT = `<p class="credit">Lessons adapted from Robert Hutchinson, <em>Mu
 
 /** The Learn tab: streak, what's next, and every chapter of the book. */
 /** `celebrate` animates today's streak (only the first time the page shows on a new day). */
-export function renderToday(progress: Progress, today: string, isNewToday: boolean, celebrate = false, extra = ""): string {
+export function renderToday(progress: Progress, today: string, _isNewToday: boolean, celebrate = false, extra = ""): string {
   const learned = streakDays(progress);
   const frozen = new Set(progress.frozen ?? []);
   const streak = currentStreak(learned, today);
@@ -55,7 +55,7 @@ export function renderToday(progress: Progress, today: string, isNewToday: boole
       <div class="today-head"><span>Today</span><span>🔥 ${streak} lesson day${streak === 1 ? "" : "s"}${progress.freezes ? ` · ❄️ ${progress.freezes}` : ""}</span></div>
       <div class="streak">
         <span class="streak-n${celebrate ? " flip" : ""}">${streak}</span>
-        <span class="streak-label">day${streak === 1 ? "" : "s"} in a row<br /><small>${isNewToday ? "Finish a section to keep it going" : `Best: ${best}`} · ${progress.xp} XP</small></span>
+        <span class="streak-label">day${streak === 1 ? "" : "s"} in a row<br /><small>${progress.learnDays?.includes(today) ? `Best: ${best}` : "Finish a section or review to keep it going"} · ${progress.xp} XP</small></span>
       </div>
       <div class="dots" aria-label="Last 14 days">${dots}</div>
       ${
