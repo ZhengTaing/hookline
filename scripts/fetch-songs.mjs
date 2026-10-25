@@ -15,11 +15,19 @@ const picks = [
   ),
 ];
 const norm = (s) => s.toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N} ]/gu, "").trim();
+// Reuse what the live site already has, so each deploy only looks up new songs.
+const live = await fetch("https://zhengtaing.github.io/hookline/song-meta.json")
+  .then((r) => (r.ok ? r.json() : {}))
+  .catch(() => ({}));
 const meta = {};
 
 for (const { title, artist } of picks) {
   const key = `${title}|${artist}`;
   if (meta[key]) continue;
+  if (live[key]?.preview) {
+    meta[key] = live[key];
+    continue;
+  }
   try {
     // Long credit lines ("HUNTR/X, EJAE, …") search better by their first name.
     const url = `https://itunes.apple.com/search?country=us&entity=song&limit=10&term=${encodeURIComponent(`${title} ${artist.split(",")[0]}`)}`;

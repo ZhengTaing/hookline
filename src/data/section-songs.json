@@ -494,5 +494,275 @@
         "artist": "Selena Gomez"
       }
     ]
+  },
+  "7.1": {
+    "listen": "Count the chords in the chorus loop and give each a number, starting from home as I.",
+    "guitar": "In C, play I–IV–V–I: C, F, G, C. Say the numbers out loud as you strum.",
+    "songs": [
+      {
+        "title": "Shut Down",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "obsessed",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Ditto",
+        "artist": "NewJeans"
+      }
+    ]
+  },
+  "7.2": {
+    "listen": "Find the home chord of the chorus, then count up the scale to name the other chords: I, ii, iii, IV, V, vi.",
+    "guitar": "Play all seven chords of C major in order: C, Dm, Em, F, G, Am, Bdim (x2343x).",
+    "songs": [
+      {
+        "title": "Hype Boy",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "like i do",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "Holy Moly",
+        "artist": "IVE"
+      }
+    ]
+  },
+  "7.3": {
+    "listen": "Does the chorus sit on a minor home chord? Listen for whether the chord before home sounds major (V) or minor (v).",
+    "guitar": "Play A minor's chords: Am, Bdim, C, Dm, Em, F, G. Then swap Em for E and hear the stronger pull back to Am.",
+    "songs": [
+      {
+        "title": "Typa Girl",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Ash",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "TEARS",
+        "artist": "JISOO"
+      }
+    ]
+  },
+  "7.4": {
+    "listen": "At the end of each phrase, ask: does it sound finished, or left hanging? Finished is usually V to I.",
+    "guitar": "Play G then C (an authentic cadence), then C then G (a half cadence). Hear which one feels done.",
+    "songs": [
+      {
+        "title": "ASAP",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "Hard to Love",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "begged",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "8.1": {
+    "listen": "Listen for chords that sound softer or jazzier than plain triads. That extra color is often a seventh.",
+    "guitar": "Compare C (x32010) with Cmaj7 (x32000), then G (320003) with G7 (320001).",
+    "songs": [
+      {
+        "title": "Off The Record",
+        "artist": "IVE"
+      },
+      {
+        "title": "Cool With You",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "Good Thing",
+        "artist": "i-dle"
+      }
+    ]
+  },
+  "8.2": {
+    "listen": "Listen for a chord that floats before it settles. That soft, open pull is the IV/5 sus sound.",
+    "guitar": "Play F/G, an F chord over a low G (3x3211), then resolve it to C.",
+    "songs": [
+      {
+        "title": "Feel My Rhythm",
+        "artist": "Red Velvet"
+      },
+      {
+        "title": "Either Way",
+        "artist": "IVE"
+      },
+      {
+        "title": "Love, older you",
+        "artist": "ILLIT"
+      }
+    ]
+  },
+  "8.3": {
+    "listen": "Pick one chord in the verse and decide: major 7th, minor 7th, or dominant 7th?",
+    "guitar": "Play C major's sevenths: Cmaj7 (x32000), Dm7 (xx0211), Em7 (022030), Fmaj7 (xx3210), G7 (320001), Am7 (x02010).",
+    "songs": [
+      {
+        "title": "Basics",
+        "artist": "TWICE"
+      },
+      {
+        "title": "Chemistry",
+        "artist": "KISS OF LIFE"
+      },
+      {
+        "title": "Starlight",
+        "artist": "JENNIE"
+      }
+    ]
+  },
+  "9.1": {
+    "listen": "Follow the bass in the chorus. Does it keep falling by fifths (or rising by fourths) toward home?",
+    "guitar": "Play Am, Dm, G, C. Each root falls a fifth on the way home.",
+    "songs": [
+      {
+        "title": "Ready For Love",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Kitsch",
+        "artist": "IVE"
+      },
+      {
+        "title": "expectations",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "9.2": {
+    "listen": "Tap each time the chord changes. Is it every bar, or every two beats? Compare the verse with the chorus.",
+    "guitar": "Strum C for 4 beats then G for 4. Then switch every 2 beats and feel the energy rise.",
+    "songs": [
+      {
+        "title": "Super Lady",
+        "artist": "i-dle"
+      },
+      {
+        "title": "Touch",
+        "artist": "KATSEYE"
+      },
+      {
+        "title": "freak",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "9.3": {
+    "listen": "Listen for a short trip home: a chord that leads to the dominant, then the dominant, then home.",
+    "guitar": "Play ii–V–I in C: Dm, G, C. Then try it in G: Am, D, G.",
+    "songs": [
+      {
+        "title": "OMG",
+        "artist": "NewJeans"
+      },
+      {
+        "title": "Sweetest Obsession",
+        "artist": "TWICE"
+      },
+      {
+        "title": "Vicio",
+        "artist": "Selena Gomez"
+      }
+    ]
+  },
+  "9.4": {
+    "listen": "Sort the chorus chords into home (tonic), going away (pre-dominant) and pulling back (dominant).",
+    "guitar": "Play C (home), F (away), G (pull), C (home), and name each job as you go.",
+    "songs": [
+      {
+        "title": "HOT",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "Baddie",
+        "artist": "IVE"
+      },
+      {
+        "title": "never get over me",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "9.5": {
+    "listen": "Listen for a short idea that repeats a step lower or higher each time. That's a sequence.",
+    "guitar": "Play Am, Dm, G, C, F, Bdim (x2343x), E, Am: the same pattern stepping down.",
+    "songs": [
+      {
+        "title": "Crazier",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "Igloo",
+        "artist": "KISS OF LIFE"
+      },
+      {
+        "title": "cigarette smoke",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "9.6": {
+    "listen": "Listen for a big major chord a whole step below home. That's the ♭VII rock sound.",
+    "guitar": "In G major, play G, F, C, G. The F is ♭VII.",
+    "songs": [
+      {
+        "title": "ROCK & ROLL",
+        "artist": "ITZY"
+      },
+      {
+        "title": "scared of my guitar",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Mean Girls",
+        "artist": "KATSEYE"
+      }
+    ]
+  },
+  "9.7": {
+    "listen": "Try singing the chorus over I–V–vi–IV. Does it fit, or does the song change the order?",
+    "guitar": "Play C, G, Am, F on loop. Then try it in G: G, D, Em, C.",
+    "songs": [
+      {
+        "title": "I GOT YOU",
+        "artist": "TWICE"
+      },
+      {
+        "title": "less",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "earthquake",
+        "artist": "JISOO"
+      }
+    ]
+  },
+  "9.8": {
+    "listen": "Listen for a minor home chord that steps down and back up: i, VII, VI, VII.",
+    "guitar": "Play Am, G, F, G on loop. Then try Em, D, C, D.",
+    "songs": [
+      {
+        "title": "Pierrot",
+        "artist": "LE SSERAFIM"
+      },
+      {
+        "title": "THE GIRLS (BLACKPINK THE GAME OST)",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "De Una Vez",
+        "artist": "Selena Gomez"
+      }
+    ]
   }
 }

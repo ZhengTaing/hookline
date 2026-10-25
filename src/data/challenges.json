@@ -641,6 +641,309 @@
           ]
         }
       ]
+    },
+    "7": {
+      "rounds": [
+        {
+          "title": "Round 1: Roman numeral detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Chord number spotter",
+          "about": "Find chords by number in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. Its V chord is…",
+              "options": [
+                "F",
+                "E♭",
+                "Gm",
+                "C"
+              ],
+              "answer": "F",
+              "miss": "Count up 5 from B♭: B♭ C D E♭ F. V is F major."
+            },
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. Its IV chord is…",
+              "options": [
+                "B♭",
+                "C",
+                "Dm",
+                "B♭m"
+              ],
+              "answer": "B♭",
+              "miss": "Count up 4 from F: F G A B♭. IV is B♭ major."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. Its iv chord is…",
+              "options": [
+                "Bm",
+                "B",
+                "C♯m",
+                "D"
+              ],
+              "answer": "Bm",
+              "miss": "In F♯ minor, iv is built on B: B D F♯, a minor chord."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. Its vi chord is…",
+              "options": [
+                "B♭m",
+                "B♭",
+                "Fm",
+                "G♭"
+              ],
+              "answer": "B♭m",
+              "miss": "Count up 6 from D♭: D♭ E♭ F G♭ A♭ B♭. vi is B♭ minor."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Shut Down",
+              "BLACKPINK"
+            ],
+            [
+              "Hype Boy",
+              "NewJeans"
+            ],
+            [
+              "obsessed",
+              "Olivia Rodrigo"
+            ],
+            [
+              "HOT",
+              "LE SSERAFIM"
+            ],
+            [
+              "Holy Moly",
+              "IVE"
+            ]
+          ]
+        }
+      ]
+    },
+    "8": {
+      "rounds": [
+        {
+          "title": "Round 1: Seventh chord detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: V7 spotter",
+          "about": "Name the dominant seventh in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. Its V7 chord is…",
+              "options": [
+                "F7",
+                "Fmaj7",
+                "B♭7",
+                "E♭7"
+              ],
+              "answer": "F7",
+              "miss": "V7 in B♭ is F A C E♭: F7."
+            },
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. Its V7 chord is…",
+              "options": [
+                "C7",
+                "Cmaj7",
+                "F7",
+                "G7"
+              ],
+              "answer": "C7",
+              "miss": "V7 in F is C E G B♭: C7."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. With the raised 7th, its V7 chord is…",
+              "options": [
+                "C♯7",
+                "C♯m7",
+                "E7",
+                "F♯7"
+              ],
+              "answer": "C♯7",
+              "miss": "Minor keys raise the 7th (E♯) for V7: C♯ E♯ G♯ B."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. Its V7 chord is…",
+              "options": [
+                "A♭7",
+                "A♭maj7",
+                "D♭7",
+                "E♭7"
+              ],
+              "answer": "A♭7",
+              "miss": "V7 in D♭ is A♭ C E♭ G♭: A♭7."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Off The Record",
+              "IVE"
+            ],
+            [
+              "Cool With You",
+              "NewJeans"
+            ],
+            [
+              "Feel My Rhythm",
+              "Red Velvet"
+            ],
+            [
+              "Basics",
+              "TWICE"
+            ],
+            [
+              "Starlight",
+              "JENNIE"
+            ]
+          ]
+        }
+      ]
+    },
+    "9": {
+      "rounds": [
+        {
+          "title": "Round 1: Function detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Progression spotter",
+          "about": "Build famous progressions in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. Which chord has the dominant job, pulling back home?",
+              "options": [
+                "C",
+                "B♭",
+                "Dm",
+                "F"
+              ],
+              "answer": "C",
+              "miss": "The dominant is V. In F major that's C."
+            },
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. The best-seller I–V–vi–IV there is…",
+              "options": [
+                "B♭ F Gm E♭",
+                "B♭ E♭ F B♭",
+                "Gm E♭ B♭ F",
+                "B♭ Gm E♭ F"
+              ],
+              "answer": "B♭ F Gm E♭",
+              "miss": "I=B♭, V=F, vi=Gm, IV=E♭."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. The i–VII–VI–VII loop there is…",
+              "options": [
+                "F♯m E D E",
+                "F♯m D E F♯m",
+                "F♯m Bm C♯ F♯m",
+                "A E F♯m D"
+              ],
+              "answer": "F♯m E D E",
+              "miss": "i=F♯m, VII=E, VI=D."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. Its ii–V–I is…",
+              "options": [
+                "E♭m A♭ D♭",
+                "A♭ G♭ D♭",
+                "E♭ A♭ D♭",
+                "B♭m E♭m D♭"
+              ],
+              "answer": "E♭m A♭ D♭",
+              "miss": "ii=E♭m, V=A♭, I=D♭."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Ready For Love",
+              "BLACKPINK"
+            ],
+            [
+              "OMG",
+              "NewJeans"
+            ],
+            [
+              "Pierrot",
+              "LE SSERAFIM"
+            ],
+            [
+              "ROCK & ROLL",
+              "ITZY"
+            ],
+            [
+              "I GOT YOU",
+              "TWICE"
+            ]
+          ]
+        }
+      ]
     }
   }
 }
