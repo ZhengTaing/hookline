@@ -5,6 +5,8 @@ import { COURSE, chapterPractice } from "./content";
 type SongRef = [string, string];
 interface Round {
   title: string;
+  /** One line for the challenge's intro screen. */
+  about: string;
   /** Questions taken from the chapter's own practice set. */
   drill?: number;
   questions?: { song: SongRef; prompt: string; options: string[]; answer: string; miss: string }[];
@@ -16,6 +18,12 @@ const DATA = challenges as unknown as { artists: string[]; chapters: Record<stri
 
 /** Artists in the order chapter challenges unlock them. */
 export const UNLOCK_ORDER = DATA.artists;
+
+/** XP for each right answer in a challenge (see the lesson player). */
+export const XP_PER_ANSWER = 10;
+
+/** Bonus XP for finishing a challenge on a streak of two days or more. */
+export const STREAK_BONUS = 10;
 
 /** Score needed to pass a challenge and unlock an artist. */
 export const PASS = 0.7;
@@ -62,8 +70,13 @@ export function chapterChallenge(n: number): Lesson | undefined {
   };
 }
 
-export function challengeRounds(n: number): string[] {
-  return DATA.chapters[String(n)]?.rounds.map((r) => r.title) ?? [];
+/** Each round's name, its one-line description and the most XP it can give. */
+export function challengeRounds(n: number): { name: string; about: string; maxXp: number }[] {
+  const lesson = chapterChallenge(n);
+  return (DATA.chapters[String(n)]?.rounds ?? []).map((r, i) => {
+    const step = lesson?.steps[i];
+    return { name: r.title.replace(/^Round \d+: /, ""), about: r.about, maxXp: step?.type === "practice" ? step.questions.length * XP_PER_ANSWER : 0 };
+  });
 }
 
 /** The next artist a passed challenge unlocks, if any are left. */

@@ -32,14 +32,14 @@ export function renderSectionSongs(sectionId: string): string {
   if (!found) return "";
   const { pick, songs } = found;
   return `
-    <article class="song-card">
-      <p class="song-eyebrow">Hear it in your playlist</p>
-      <p class="song-text">${esc(pick.listen)}</p>
+    <section class="song-list">
+      <h2>Hear it in your playlist</h2>
+      <p class="muted">${esc(pick.listen)} ${songs.length} songs, ${new Set(songs.map((s) => s.artist)).size} artists. Tap ▶ to hear 30 seconds.</p>
       ${songs
         .map(
           (s, i) => `
         <div class="song-row" data-song="${esc(songKey(s.title, s.artist))}" style="--i:${i}">
-          <div class="song-art"></div>
+          <div class="song-art"><span>Album art</span></div>
           <div class="song-head">
             <a href="${searchUrl(s)}" target="_blank" rel="noopener"><b>${esc(s.title)}</b></a>
             <span>${esc(shortArtist(s.artist))}${s.year ? ` · ${s.year}` : ""}${s.seconds ? ` · ${time(s.seconds)}` : ""}</span>
@@ -50,7 +50,7 @@ export function renderSectionSongs(sectionId: string): string {
         )
         .join("")}
       <div class="song-guitar"><b>Build it on guitar</b><p>${esc(pick.guitar)}</p></div>
-    </article>`;
+    </section>`;
 }
 
 /** The album art's average color, darkened so white text stays readable on it. */
@@ -77,8 +77,7 @@ export async function hydrateSongs(root: ParentNode): Promise<void> {
   const rows = [...root.querySelectorAll<HTMLElement>(".song-row")];
   if (!rows.length) return;
   const meta = await loadSongMeta();
-  const card = root.querySelector<HTMLElement>(".song-card");
-  rows.forEach((row, i) => {
+  rows.forEach((row) => {
     const m = meta[row.dataset.song ?? ""];
     if (!m || !row.isConnected) return;
     if (m.url) row.querySelector("a")!.href = m.url;
@@ -88,9 +87,9 @@ export async function hydrateSongs(root: ParentNode): Promise<void> {
       img.alt = "";
       img.onload = () => {
         row.querySelector(".song-art")!.replaceChildren(img);
-        // The first song's art colors the whole card.
-        const tint = i === 0 ? tintFrom(img) : null;
-        if (tint && card) card.style.setProperty("--song-tint", tint);
+        // Each song's card takes its color from its own album art.
+        const tint = tintFrom(img);
+        if (tint) row.style.setProperty("--song-tint", tint);
       };
       img.src = m.artwork.replace("600x600", "200x200");
     }
@@ -111,4 +110,41 @@ export async function hydrateSongs(root: ParentNode): Promise<void> {
   });
   // Stop any preview when leaving the page.
   window.addEventListener("hashchange", stopSong, { once: true });
+}
+
+/** Album art for one of an artist's songs, for the artist unlock card. */
+export async function artFor(artist: string): Promise<string | undefined> {
+  const meta = await loadSongMeta();
+  const key = Object.keys(meta).find((k) => k.split("|")[1] === artist && meta[k].artwork);
+  return key ? meta[key].artwork : undefined;
+}
+
+/** A song card for a challenge question. A "name that intro" card hides the title. */
+export function renderQuestionSong(title: string, artist: string, mystery: boolean): string {
+  return `
+    <div class="song-row q-song" data-song="${esc(songKey(title, artist))}">
+      <div class="song-art${mystery ? " mystery" : ""}"><span>${mystery ? "?" : "Album art"}</span></div>
+      <div class="song-head">
+        <b>${mystery ? "Mystery song" : esc(title)}</b>
+        <span>${mystery ? "Listen to the intro" : esc(shortArtist(artist))}</span>
+      </div>
+      <button class="song-preview" type="button" data-sound aria-label="Play the song"></button>
+    </div>`;
+}
+
+/** Colors a challenge question's song card from its album art (the art stays hidden for mystery songs). */
+export async function tintQuestionSong(root: ParentNode, showArt: boolean): Promise<void> {
+  const row = root.querySelector<HTMLElement>(".q-song");
+  const m = (await loadSongMeta())[row?.dataset.song ?? ""];
+  if (!row || !m?.artwork) return;
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.alt = "";
+  img.onload = () => {
+    if (!row.isConnected) return;
+    if (showArt) row.querySelector(".song-art")!.replaceChildren(img);
+    const tint = tintFrom(img);
+    if (tint) row.style.setProperty("--song-tint", tint);
+  };
+  img.src = m.artwork.replace("600x600", "200x200");
 }

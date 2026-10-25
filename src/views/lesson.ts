@@ -3,6 +3,8 @@ import { INTERVAL_WORDS, NOTE_NAMES, displayName, fretMidi, intervalName, parseN
 import type { DuelRound, Lesson, RushQuestion, Sound, Step, Visual } from "../lessons/types";
 import { fretboardSvg, rhythmSvg, staffSvg } from "../ui/notation";
 import { playSong, stopSong } from "../songs";
+import { renderQuestionSong, tintQuestionSong } from "./song-card";
+import { XP_PER_ANSWER } from "../lessons/challenge";
 
 export interface LessonResult {
   lessonId: string;
@@ -88,6 +90,8 @@ export function runLesson(
 ): () => void {
   const result: LessonResult = { lessonId: lesson.id, xp: 0, correct: 0, total: 0, bestCombo: 0, missed: [], fact: lesson.fact };
   let stepIndex = 0;
+  // Chapter challenges get colored round bars, a running XP count and song cards.
+  const challenge = lesson.id.startsWith("challenge-");
   let cleanup: (() => void) | null = null;
 
   const score = (ok: boolean, xp: number, miss: string) => {
@@ -106,7 +110,7 @@ export function runLesson(
   function frame(inner: string): void {
     const bars = lesson.steps.map((_, i) => `<i class="${i <= stepIndex ? "on" : ""}"></i>`).join("");
     root.innerHTML = `
-      <div class="lesson">
+      <div class="lesson${challenge ? " challenge" : ""}">
         <div class="lesson-top">
           <button class="x" type="button" data-exit aria-label="Leave lesson">×</button>
           <div class="steps">${bars}</div>
@@ -267,7 +271,7 @@ export function runLesson(
         result.bestCombo = Math.max(result.bestCombo, combo);
         points += 10 * multiplier();
       } else combo = 0;
-      score(ok, ok ? (untimed ? 5 : 10 * multiplier()) : 0, miss);
+      score(ok, ok ? (challenge ? XP_PER_ANSWER : untimed ? 5 : 10 * multiplier()) : 0, miss);
       locked = true;
       if (untimed) {
         const btn = root.querySelector<HTMLButtonElement>("[data-next]")!;
@@ -292,6 +296,9 @@ export function runLesson(
     };
 
     const head = () => {
+      if (untimed && challenge) {
+        return `<div class="hud"><span>Round ${stepIndex + 1} of ${lesson.steps.length} · ${source.replace(/^Round \d+: /, "")}</span><b>+${result.xp} XP so far</b></div>`;
+      }
       if (untimed) return `<p class="eyebrow">${source} · ${q + 1} of ${order.length}</p>`;
       const left = Math.max(0, end - Date.now());
       return `
@@ -396,10 +403,17 @@ export function runLesson(
           ${untimed ? "" : `<p class="eyebrow">Book ${source}</p>`}
           <h2>${question.prompt}</h2>
           ${question.visual ? visualHtml(question.visual) : ""}
-          ${question.sound && !(untimed && question.visual) ? `<button class="${question.visual ? "btn ghost" : "play-big"}" type="button" data-sound>▶ Play</button>` : ""}
+          ${
+            question.sound?.kind === "song"
+              ? renderQuestionSong(question.sound.title, question.sound.artist, question.options.includes(question.sound.title))
+              : question.sound && !(untimed && question.visual)
+                ? `<button class="${question.visual ? "btn ghost" : "play-big"}" type="button" data-sound>▶ Play</button>`
+                : ""
+          }
           <div class="opts${options.some((o) => o.length > 14) ? " stack" : ""}">${options.map((o) => `<button class="opt" type="button" data-o="${o}">${o}</button>`).join("")}</div>
           <p class="fb" aria-live="polite"></p>${foot()}`);
         // In untimed sets a picture question plays its sound after the answer, like the mockup.
+        if (question.sound?.kind === "song") void tintQuestionSong(root, !question.options.includes(question.sound.title));
         if (question.sound && !(untimed && question.visual)) {
           const s = question.sound;
           root.querySelector("[data-sound]")!.addEventListener("click", () => play(s));

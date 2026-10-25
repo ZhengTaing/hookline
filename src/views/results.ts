@@ -28,18 +28,3 @@ export function renderResults(result: LessonResult, streak: number, title: strin
     </section>`;
 }
 
-/** A challenge's XP round by round, and the artist it unlocked (if it was passed). */
-export function renderChallengeExtras(result: LessonResult, rounds: string[], unlocked: string | undefined, owned: number, total: number, pass: number): string {
-  const passed = result.total > 0 && result.correct / result.total >= pass;
-  return `
-    <div class="round-xp">
-      ${rounds.map((r, i) => `<div><span>${r}</span><b>+${result.stepXp?.[i] ?? 0}</b></div>`).join("")}
-    </div>
-    ${
-      unlocked
-        ? `<div class="unlock"><p class="song-eyebrow">Artist unlocked</p><b>${unlocked}</b><span>${owned} of ${total} artists collected</span></div>`
-        : passed
-          ? `<p class="muted">Passed. You've collected all ${total} artists.</p>`
-          : `<p class="muted">Get ${Math.round(pass * 100)}% or more to unlock an artist. Play it again when you're ready.</p>`
-    }`;
-}
