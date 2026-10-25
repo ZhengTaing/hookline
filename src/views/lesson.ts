@@ -307,7 +307,8 @@ export function runLesson(
         <div class="combo">${combo >= 2 ? `Combo ×${multiplier()} · ${combo} in a row` : ""}</div>`;
     };
 
-    const foot = () => (untimed ? `<button class="btn push" type="button" data-next disabled>${q < order.length - 1 ? "Next" : "Continue"}</button>` : "");
+    const tip = () => (order[q].tip ? `<details class="tip"><summary>💡 Hint</summary><p>${order[q].tip}</p></details>` : "");
+    const foot = () => (untimed ? `${tip()}<button class="btn push" type="button" data-next disabled>${q < order.length - 1 ? "Next" : "Continue"}</button>` : "");
     const plus = () => (untimed ? "Yes!" : `+${10 * Math.min(1 + Math.floor((combo + 1) / 2), 4)}`);
 
     const draw = () => {

@@ -427,3 +427,8 @@ button, input { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+.tip { margin: 0 0 8px; font-size: 14px; }
+.tip summary { cursor: pointer; color: var(--dim); list-style: none; }
+.tip summary::-webkit-details-marker { display: none; }
+.tip p { margin: 6px 0 0; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--dim) 12%, transparent); }

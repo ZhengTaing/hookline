@@ -39,7 +39,8 @@ function roundSteps(n: number, round: Round): Step {
     questions = pool.filter((_, i) => i % gap === 0).slice(0, round.drill);
   }
   if (round.questions) {
-    questions = round.questions.map((q) => ({ kind: "choice", prompt: q.prompt, options: q.options, answer: q.answer, sound: song(q.song), miss: q.miss }));
+    const tip = "Write out the key's scale from its home note, then count up to the step you need. Majors go whole, whole, half, whole, whole, whole, half.";
+    questions = round.questions.map((q) => ({ kind: "choice", prompt: q.prompt, options: q.options, answer: q.answer, sound: song(q.song), miss: q.miss, tip }));
   }
   if (round.intro) {
     const titles = round.intro.map(([t]) => t);
