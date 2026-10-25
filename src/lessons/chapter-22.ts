@@ -65,6 +65,7 @@ export const CHAPTER_22: Record<string, Step[]> = {
     ),
     practice("Put it in order", {
       kind: "order",
+      layout: "list",
       prompt: "List C major's closely related keys, from the chords of the key.",
       given: ["D minor", null, null, null, "A minor"],
       answer: ["D minor", "E minor", "F major", "G major", "A minor"],
