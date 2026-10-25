@@ -574,3 +574,5 @@ button, input { font: inherit; color: inherit; }
 }
 .today-next .quest-tag { margin-top: 4px; }
 .unlock .reveal + .reveal { margin-top: 18px; }
+.quest-tag.locked { background: none; border: 1px dashed #bdbdbd; color: var(--dim); }
+.today-card .pink-btn { background: #c2255c; color: #fff; }
