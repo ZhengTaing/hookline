@@ -31,6 +31,8 @@ import { CHAPTER_30 } from "./chapter-30";
 import { CHAPTER_31 } from "./chapter-31";
 import { CHAPTER_32 } from "./chapter-32";
 import { CHAPTER_33 } from "./chapter-33";
+import { CHAPTER_34 } from "./chapter-34";
+import { CHAPTER_35 } from "./chapter-35";
 import { CHAPTERS_2_4 } from "./chapters-2-4";
 import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
@@ -225,9 +227,9 @@ const GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLesson));
  * Chapters moved to the new lesson layout so far. The rest keep the earlier layout until
  * each one is checked, one chapter at a time.
  */
-export const NEW_LAYOUT = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]);
+export const NEW_LAYOUT = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]);
 /** Hand-written steps for chapters in the new layout. */
-const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2, ...CHAPTER_3, ...CHAPTER_4, ...CHAPTER_5, ...CHAPTER_6, ...CHAPTER_7, ...CHAPTER_8, ...CHAPTER_9, ...CHAPTER_10, ...CHAPTER_11, ...CHAPTER_12, ...CHAPTER_13, ...CHAPTER_14, ...CHAPTER_15, ...CHAPTER_16, ...CHAPTER_17, ...CHAPTER_18, ...CHAPTER_19, ...CHAPTER_20, ...CHAPTER_21, ...CHAPTER_22, ...CHAPTER_23, ...CHAPTER_24, ...CHAPTER_25, ...CHAPTER_26, ...CHAPTER_27, ...CHAPTER_28, ...CHAPTER_29, ...CHAPTER_30, ...CHAPTER_31, ...CHAPTER_32, ...CHAPTER_33 };
+const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2, ...CHAPTER_3, ...CHAPTER_4, ...CHAPTER_5, ...CHAPTER_6, ...CHAPTER_7, ...CHAPTER_8, ...CHAPTER_9, ...CHAPTER_10, ...CHAPTER_11, ...CHAPTER_12, ...CHAPTER_13, ...CHAPTER_14, ...CHAPTER_15, ...CHAPTER_16, ...CHAPTER_17, ...CHAPTER_18, ...CHAPTER_19, ...CHAPTER_20, ...CHAPTER_21, ...CHAPTER_22, ...CHAPTER_23, ...CHAPTER_24, ...CHAPTER_25, ...CHAPTER_26, ...CHAPTER_27, ...CHAPTER_28, ...CHAPTER_29, ...CHAPTER_30, ...CHAPTER_31, ...CHAPTER_32, ...CHAPTER_33, ...CHAPTER_34, ...CHAPTER_35 };
 const OLD_GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLessonV2));
 const order = (id: string) => id.split(".").map(Number);
 const atOrBefore = (a: string, b: string) => order(a)[0] < order(b)[0] || (order(a)[0] === order(b)[0] && order(a)[1] <= order(b)[1]);
