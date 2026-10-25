@@ -28,6 +28,7 @@ export function renderToday(progress: Progress, today: string, _isNewToday: bool
   const days = recentDays(learned, today, 14);
   const t = todayStats(progress, today);
   const nextId = nextLessonId(progress);
+  const current = nextId ? chapterOf(nextId) : undefined;
   const next = nextId ? chapterOf(nextId)?.lessons.find((l) => l.id === nextId) : undefined;
   const due = dueCards(progress, today).length;
 
@@ -60,7 +61,7 @@ export function renderToday(progress: Progress, today: string, _isNewToday: bool
       <div class="dots" aria-label="Last 14 days">${dots}</div>
       ${
         next
-          ? `<div class="today-next"><small>Next section · ${chapterOf(next.id)?.chapter ?? ""}</small><b>${next.id} ${next.title}</b></div>
+          ? `<div class="today-next"><small>Next section · ${chapterOf(next.id)?.chapter ?? ""}</small><b>${next.id} ${next.title}</b>${questBadge(progress, next.id)}</div>
             <a class="btn" href="#lesson/${next.id}">Continue</a>`
           : `<p class="muted">You've finished the whole book.</p>`
       }
@@ -73,12 +74,47 @@ export function renderToday(progress: Progress, today: string, _isNewToday: bool
       </a>
       ${due ? `<a class="btn ghost" href="#practice">Review ${due} card${due === 1 ? "" : "s"}</a>` : ""}
     </section>
+    ${
+      current
+        ? `<section class="course chapter-now">
+            <h2>${current.chapter} · ${current.title}</h2>
+            <ol class="units">${sectionRows(progress, current, nextId)}</ol>
+            <p class="credit">Badges mark sections with songs by an artist you own. Finish 3 of them to level up that card.</p>
+          </section>`
+        : ""
+    }
     ${extra}
     <section class="course">
       <h2>The book, chapter by chapter</h2>
       <ol class="units">${chapters}</ol>
       ${CREDIT}
     </section>`;
+}
+
+/** The badge on a section that moves an artist quest forward: the first owned artist featured in its songs. */
+function questBadge(progress: Progress, lessonId: string): string {
+  if (progress.completedLessons.includes(lessonId)) return "";
+  const quest = (progress.artists ?? []).find((a) => questFor(progress, a) && featuredSections(a).includes(lessonId));
+  return quest ? `<span class="tag quest-tag">${["⚪", "🔷", "🟣", "🌟"][rarityOf(progress, quest)]} ${quest} quest</span>` : "";
+}
+
+/** A chapter's sections as course-path rows. */
+function sectionRows(progress: Progress, unit: Unit, nextId: string | null): string {
+  return unit.lessons
+    .map((l, li) => {
+      const done = progress.completedLessons.includes(l.id);
+      const open = isUnlocked(progress, l.id);
+      const state = done ? "done" : l.id === nextId ? "next" : open ? "open" : "locked";
+      const label = done ? "Done" : l.id === nextId ? "Now" : "";
+      const game = l.steps.some((s) => s.type === "rush") ? `<span class="tag">Game</span>` : "";
+      const inner = `<span class="unit-n">${l.id}</span>
+        <span class="unit-text"><strong>${l.title}</strong><small>${l.summary}</small>${game}${questBadge(progress, l.id)}</span>
+        <em>${label}</em>`;
+      return open
+        ? `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><a href="#lesson/${l.id}">${inner}</a></li>`
+        : `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><span class="row">${inner}</span></li>`;
+    })
+    .join("");
 }
 
 /** One chapter's course path: every section of the book, in order. */
@@ -89,24 +125,7 @@ export function renderChapter(progress: Progress, n: number): string {
   const mins = Math.round(unit.lessons.reduce((t, l) => t + minutes(l), 0) / unit.lessons.length);
   const firstOpen = unit.lessons.find((l) => !progress.completedLessons.includes(l.id) && isUnlocked(progress, l.id));
 
-  const rows = unit.lessons
-    .map((l, li) => {
-      const done = progress.completedLessons.includes(l.id);
-      const open = isUnlocked(progress, l.id);
-      const state = done ? "done" : l.id === nextId ? "next" : open ? "open" : "locked";
-      const label = done ? "Done" : l.id === nextId ? "Now" : "";
-      const game = l.steps.some((s) => s.type === "rush") ? `<span class="tag">Game</span>` : "";
-      // Sections that move an artist quest forward wear that artist's badge.
-      const quest = done ? undefined : (progress.artists ?? []).find((a) => questFor(progress, a) && featuredSections(a).includes(l.id));
-      const badge = quest ? `<span class="tag quest-tag">${["⚪", "🔷", "🟣", "🌟"][rarityOf(progress, quest)]} ${quest} quest</span>` : "";
-      const inner = `<span class="unit-n">${l.id}</span>
-        <span class="unit-text"><strong>${l.title}</strong><small>${l.summary}</small>${game}${badge}</span>
-        <em>${label}</em>`;
-      return open
-        ? `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><a href="#lesson/${l.id}">${inner}</a></li>`
-        : `<li class="unit ${state}" style="--i:${Math.min(li, 12)}"><span class="row">${inner}</span></li>`;
-    })
-    .join("");
+  const rows = sectionRows(progress, unit, nextId);
 
   return `
     <section class="course chapter">
