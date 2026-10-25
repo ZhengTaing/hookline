@@ -566,3 +566,9 @@ button, input { font: inherit; color: inherit; }
 .review .quest { margin-bottom: 4px; }
 .review .quest-reward { text-decoration: none; }
 .no-hint { margin: -4px 0 0; font-size: 13px; font-weight: 800; }
+.tip summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tip-bonus { padding: 3px 8px; border-radius: 999px; background: #fff7e0; color: #8a6100; font-size: 11px; font-weight: 800; }
+.tip[open] .tip-bonus { display: none; }
+@media (prefers-color-scheme: dark) {
+  .today-card, .next-unlock, .artist-teaser { border: 1px solid #2f2f2f; }
+}

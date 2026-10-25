@@ -4,7 +4,8 @@ export function renderResults(result: LessonResult, streak: number, title: strin
   const accuracy = result.total ? Math.round((result.correct / result.total) * 100) : 0;
   const missed = [...new Set(result.missed)];
   const drill = /^(practice|challenge)-/.test(result.lessonId);
-  const again = result.lessonId.startsWith("challenge-") ? `#challenge/${chapter}` : drill ? `#drill/${chapter}` : `#lesson/${result.lessonId}`;
+  const weak = result.lessonId === "practice-weak";
+  const again = weak ? "#drill/weak" : result.lessonId.startsWith("challenge-") ? `#challenge/${chapter}` : drill ? `#drill/${chapter}` : `#lesson/${result.lessonId}`;
   return `
     <section class="results">
       <p class="eyebrow">${drill ? `${title} complete` : `Section ${result.lessonId} complete · ${title}`}</p>
@@ -23,7 +24,7 @@ export function renderResults(result: LessonResult, streak: number, title: strin
       ${result.fact ? `<p class="muted small">Added to your review deck: “${result.fact.front}”</p>` : ""}
       ${extra}
       ${nextId && !drill ? `<a class="btn" href="#lesson/${nextId}">Next: section ${nextId}</a>` : ""}
-      <a class="btn ghost" href="#chapter/${chapter}">Back to the chapter</a>
+      <a class="btn ghost" href="${weak ? "#practice" : `#chapter/${chapter}`}">${weak ? "Back to review" : "Back to the chapter"}</a>
       <a class="btn ghost" href="${again}">Play it again</a>
     </section>`;
 }
