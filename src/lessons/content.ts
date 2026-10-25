@@ -13,6 +13,9 @@ import { CHAPTER_12 } from "./chapter-12";
 import { CHAPTER_13 } from "./chapter-13";
 import { CHAPTER_14 } from "./chapter-14";
 import { CHAPTER_15 } from "./chapter-15";
+import { CHAPTER_16 } from "./chapter-16";
+import { CHAPTER_17 } from "./chapter-17";
+import { CHAPTER_18 } from "./chapter-18";
 import { CHAPTERS_2_4 } from "./chapters-2-4";
 import { CHAPTERS_10_12 } from "./chapters-10-12";
 import { CHAPTERS_13_22 } from "./chapters-13-22";
@@ -207,9 +210,9 @@ const GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLesson));
  * Chapters moved to the new lesson layout so far. The rest keep the earlier layout until
  * each one is checked, one chapter at a time.
  */
-export const NEW_LAYOUT = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+export const NEW_LAYOUT = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
 /** Hand-written steps for chapters in the new layout. */
-const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2, ...CHAPTER_3, ...CHAPTER_4, ...CHAPTER_5, ...CHAPTER_6, ...CHAPTER_7, ...CHAPTER_8, ...CHAPTER_9, ...CHAPTER_10, ...CHAPTER_11, ...CHAPTER_12, ...CHAPTER_13, ...CHAPTER_14, ...CHAPTER_15 };
+const WRITTEN: Record<string, Step[]> = { ...CHAPTER_1, ...CHAPTER_2, ...CHAPTER_3, ...CHAPTER_4, ...CHAPTER_5, ...CHAPTER_6, ...CHAPTER_7, ...CHAPTER_8, ...CHAPTER_9, ...CHAPTER_10, ...CHAPTER_11, ...CHAPTER_12, ...CHAPTER_13, ...CHAPTER_14, ...CHAPTER_15, ...CHAPTER_16, ...CHAPTER_17, ...CHAPTER_18 };
 const OLD_GAMES: Lesson[] = BOOK.flatMap((u) => u.lessons.map(mixLessonV2));
 const order = (id: string) => id.split(".").map(Number);
 const atOrBefore = (a: string, b: string) => order(a)[0] < order(b)[0] || (order(a)[0] === order(b)[0] && order(a)[1] <= order(b)[1]);
