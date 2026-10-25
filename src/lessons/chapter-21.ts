@@ -20,8 +20,8 @@ const GER = ["Ab2", "C4", "Eb4", "F#4"];
 const V = ["G2", "B3", "D4", "G4"];
 const TYPES = ["Italian", "French", "German"];
 const CHROMATIC = ["A2", "G#2", "G2", "F#2", "F2"];
-// A♭7 barre at fret 4 (sounds like the German sixth in C). Strings count from high e (0).
-const AB7 = { name: "A♭7 (barre at fret 4)", marks: [{ string: 5, fret: 4 }, { string: 4, fret: 6 }, { string: 3, fret: 4 }, { string: 2, fret: 5 }, { string: 1, fret: 4 }, { string: 0, fret: 4 }] };
+// A♭7 at fret 4, A string muted so it fits the five-fret picture (sounds like the German sixth in C). Strings count from high e (0).
+const AB7 = { name: "A♭7 (fret 4)", marks: [{ string: 5, fret: 4 }, { string: 3, fret: 4 }, { string: 2, fret: 5 }, { string: 1, fret: 4 }, { string: 0, fret: 4 }] };
 
 /** Name the augmented sixth type from its notes. */
 const whichType = (notes: string[], spelled: string, answer: string, why: string): RushQuestion => ({
@@ -74,7 +74,7 @@ export const CHAPTER_21: Record<string, Step[]> = {
       beatsPerBar: 4,
       bars: 2,
       title: "Strum the German sixth (as A♭7)",
-      hint: "Hold an E-shape barre at fret 4 with the 7th on the D string: 4 6 4 5 4 4. Strum on every click. Hands busy? Tap the button instead and it plays the guitar for you.",
+      hint: "Hold 4 x 4 5 4 4: low E fret 4, mute the A string, then D fret 4, G fret 5, B and high e fret 4. Strum on every click. Hands busy? Tap the button instead and it plays the guitar for you.",
       guitar: AB7,
     },
     practice(
