@@ -320,8 +320,8 @@ export const COURSE: Unit[] = BOOK_CHAPTERS.map((ch) => ({
   lessons: ch.sections.map((sec, i): Lesson => {
     const read: Step = { type: "read", section: sec.id, title: sec.title, headline: sec.headline, text: sec.text, chips: (sec.ex ?? []).map(parseExample) };
     const rawRest = !NEW_LAYOUT.has(ch.n) ? oldSteps(sec.id, i) : (WRITTEN[sec.id] ?? gameFor(sec.id)?.steps ?? sectionCheck(ch, i));
-    // Every question gets a Hint: the section's key idea (unless that idea is the answer).
-    const tip = `${sec.title}: ${sec.headline}`;
+    // Every question gets a Hint: what the section's card said (skipped when its headline is the answer).
+    const tip = `${sec.title}: ${sec.text}`;
     const withTip = (qs: RushQuestion[]) => qs.map((q) => ("answer" in q && q.answer === sec.headline ? q : { ...q, tip: q.tip ?? tip }));
     const rest = rawRest.map((s): Step => (s.type === "practice" || s.type === "rush" ? { ...s, questions: withTip(s.questions) } : s));
     return {
