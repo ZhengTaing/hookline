@@ -11,7 +11,8 @@ import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
 import { renderResults } from "./views/results";
 import { renderChallengeIntro, renderChallengeResults } from "./views/challenge";
-import { artistPhoto, hydrateArtists, renderArtistTeaser, renderCollection } from "./views/artists";
+import { hydrateArtists, renderArtistTeaser, renderCollection, showReveal, wireCollection } from "./views/artists";
+import { RARITIES, addCards, claimDaily, countToday, levelCards, openPack, unlockRarity } from "./cards";
 import { hydrateSongs, renderSectionSongs } from "./views/song-card";
 import { PASS, STREAK_BONUS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
 import { mountReview } from "./views/review";
@@ -135,8 +136,11 @@ function shell(tab: Tab, body: string): void {
 
 async function finishLesson(result: LessonResult, title: string): Promise<void> {
   stopLesson = null;
-  progress = applyResult(progress, result, tomorrow());
   const run = /^(practice|challenge)-(\d+)$/.exec(result.lessonId);
+  // Quests: today's counts, then any artist cards whose quest this section finished.
+  progress = countToday(applyResult(progress, result, tomorrow()), dayKey(new Date()), result.xp, !run);
+  const leveled = levelCards(progress);
+  progress = leveled.progress;
   const chapter = run ? Number(run[2]) : COURSE.findIndex((u) => u.lessons.some((l) => l.id === result.lessonId)) + 1;
   const streak = currentStreak(progress.visits, dayKey(new Date()));
   let extra = "";
@@ -148,17 +152,13 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
     const unlocked = score >= PASS ? nextArtist(owned) : undefined;
     const extraArtist = unlocked && score === 1 ? nextArtist([...owned, unlocked]) : undefined;
     const bonus = streak >= 2 ? STREAK_BONUS : 0;
-    progress = { ...progress, xp: progress.xp + bonus, artists: [...owned, ...[unlocked, extraArtist].filter((a): a is string => !!a)] };
+    const rarity = unlockRarity(score, streak);
+    progress = addCards({ ...progress, xp: progress.xp + bonus }, [unlocked, extraArtist].filter((a): a is string => !!a), rarity);
     shell(
       "learn",
-      renderChallengeResults(result, chapter, challengeRounds(chapter), { days: streak, bonus }, unlocked, progress.artists!.length, UNLOCK_ORDER.length, PASS, chapter < COURSE.length, extraArtist),
+      renderChallengeResults(result, chapter, challengeRounds(chapter), { days: streak, bonus }, unlocked, progress.artists!.length, UNLOCK_ORDER.length, PASS, chapter < COURSE.length, extraArtist, rarity),
     );
-    if (unlocked) {
-      void artistPhoto(unlocked).then((src) => {
-        const box = app.querySelector(".unlock-art");
-        if (src && box) box.innerHTML = `<img src="${src}" alt="">`;
-      });
-    }
+    void hydrateArtists(app);
     lastHash = `challenge/${chapter}/play`;
     window.scrollTo(0, 0);
     countUp(app.querySelector<HTMLElement>(".big-n"), result.xp + bonus, "+");
@@ -180,6 +180,8 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
   }
   shell("learn", renderResults(result, streak, title, chapter, nextLessonId(progress), extra));
   void hydrateSongs(app);
+  const up = leveled.upgraded[0];
+  if (up) showReveal(up, progress.cards![up].r, `Artist quest done! ${up} leveled up to ${RARITIES[progress.cards![up].r]}.`);
   lastHash = `lesson/${result.lessonId}`;
   app.querySelector(".content")?.classList.add("nav-tab");
   window.scrollTo(0, 0);
@@ -271,10 +273,28 @@ function route(): void {
     tab === "learn"
       ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated, renderArtistTeaser(progress))
       : tab === "artists"
-        ? renderCollection(progress)
+        ? renderCollection(progress, dayKey(new Date()))
         : renderPlaceholder(tab),
   );
   if (tab === "learn" || tab === "artists") void hydrateArtists(app);
+  if (tab === "artists") {
+    const save = () => {
+      route();
+      saveProgress(userId, progress).catch(() => undefined);
+    };
+    wireCollection(app.querySelector<HTMLElement>(".collection")!, progress, {
+      claim: (i) => {
+        progress = claimDaily(progress, dayKey(new Date()), i);
+        save();
+      },
+      openPack: () => {
+        const opened = openPack(progress, dayKey(new Date()));
+        progress = opened.progress;
+        save();
+        if (opened.artist) showReveal(opened.artist, 1, "Your weekly streak pack. Every pack card is Rare.");
+      },
+    });
+  }
   if (tab === "learn") celebrated = true;
   enterPage(tab);
 }
