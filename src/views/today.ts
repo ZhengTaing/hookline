@@ -18,7 +18,7 @@ const CREDIT = `<p class="credit">Lessons adapted from Robert Hutchinson, <em>Mu
 
 /** The Learn tab: streak, what's next, and every chapter of the book. */
 /** `celebrate` animates today's streak (only the first time the page shows on a new day). */
-export function renderToday(progress: Progress, today: string, isNewToday: boolean, celebrate = false): string {
+export function renderToday(progress: Progress, today: string, isNewToday: boolean, celebrate = false, extra = ""): string {
   const streak = currentStreak(progress.visits, today);
   const best = bestStreak(progress.visits);
   const days = recentDays(progress.visits, today, 14);
@@ -60,7 +60,7 @@ export function renderToday(progress: Progress, today: string, isNewToday: boole
       }
       ${due ? `<a class="btn ghost" href="#practice">Review ${due} card${due === 1 ? "" : "s"}</a>` : ""}
     </section>
-
+    ${extra}
     <section class="course">
       <h2>The book, chapter by chapter</h2>
       <ol class="units">${chapters}</ol>

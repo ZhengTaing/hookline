@@ -11,6 +11,7 @@ import { renderLogin } from "./views/login";
 import { renderPlaceholder } from "./views/placeholder";
 import { renderResults } from "./views/results";
 import { renderChallengeIntro, renderChallengeResults } from "./views/challenge";
+import { hydrateArtists, renderArtistCards } from "./views/artists";
 import { artFor, hydrateSongs, renderSectionSongs } from "./views/song-card";
 import { PASS, STREAK_BONUS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
 import { mountReview } from "./views/review";
@@ -261,7 +262,8 @@ function route(): void {
   }
 
   const tab = (TABS.some((t) => t.id === hash) ? hash : "learn") as Tab;
-  shell(tab, tab === "learn" ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated) : renderPlaceholder(tab));
+  shell(tab, tab === "learn" ? renderToday(progress, dayKey(new Date()), isNewToday, isNewToday && !celebrated, renderArtistCards(progress)) : renderPlaceholder(tab));
+  if (tab === "learn") hydrateArtists(app);
   if (tab === "learn") celebrated = true;
   enterPage(tab);
 }
