@@ -29,7 +29,7 @@ export const CHAPTER_25: Record<string, Step[]> = {
       given: ["Theme 1 (I)", null, null, null, null, null],
       answer: ["Theme 1 (I)", "Transition", "Theme 2 (V)", "Development", "Theme 1 (I)", "Theme 2 (I)"],
       tiles: ["Development", "Theme 2 (V)", "Theme 2 (I)", "Transition", "Theme 1 (I)", "Coda"],
-      labels: ["exposition", "exposition", "exposition", "development", "recap", "recap"],
+      labels: ["expo", "expo", "expo", "dev", "recap", "recap"],
       miss: "Theme 1, transition, Theme 2 in V; development; then both themes in the home key",
     }),
     practice(
