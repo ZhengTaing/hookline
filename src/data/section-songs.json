@@ -1106,5 +1106,329 @@
         "artist": "Selena Gomez"
       }
     ]
+  },
+  "13.1": {
+    "listen": "At the very end of the chorus, does the melody land on the home note over the home chord? That's the full stop, a PAC.",
+    "guitar": "Play G (320003), then C (x32010) with C on top (B string, fret 1). That's a perfect authentic cadence.",
+    "songs": [
+      {
+        "title": "I Am the Best",
+        "artist": "2NE1"
+      },
+      {
+        "title": "Spicy",
+        "artist": "aespa"
+      },
+      {
+        "title": "yes, and?",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "13.2": {
+    "listen": "Listen for a short idea, the same idea again a step higher, then a longer line that runs to the end. That's a sentence.",
+    "guitar": "Play C–E–G (A string fret 3, D string fret 2, open G), then D–F–A (open D, D string fret 3, G string fret 2), then run down G–F–E–D–C.",
+    "songs": [
+      {
+        "title": "Kill This Love",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Dumb Dumb",
+        "artist": "Red Velvet"
+      },
+      {
+        "title": "Can't Nobody",
+        "artist": "2NE1"
+      }
+    ]
+  },
+  "13.3": {
+    "listen": "Listen for a line that ends hanging like a question, then a similar line that ends at home like an answer. That's a period.",
+    "guitar": "Play C, F, G and stop on G (the question). Then play C, F, G, C (the answer).",
+    "songs": [
+      {
+        "title": "Gee",
+        "artist": "Girls' Generation"
+      },
+      {
+        "title": "Come Back Home",
+        "artist": "2NE1"
+      },
+      {
+        "title": "the boy is mine",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "13.4": {
+    "listen": "Count the phrases before the big ending. One question with two answers is an asymmetrical period.",
+    "guitar": "Play C, F, G (the question), then C, F, C twice (two answers).",
+    "songs": [
+      {
+        "title": "Dirty Work (feat. Flo Milli)",
+        "artist": "aespa"
+      },
+      {
+        "title": "Lion Heart",
+        "artist": "Girls' Generation"
+      },
+      {
+        "title": "Good for You (feat. A$AP Rocky)",
+        "artist": "Selena Gomez"
+      }
+    ]
+  },
+  "13.5": {
+    "listen": "Listen for four phrases: two that build the question, then two that answer it. That's a double period.",
+    "guitar": "Play C–G, Am–G (the question group), then C–G, F–C (the answer group).",
+    "songs": [
+      {
+        "title": "Baby I Miss You",
+        "artist": "2NE1"
+      },
+      {
+        "title": "DDU-DU DDU-DU",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "The Feels",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "13.6": {
+    "listen": "Does every phrase end hanging, never fully home? Then it's a phrase group or chain, not a period.",
+    "guitar": "Play C, F, G, then Am, F, G. Both end on G, so neither one answers.",
+    "songs": [
+      {
+        "title": "BORN TO BE",
+        "artist": "ITZY"
+      },
+      {
+        "title": "Red Flavor",
+        "artist": "Red Velvet"
+      },
+      {
+        "title": "SHEESH",
+        "artist": "BABYMONSTER"
+      }
+    ]
+  },
+  "13.7": {
+    "listen": "Listen for the last note of one line also starting the next, with no breath between. That's an elision.",
+    "guitar": "Play C, F, G, C, and start the next phrase on that same C: C, Am, F, G.",
+    "songs": [
+      {
+        "title": "Crush",
+        "artist": "2NE1"
+      },
+      {
+        "title": "Mantra",
+        "artist": "JENNIE"
+      },
+      {
+        "title": "Psycho",
+        "artist": "Red Velvet"
+      }
+    ]
+  },
+  "13.8": {
+    "listen": "Pick one chorus. Is it a sentence, a period, or a chain? Check how its last phrase ends.",
+    "guitar": "Play a full period: C, F, G (the question), then C, F, G, C (the answer).",
+    "songs": [
+      {
+        "title": "LALISA",
+        "artist": "LISA"
+      },
+      {
+        "title": "Clap Your Hands",
+        "artist": "2NE1"
+      },
+      {
+        "title": "supernatural",
+        "artist": "Ariana Grande"
+      }
+    ]
+  },
+  "14.1": {
+    "listen": "Count how many parts play at once in the intro, then in the chorus. More layers make a thicker texture.",
+    "guitar": "Play one note (open G), then a full G chord (320003). Same harmony, thicker texture.",
+    "songs": [
+      {
+        "title": "Hoot",
+        "artist": "Girls' Generation"
+      },
+      {
+        "title": "Gotta Be You",
+        "artist": "2NE1"
+      },
+      {
+        "title": "MONEY",
+        "artist": "LISA"
+      }
+    ]
+  },
+  "14.2": {
+    "listen": "Listen for a part where every sung note gets its own chord, like a hymn. That's chorale texture.",
+    "guitar": "Strum once per melody note: C, F, G, C, one strum each.",
+    "songs": [
+      {
+        "title": "Into the New World",
+        "artist": "Girls' Generation"
+      },
+      {
+        "title": "eternal sunshine",
+        "artist": "Ariana Grande"
+      },
+      {
+        "title": "If I Were You",
+        "artist": "2NE1"
+      }
+    ]
+  },
+  "14.3": {
+    "listen": "Listen for a guitar or piano playing the chord one note at a time. That's an arpeggiated accompaniment.",
+    "guitar": "Fingerpick C (x32010): A string, G string, B string, G string, and repeat.",
+    "songs": [
+      {
+        "title": "STAY",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "happier",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "It Hurts (Slow)",
+        "artist": "2NE1"
+      }
+    ]
+  },
+  "14.4": {
+    "listen": "Listen for whole chords hit together on a repeating rhythm. That's a block chord accompaniment.",
+    "guitar": "Strum C, F, G, C in steady quarter notes, four strums a bar.",
+    "songs": [
+      {
+        "title": "Ice Cream Cake",
+        "artist": "Red Velvet"
+      },
+      {
+        "title": "Kill Em With Kindness",
+        "artist": "Selena Gomez"
+      },
+      {
+        "title": "MORE & MORE",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "14.5": {
+    "listen": "Listen for chords landing just after the beat or between beats, the bouncy chop of reggae.",
+    "guitar": "Pick the low C (A string, fret 3), then strum the C chord on the 'and'. Repeat.",
+    "songs": [
+      {
+        "title": "I Don't Care (Reggae Mix)",
+        "artist": "2NE1"
+      },
+      {
+        "title": "Hands To Myself",
+        "artist": "Selena Gomez"
+      },
+      {
+        "title": "Alcohol-Free",
+        "artist": "TWICE"
+      }
+    ]
+  },
+  "14.6": {
+    "listen": "Clap along: three hits in one bar, two in the next. Does the beat fit the 3–2 clave?",
+    "guitar": "Mute the strings and tap the clave: 1, the 'and' of 2, 4 | 2, 3.",
+    "songs": [
+      {
+        "title": "Me & the Rhythm",
+        "artist": "Selena Gomez"
+      },
+      {
+        "title": "BOOMBAYAH",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Fire",
+        "artist": "2NE1"
+      }
+    ]
+  },
+  "14.7": {
+    "listen": "Hum the bass line from the intro. Could you name the song from it alone?",
+    "guitar": "On the low E string, play open E, G (fret 3), A (fret 5), then open E, G, A again: a riff.",
+    "songs": [
+      {
+        "title": "Bad Boy",
+        "artist": "Red Velvet"
+      },
+      {
+        "title": "Kick It",
+        "artist": "BLACKPINK"
+      },
+      {
+        "title": "Bite",
+        "artist": "aespa"
+      }
+    ]
+  },
+  "15.1": {
+    "listen": "Compare the verse and the chorus. What changed: register, texture, rhythm or loudness?",
+    "guitar": "Play C, Am, F, G softly with single notes, then again loud with full strums.",
+    "songs": [
+      {
+        "title": "Ah-Yah-Yah",
+        "artist": "2NE1"
+      },
+      {
+        "title": "Set The Tone",
+        "artist": "aespa"
+      },
+      {
+        "title": "jealousy, jealousy",
+        "artist": "Olivia Rodrigo"
+      }
+    ]
+  },
+  "15.2": {
+    "listen": "Listen for a main section that keeps coming back with new sections in between: A B A C A. That's a rondo.",
+    "guitar": "Play C, G (A), Am, E (B), C, G (A), F, C (C), then C, G (A) once more.",
+    "songs": [
+      {
+        "title": "Go Away",
+        "artist": "2NE1"
+      },
+      {
+        "title": "Holiday",
+        "artist": "Girls' Generation"
+      },
+      {
+        "title": "피카부 (Peek-A-Boo)",
+        "artist": "Red Velvet"
+      }
+    ]
+  },
+  "15.3": {
+    "listen": "Listen for the moment the drums and bass come in. How does the song lift?",
+    "guitar": "Play the verse as soft single notes, then strum full chords for the chorus.",
+    "songs": [
+      {
+        "title": "Happy",
+        "artist": "2NE1"
+      },
+      {
+        "title": "Revival",
+        "artist": "Selena Gomez"
+      },
+      {
+        "title": "Melody",
+        "artist": "aespa"
+      }
+    ]
   }
 }

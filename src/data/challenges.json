@@ -1281,6 +1281,309 @@
           ]
         }
       ]
+    },
+    "13": {
+      "rounds": [
+        {
+          "title": "Round 1: Phrase detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Cadence builder",
+          "about": "End phrases in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. A PAC there ends V–I, which is…",
+              "options": [
+                "C–F",
+                "F–C",
+                "B♭–F",
+                "Dm–F"
+              ],
+              "answer": "C–F",
+              "miss": "V in F major is C, so the PAC goes C to F."
+            },
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. An antecedent ending on a half cadence stops on…",
+              "options": [
+                "F",
+                "B♭",
+                "E♭",
+                "Cm"
+              ],
+              "answer": "F",
+              "miss": "A half cadence ends on V, which is F in B♭ major."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. For a PAC, the top note of the last chord must be…",
+              "options": [
+                "F♯",
+                "A",
+                "C♯",
+                "E"
+              ],
+              "answer": "F♯",
+              "miss": "A PAC puts the tonic on top: F♯."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. A consequent ending on a PAC goes…",
+              "options": [
+                "A♭–D♭",
+                "D♭–A♭",
+                "G♭–D♭",
+                "E♭m–A♭"
+              ],
+              "answer": "A♭–D♭",
+              "miss": "V–I in D♭ major is A♭ to D♭."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "I Am the Best",
+              "2NE1"
+            ],
+            [
+              "Kill This Love",
+              "BLACKPINK"
+            ],
+            [
+              "Gee",
+              "Girls' Generation"
+            ],
+            [
+              "Dirty Work (feat. Flo Milli)",
+              "aespa"
+            ],
+            [
+              "Crush",
+              "2NE1"
+            ]
+          ]
+        }
+      ]
+    },
+    "14": {
+      "rounds": [
+        {
+          "title": "Round 1: Texture detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Texture builder",
+          "about": "Build accompaniments in songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. An arpeggio of the I chord plays…",
+              "options": [
+                "F–A–C",
+                "F–G–A",
+                "F–B♭–D",
+                "C–E–G"
+              ],
+              "answer": "F–A–C",
+              "miss": "The I chord in F major is F–A–C, played one note at a time."
+            },
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. An afterbeat pattern on I plays the bass B♭, then which chord?",
+              "options": [
+                "B♭",
+                "F",
+                "E♭",
+                "Gm"
+              ],
+              "answer": "B♭",
+              "miss": "Afterbeats repeat the same chord after the bass: B♭ (B♭–D–F)."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. A block chord on i strikes…",
+              "options": [
+                "F♯–A–C♯",
+                "F♯–A♯–C♯",
+                "A–C♯–E",
+                "F♯–G♯–A"
+              ],
+              "answer": "F♯–A–C♯",
+              "miss": "Minor i: root F♯, minor 3rd A, 5th C♯, all at once."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. A bass riff on I, IV and V plays the roots…",
+              "options": [
+                "D♭, G♭, A♭",
+                "D♭, F, A♭",
+                "D♭, E♭, F",
+                "D♭, G, A"
+              ],
+              "answer": "D♭, G♭, A♭",
+              "miss": "I, IV and V in D♭ major are D♭, G♭ and A♭."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Hoot",
+              "Girls' Generation"
+            ],
+            [
+              "Into the New World",
+              "Girls' Generation"
+            ],
+            [
+              "STAY",
+              "BLACKPINK"
+            ],
+            [
+              "Ice Cream Cake",
+              "Red Velvet"
+            ],
+            [
+              "BOOMBAYAH",
+              "BLACKPINK"
+            ]
+          ]
+        }
+      ]
+    },
+    "15": {
+      "rounds": [
+        {
+          "title": "Round 1: Contrast detective",
+          "about": "Questions from this chapter's sections",
+          "drill": 4
+        },
+        {
+          "title": "Round 2: Contrast builder",
+          "about": "Pick contrasting keys for songs' real keys",
+          "questions": [
+            {
+              "song": [
+                "vampire",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "vampire is in F major. A contrasting section in the parallel minor is in…",
+              "options": [
+                "F minor",
+                "D minor",
+                "C major",
+                "B♭ major"
+              ],
+              "answer": "F minor",
+              "miss": "The parallel minor keeps the same home note: F minor."
+            },
+            {
+              "song": [
+                "drivers license",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "drivers license is in B♭ major. Its relative minor, for a contrasting section, is…",
+              "options": [
+                "G minor",
+                "B♭ minor",
+                "D minor",
+                "C minor"
+              ],
+              "answer": "G minor",
+              "miss": "The relative minor starts on the 6th note of B♭ major: G."
+            },
+            {
+              "song": [
+                "good 4 u",
+                "Olivia Rodrigo"
+              ],
+              "prompt": "good 4 u is in F♯ minor. Its relative major, for a contrasting chorus, is…",
+              "options": [
+                "A major",
+                "F♯ major",
+                "D major",
+                "E major"
+              ],
+              "answer": "A major",
+              "miss": "The relative major starts on the 3rd note of F♯ minor: A."
+            },
+            {
+              "song": [
+                "On The Ground",
+                "ROSÉ"
+              ],
+              "prompt": "On The Ground is in D♭ major. A B section in the key of V is in…",
+              "options": [
+                "A♭ major",
+                "G♭ major",
+                "E♭ major",
+                "B♭ minor"
+              ],
+              "answer": "A♭ major",
+              "miss": "V in D♭ major is A♭."
+            }
+          ]
+        },
+        {
+          "title": "Round 3: Name that intro",
+          "about": "Speed round on 30-second intros",
+          "intro": [
+            [
+              "Ah-Yah-Yah",
+              "2NE1"
+            ],
+            [
+              "Holiday",
+              "Girls' Generation"
+            ],
+            [
+              "Go Away",
+              "2NE1"
+            ],
+            [
+              "Set The Tone",
+              "aespa"
+            ],
+            [
+              "피카부 (Peek-A-Boo)",
+              "Red Velvet"
+            ]
+          ]
+        }
+      ]
     }
   }
 }
