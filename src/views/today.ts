@@ -107,9 +107,12 @@ function questBadge(progress: Progress, lessonId: string): string {
   if (progress.completedLessons.includes(lessonId)) return "";
   const quest = (progress.artists ?? []).find((a) => questFor(progress, a) && featuredSections(a).includes(lessonId));
   if (quest) return `<span class="tag quest-tag">${["⚪", "🔷", "🟣", "🌟"][rarityOf(progress, quest)]} ${quest} quest</span>`;
-  // Before you own them, the next artist's sections show a locked badge, so you can see what's coming.
-  const next = UNLOCK_ORDER.find((a) => !progress.artists?.includes(a));
-  return next && featuredSections(next).includes(lessonId) ? `<span class="tag quest-tag locked">🔒 ${next} quest</span>` : "";
+  // Artists you don't own yet show a locked badge as a tease. Pick the one featured in the fewest
+  // sections, so the badges vary instead of naming the same big artist everywhere.
+  const tease = UNLOCK_ORDER.filter((a) => !progress.artists?.includes(a) && featuredSections(a).includes(lessonId)).sort(
+    (a, b) => featuredSections(a).length - featuredSections(b).length,
+  )[0];
+  return tease ? `<span class="tag quest-tag locked">🔒 ${tease} quest</span>` : "";
 }
 
 /** Finished chapters whose challenge you haven't passed yet. */
