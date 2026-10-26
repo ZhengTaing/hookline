@@ -1,4 +1,4 @@
-import { DAILY, PACK_STREAK, goalOf, QUEST_GOAL, RARITIES, RARITY_HOW, SETS, activeQuest, packState, questFor, rarityOf, todayStats } from "../cards";
+import { DAILY, PACK_STREAK, featuredSections, goalOf, QUEST_GOAL, RARITIES, RARITY_HOW, SETS, activeQuest, packState, questFor, rarityOf, todayStats } from "../cards";
 import { dueCards } from "../progress";
 import { UNLOCK_ORDER } from "../lessons/challenge";
 import type { Progress } from "../store";
@@ -20,15 +20,20 @@ export async function artistPhoto(artist: string): Promise<string | undefined> {
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const GEMS = ["⚪", "🔷", "🟣", "🌟"];
 
-/** A collectible card. A null rarity is a card you don't own yet. */
+/** A collectible trading card: the whole square photo on top, details in a strip below. A null rarity is a card you don't own yet. */
 export function cardHtml(artist: string, rarity: number | null, extra = ""): string {
   const n = UNLOCK_ORDER.indexOf(artist) + 1;
   const cls = rarity === null ? "locked" : `r${rarity}`;
+  const lessons = featuredSections(artist).length;
+  const tag = rarity === null ? (extra.includes("next") ? "🔒 Next" : "🔒") : `${GEMS[rarity]} ${RARITIES[rarity]}`;
   return `
     <div class="acard ${cls} ${extra}" data-artist="${esc(artist)}" role="button" tabindex="0">
       <div class="artist-photo"><span>${esc(artist)}</span></div>
-      <div class="acard-top"><span>#${n}</span><span>${rarity === null ? "🔒" : GEMS[rarity]}</span></div>
-      <b>${esc(artist)}</b>
+      <div class="acard-info">
+        <div class="acard-top"><span>#${n}</span><span>${tag}</span></div>
+        <b>${esc(artist)}</b>
+        ${lessons ? `<small>In ${lessons} lesson${lessons === 1 ? "" : "s"}</small>` : ""}
+      </div>
     </div>`;
 }
 

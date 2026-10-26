@@ -14,7 +14,7 @@ import { hydrateArtists, renderArtistTeaser, renderCollection, showReveal, wireC
 import { RARITIES, claimDaily, countToday, levelCards, mixArtists, mixSong, openPack } from "./cards";
 import { challengeReward, isCleared, lessonStreak, replayCard, recordLearnDay, reviewReward, useFreeze } from "./rewards";
 import { hydrateSongs, renderSectionSongs } from "./views/song-card";
-import { PASS, UNLOCK_ORDER, challengeRounds, chapterChallenge } from "./lessons/challenge";
+import { PASS, UNLOCK_ORDER, challengeRounds, chapterChallenge, nextArtist } from "./lessons/challenge";
 import { mountReview } from "./views/review";
 import { renderChapter, renderToday } from "./views/today";
 
@@ -175,9 +175,13 @@ async function finishLesson(result: LessonResult, title: string): Promise<void> 
   } else if (section) {
     // Every section ends with songs from the playlist; a chapter's last section opens its challenge.
     const last = COURSE[chapter - 1]?.lessons.at(-1)?.id === result.lessonId;
-    extra =
-      renderSectionSongs(result.lessonId, mixSong(result.lessonId, mixArtists(progress))) +
-      (last && chapterChallenge(chapter) ? `<a class="btn challenge-btn" href="#challenge/${chapter}">Start the chapter ${chapter} challenge</a>` : "");
+    // Finishing a chapter doesn't give a card by itself: put its challenge first so it can't be missed.
+    const card = nextArtist(progress.artists ?? []);
+    const prompt =
+      last && chapterChallenge(chapter)
+        ? `<a class="chapter-done" href="#challenge/${chapter}"><small>Chapter ${chapter} done!</small><b>🎴 Play the challenge${card ? ` to unlock ${card}` : ""}</b><span>Your card comes from passing it. A perfect score unlocks two.</span></a>`
+        : "";
+    extra = prompt + renderSectionSongs(result.lessonId, mixSong(result.lessonId, mixArtists(progress)));
   }
   shell("learn", renderResults(result, streak, title, chapter, nextLessonId(progress), extra));
   void hydrateSongs(app);
