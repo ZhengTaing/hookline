@@ -162,9 +162,9 @@
         "note": "B♭ major, for comparison."
       },
       {
-        "title": "Lovesick Girls",
-        "artist": "BLACKPINK",
-        "note": "Chorus loops D♯m, C♯, F♯, B. Does it feel at home on D♯m or F♯?"
+        "title": "REBEL HEART",
+        "artist": "IVE",
+        "note": "Your ear test: does the chorus feel darker like good 4 u, or brighter like drivers license?"
       }
     ]
   },
@@ -173,19 +173,19 @@
     "guitar": "Put a capo on fret 4 and strum Bm, A, D, G. Those shapes sound as Lovesick Girls' D♯m, C♯, F♯, B.",
     "songs": [
       {
-        "title": "good 4 u",
-        "artist": "Olivia Rodrigo",
-        "note": "F♯ minor has 3 sharps, the same as its relative, A major."
-      },
-      {
-        "title": "drivers license",
-        "artist": "Olivia Rodrigo",
-        "note": "B♭ major, but it ends on G minor, its relative minor."
-      },
-      {
         "title": "Lovesick Girls",
         "artist": "BLACKPINK",
-        "note": "D♯ minor and F♯ major share 6 sharps."
+        "note": "D♯ minor and F♯ major share 6 sharps. The chorus pulls between the two."
+      },
+      {
+        "title": "Bad Liar",
+        "artist": "Selena Gomez",
+        "note": "Hum the note the song keeps coming home to. Then try the note 3 half steps above it: if that fits, you're hearing the relative major."
+      },
+      {
+        "title": "Yeah Yeah Yeah",
+        "artist": "BLACKPINK",
+        "note": "Listen for the home chord. Does it sound minor (dark) or major (bright)?"
       }
     ]
   },

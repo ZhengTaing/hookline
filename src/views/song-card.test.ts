@@ -29,3 +29,14 @@ describe("playlist songs", () => {
     }
   });
 });
+
+describe("section song variety", () => {
+  it("never gives two sections the same set of songs", () => {
+    const seen = new Map<string, string>();
+    for (const [id, pick] of Object.entries(sectionSongs as Record<string, { songs: { title: string }[] }>)) {
+      const key = pick.songs.map((s) => s.title).sort().join("|");
+      expect(seen.get(key), `${id} repeats ${seen.get(key)}`).toBeUndefined();
+      seen.set(key, id);
+    }
+  });
+});
